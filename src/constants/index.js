@@ -6,9 +6,6 @@ import {
   meta,
   starbucks,
   tesla,
-  carrent,
-  jobit,
-  tripguide,
 } from "../assets";
 
 import {
@@ -103,67 +100,40 @@ const experiences = [
 
 const projects = [
   {
-    name: "Car Rent",
+    name: "Compliance Dashboard",
     description:
-      "Web-based platform that allows users to search, book, and manage car rentals from various providers, providing a convenient and efficient solution for transportation needs.",
-    tags: [
-      {
-        name: "react",
-        color: "blue-text-gradient",
-      },
-      {
-        name: "mongodb",
-        color: "green-text-gradient",
-      },
-      {
-        name: "tailwind",
-        color: "pink-text-gradient",
-      },
-    ],
-    image: carrent,
-    source_code_link: "https://github.com/",
+      "Internal financial-services dashboard for change-management review. React + TypeScript on a backend team's data feed.",
+    techStack: ["React", "TypeScript", "Node", "PostgreSQL"],
+    coverImage: null,
+    liveUrl: null,
+    sourceUrl: null,
   },
   {
-    name: "Job IT",
+    name: "Portfolio v2",
     description:
-      "Web application that enables users to search for job openings, view estimated salary ranges for positions, and locate available jobs based on their current location.",
-    tags: [
-      {
-        name: "react",
-        color: "blue-text-gradient",
-      },
-      {
-        name: "restapi",
-        color: "green-text-gradient",
-      },
-      {
-        name: "scss",
-        color: "pink-text-gradient",
-      },
-    ],
-    image: jobit,
-    source_code_link: "https://github.com/",
+      "This site. Typographic redesign with GSAP pinned scroll, Lenis smooth-scroll, Framer Motion reveals, and a custom theme system.",
+    techStack: ["React", "Vite", "GSAP", "Lenis", "Tailwind"],
+    coverImage: null,
+    liveUrl: "https://github.com/adnaandasoo4/portfolio",
+    sourceUrl: "https://github.com/adnaandasoo4/portfolio",
   },
   {
-    name: "Trip Guide",
+    name: "Design System Explorer",
     description:
-      "A comprehensive travel booking platform that allows users to book flights, hotels, and rental cars, and offers curated recommendations for popular destinations.",
-    tags: [
-      {
-        name: "nextjs",
-        color: "blue-text-gradient",
-      },
-      {
-        name: "supabase",
-        color: "green-text-gradient",
-      },
-      {
-        name: "css",
-        color: "pink-text-gradient",
-      },
-    ],
-    image: tripguide,
-    source_code_link: "https://github.com/",
+      "Browser-based playground for a component library — live token previews, prop controls, and copyable usage snippets.",
+    techStack: ["React", "TypeScript", "Tailwind", "MDX"],
+    coverImage: null,
+    liveUrl: null,
+    sourceUrl: null,
+  },
+  {
+    name: "Motion Library",
+    description:
+      "Reusable React hooks + components for scroll-driven and gesture-driven UI. Designed for production performance at 60fps.",
+    techStack: ["React", "GSAP", "Motion", "TypeScript"],
+    coverImage: null,
+    liveUrl: null,
+    sourceUrl: null,
   },
 ];
 
@@ -238,4 +208,10 @@ export const tech = {
   // the spec — Hero (no label), Manifesto 01, Selected Work 02 (Phase 5),
   // Experience 03, Tech 04.
   label: "04 — Stack",
+};
+
+export const selectedWork = {
+  // Small uppercase mono label rendered above the slide track. Numbering follows
+  // the spec — Manifesto 01, Selected Work 02, Experience 03, Tech 04.
+  label: "02 — Selected Work",
 };
