@@ -36,7 +36,10 @@ export function setupGsap(lenis) {
 
   return () => {
     lenis.off("scroll", onScroll);
-    ScrollTrigger.killAll();
+    // Do not call ScrollTrigger.killAll() here — it would wipe triggers
+    // created by other components (e.g., SelectedWork in Phase 5).
+    // LenisProvider is mounted for the app's whole lifetime; the proxy
+    // and scroll listener registration stays.
   };
 }
 
