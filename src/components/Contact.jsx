@@ -1,128 +1,79 @@
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import emailjs from '@emailjs/browser';
-import { styles } from '../styles';
-import { EarthCanvas } from './canvas';
-import { SectionWrapper } from '../hoc';
-import { slideIn } from '../utils/motion';
+import { footer, personalityPills, socials } from "../constants";
 
-const Contact = () => {
-
-  const formRef = useRef();
-  const [form, setForm] = useState({name: '', email: '', message: ''});
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { target } = e;
-    const { name, value } = target;
-
-    setForm({
-      ...form,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    emailjs
-      .send(
-        'service_it6maig',
-        'template_yh1ga1g',
-        {
-          from_name: form.name,
-          to_name: "Adnaan",
-          from_email: form.email,
-          to_email: "adasoo747gmail.com",
-          message: form.message,
-        },
-        'tjx7Mnv8l9U0o-V9F'
-      )
-      .then(
-        () => {
-          setLoading(false);
-          alert("Thank you, I will get back to you as soon as possible!");
-
-          setForm({
-            name: "",
-            email: "",
-            message: "",
-          });
-        },
-        (error) => {
-          setLoading(false);
-          console.error(error);
-
-          alert("Ahh, something went wrong! Please try again.");
-        }
-      );
-  };
-
+/**
+ * Footer / contact section. dvdrod-style: a row of personality pills along the top,
+ * a giant typographic CTA wrapping a mailto link, email + location at bottom-left,
+ * inline social links at bottom-right, and a copyright line below a divider.
+ * No form, no Earth canvas, no SectionWrapper wrap (this is a <footer>, not a content section).
+ */
+export default function Contact() {
   return (
-    <div className='xl:mt-12 xl:flex-row flex-col-reverse flex gap-10 overflow-hidden'>
-      <motion.div
-        variants={slideIn("left", "tween", 0.2, 1)}
-        className='flex-[0.75] bg-black-100 p-8 rounded-2xl'
-      >
-        <p className={styles.sectionSubText}>Get In Touch</p>
-        <h3 className={styles.sectionHeadText}>Contact.</h3>
+    <footer
+      id="contact"
+      className="px-6 pb-10 pt-32 sm:px-16"
+    >
+      <div className="mx-auto max-w-7xl">
+        {/* Personality pills row, right-aligned */}
+        <div className="mb-24 flex flex-wrap justify-end gap-2">
+          {personalityPills.map((pill) => (
+            <span
+              key={pill}
+              className="rounded-full border border-edge px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted"
+            >
+              {pill}
+            </span>
+          ))}
+        </div>
 
-        <form 
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className='mt-12 flex flex-col gap-8'
+        {/* Massive CTA */}
+        <a
+          href={`mailto:${footer.email}`}
+          className="group block text-ink"
+          style={{
+            fontFamily:
+              "Geist, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(60px, 12vw, 180px)",
+            lineHeight: "0.92",
+            letterSpacing: "-0.02em",
+          }}
         >
-          <label className='flex flex-col'>
-            <span className='text-white font-medium mb-4'>Your Name</span>
-            <input 
-              type="text" 
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="what's your name?"
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outlined-none border-none font-medium'
-            />
-          </label>
-          <label className='flex flex-col'>
-            <span className='text-white font-medium mb-4'>Your Email</span>
-            <input 
-              type="email" 
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="what's your email?"
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outlined-none border-none font-medium'
-            />
-          </label>
-          <label className='flex flex-col'>
-            <span className='text-white font-medium mb-4'>Your Message</span>
-            <textarea 
-              rows="7" 
-              name="message"
-              value={form.message}
-              onChange={handleChange}
-              placeholder="what do you want to say?"
-              className='bg-tertiary py-4 px-6 placeholder:text-secondary text-white rounded-lg outlined-none border-none font-medium'
-            />
-          </label>
-          <button
-            type="submit"
-            className='bg-[#915EFF] py-3 px-8 outline-none w-full text-white font-bold shadow-md shadow-primary rounded-xl hover:bg-tertiary duration-300'
+          {footer.headline}{" "}
+          <span
+            aria-hidden="true"
+            className="inline-block transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
           >
-            {loading ? 'Sending...' : 'Send'}
-          </button>
-        </form>
-      </motion.div>
+            ↗
+          </span>
+        </a>
 
-      <motion.div
-        variants={slideIn("right", "tween", 0.2, 1)}
-        className='xl:flex-1 xl:h-auto md:h-[550px] h-[350px]'
-      >
-        <EarthCanvas />
-      </motion.div>
-    </div>
-  )
+        {/* Bottom row: email + location on left, socials on right */}
+        <div className="mt-24 flex flex-wrap items-end justify-between gap-6">
+          <div className="flex flex-col gap-1 font-mono text-[11px] tracking-wider text-muted">
+            <span>{footer.email}</span>
+            <span>{footer.location}</span>
+          </div>
+          <ul className="flex gap-6 font-mono text-[11px] uppercase tracking-widest">
+            {socials.map((social) => (
+              <li key={social.name}>
+                <a
+                  href={social.url}
+                  className="text-ink transition-opacity hover:opacity-60"
+                  target={social.url.startsWith("http") ? "_blank" : undefined}
+                  rel={social.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                >
+                  {social.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Divider + copyright */}
+        <div className="mt-10 border-t border-edge pt-6 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+          {footer.copyright}
+        </div>
+      </div>
+    </footer>
+  );
 }
-
-export default SectionWrapper(Contact, "");
