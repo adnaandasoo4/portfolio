@@ -256,3 +256,19 @@ export const now = {
   label: "Now",
   body: "Currently building portfolio.v2 — shipping motion-led case studies for selected work.",
 };
+
+export const hero = {
+  // Target string for HeroDecoder. \n is treated as a line break.
+  name: "ADNAAN\nDASOO",
+  subtitle: "Frontend · Creative Developer",
+  location: "Atlanta · GMT-5",
+  availability: "Available for work",
+};
+
+export const footer = {
+  // The arrow ↗ is appended by the JSX, don't include it in the string.
+  headline: "Say hi! Let's talk",
+  email: "adnaandasoo@gmail.com",
+  location: "Atlanta · GMT-5",
+  copyright: "© 2026 Adnaan Dasoo · Frontend Developer",
+};
