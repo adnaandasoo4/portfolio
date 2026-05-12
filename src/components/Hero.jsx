@@ -14,8 +14,8 @@ const ease = [0.65, 0, 0.35, 1];
  */
 export default function Hero() {
   return (
-    <section className="relative min-h-screen w-full px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
-      <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-7xl flex-col justify-end gap-12">
+    <section className="relative flex min-h-screen w-full flex-col px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end gap-12">
         {/* Name + subtitle */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -34,7 +34,7 @@ export default function Hero() {
 
         {/* Bottom row: location + availability pill on the left, Now card on the right */}
         <motion.div
-          className="flex flex-wrap items-end justify-between gap-6"
+          className="grid grid-cols-1 gap-6 sm:grid-cols-[1fr_auto] sm:items-end"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5, ease }}
