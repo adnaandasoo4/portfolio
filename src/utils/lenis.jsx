@@ -1,10 +1,9 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import Lenis from "lenis";
 
 const LenisContext = createContext(null);
 
 export function LenisProvider({ children }) {
-  const lenisRef = useRef(null);
   const [lenis, setLenis] = useState(null);
 
   useEffect(() => {
@@ -13,7 +12,6 @@ export function LenisProvider({ children }) {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
-    lenisRef.current = instance;
     setLenis(instance);
 
     let frame;
@@ -26,14 +24,17 @@ export function LenisProvider({ children }) {
     return () => {
       cancelAnimationFrame(frame);
       instance.destroy();
-      lenisRef.current = null;
-      setLenis(null);
     };
   }, []);
 
   return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }
 
+/**
+ * Returns the active Lenis instance, or `null` until the provider's first
+ * effect commit. Consumers must guard for `null` (e.g. early-return from a
+ * scroll-setup effect when Lenis isn't ready yet).
+ */
 export function useLenis() {
   return useContext(LenisContext);
 }
