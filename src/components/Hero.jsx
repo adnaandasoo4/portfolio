@@ -1,44 +1,70 @@
-import { motion } from 'framer-motion';
-import { styles } from '../styles';
-import { ComputersCanvas } from './canvas';
+import { motion } from "framer-motion";
+import { hero } from "../constants";
+import HeroDecoder from "./HeroDecoder";
+import Now from "./Now";
 
+const ease = [0.65, 0, 0.35, 1];
 
-const Hero = () => {
+/**
+ * Hero section. Renders a full-viewport stage with the decoded name + subtitle in
+ * the middle row, and a bottom row containing location/availability on the left
+ * and the Now card on the right. Drops the old "Hi, I'm Adnaan" headline, the
+ * orange gradient sidebar, the (commented-out) ComputersCanvas, and the bouncing
+ * scroll indicator.
+ */
+export default function Hero() {
   return (
-    <section className='relative w-full h-screen mx-auto'>
-      <div className={`${styles.paddingX} absolute inset-0 top-[120px] max-w-7xl mx-auto flex flex-row items-start gap-5`}>
-        <div className='flex flex-col justify-center items-center mt-5'>
-          <div className='w-5 h-5 rounded-full bg-[#ea553b]' />
-          <div className='w-1 sm:h-80 h-40 orange-gradient' />
-        </div>
+    <section className="relative min-h-screen w-full px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
+      <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-7xl flex-col justify-end gap-12">
+        {/* Name + subtitle */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease }}
+        >
+          <HeroDecoder
+            target={hero.name}
+            className="font-display text-ink"
+            // Display sizing applied via inline style because clamp() is awkward in Tailwind config.
+          />
+          <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted">
+            {hero.subtitle}
+          </p>
+        </motion.div>
 
-        <div>
-          <h1 className={`${styles.heroHeadText} text-white`}>Hi, I'm <span className='text-[#ea553b]'>Adnaan</span></h1>
-          <p className={`${styles.heroSubText} mt-2 text-white-100`}> I develop full stack applications <br className='sm:block hidden'/> and webpages</p>
-        </div>
-      </div>
-
-      {/* <ComputersCanvas /> */}
-
-      <div className='absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center'>
-        <a href='#about'>
-          <div className='w-[32px] h-[55px] rounded-3xl border-4 border-secondary flex justify-center items-start p-2'>
-            <motion.div
-              animate={{
-                y: [0, 24],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                repeatType: "loop",
-              }}
-              className='w-2 h-2 rounded-full bg-secondary mb-1'
-            />
+        {/* Bottom row: location + availability pill on the left, Now card on the right */}
+        <motion.div
+          className="flex flex-wrap items-end justify-between gap-6"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5, ease }}
+        >
+          <div className="flex flex-col gap-2 font-mono text-[10px] uppercase tracking-widest text-muted">
+            <span>{hero.location}</span>
+            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-edge px-2.5 py-1 text-ink">
+              <span
+                aria-hidden="true"
+                className="block h-1.5 w-1.5 rounded-full bg-accent"
+                style={{ boxShadow: "0 0 0 3px rgb(from var(--accent) r g b / 0.18)" }}
+              />
+              {hero.availability}
+            </span>
           </div>
-        </a>
-      </div>
-    </section>
-  )
-}
 
-export default Hero
+          <Now />
+        </motion.div>
+      </div>
+
+      <style>{`
+        section [data-hero-decoder-style] {}
+        /* The HeroDecoder renders a <span>; sizing is set via this descendant rule
+           so we don't need to inline a clamp() in JSX style. */
+        section :where(.font-display.text-ink) {
+          font-size: clamp(60px, 11vw, 168px);
+          line-height: 0.92;
+          letter-spacing: -0.01em;
+        }
+      `}</style>
+    </section>
+  );
+}
