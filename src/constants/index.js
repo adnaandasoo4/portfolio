@@ -248,9 +248,8 @@ export const personalityPills = [
 ];
 
 export const socials = [
-  { name: "Email", url: "mailto:adasoo747@gmail.com" },
+  { name: "Email", url: "mailto:adnaandasoo@gmail.com" },
   { name: "GitHub", url: "https://github.com/adnaandasoo4" },
-  { name: "LinkedIn", url: "https://linkedin.com/in/" },
 ];
 
 export const now = {
