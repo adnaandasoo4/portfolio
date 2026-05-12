@@ -14,8 +14,8 @@ import { staggerContainer } from "../utils/motion";
  *   GSAP ScrollTrigger animations (used by SelectedWork in a later phase). The
  *   outer <section> is still rendered, just without the FM viewport reveal.
  */
-const SectionWrapper = (Component, idName, options = {}) => {
-  const { scrollTriggered = false } = options;
+const SectionWrapper = (Component, idName, options) => {
+  const { scrollTriggered = false } = options ?? {};
 
   return function HOC() {
     const motionProps = scrollTriggered
