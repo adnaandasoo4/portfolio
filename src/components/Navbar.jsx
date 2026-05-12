@@ -1,87 +1,84 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { styles } from "../styles";
+import { useState } from "react";
 import { navLinks } from "../constants";
-import { logo, menu, close } from "../assets";
-import adnaan from "../assets/adnaan.png";
+import ThemeToggle from "./ThemeToggle";
 
-const Navbar = () => {
-  const [active, setActive] = useState("");
-  const [toggle, setToggle] = useState(false);
+/**
+ * Sticky top navigation. Holds the logo (text mark), anchor links to sections,
+ * and the theme toggle. Background uses a translucent `bg-paper` with backdrop
+ * blur so the nav stays readable when content scrolls beneath it. Mobile
+ * collapses the link list into a stacked menu under a tap-to-open chevron.
+ */
+export default function Navbar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav
-      className={`${styles.paddingX} w-full flex items-center py-5 fixed top-0 z-20 bg-test`}
-    >
-      <div className="w-full flex justify-between items-center max-w-7xl mx-auto">
-        <Link
-          to="/"
-          className="flex item-center gap-2"
-          onClick={() => {
-            setActive("");
-            window.scrollTo(0, 0);
-          }}
+    <nav className="fixed left-0 right-0 top-0 z-50 backdrop-blur-md">
+      <div
+        className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 text-ink sm:px-16"
+        style={{ background: "rgb(from var(--bg) r g b / 0.8)" }}
+      >
+        <a
+          href="#"
+          className="font-display text-base tracking-wider transition-opacity hover:opacity-70"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
-          {/* <img src={adnaan} alt="logo" className='w-9 h-9 object-contain'/> */}
-          <p className="text-white text-[18px] font-bold cursor-pointer">
-            adnaan dasoo.
-          </p>
-        </Link>
+          AD.
+        </a>
 
-        <div className="flex items-center gap-12">
-          <ul className="list-none hidden sm:flex flex-row gap-10">
-            {navLinks.map((nav) => (
-              <li
-                key={nav.id}
-                className={`${
-                  active === nav.title ? "text-white" : "text-secondary"
-                } hover:text-white text-[18px] font-medium cursor-pointer`}
-                onClick={() => setActive(nav.title)}
+        {/* Desktop nav */}
+        <ul className="hidden gap-8 font-mono text-[10px] uppercase tracking-widest md:flex">
+          {navLinks.map((link) => (
+            <li key={link.id}>
+              <a
+                href={`#${link.id}`}
+                className="transition-opacity hover:opacity-60"
               >
-                <a href={`#${nav.id}`}>{nav.title}</a>
+                {link.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+
+          {/* Mobile menu trigger */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-edge text-ink md:hidden"
+          >
+            <span className="sr-only">Menu</span>
+            <span aria-hidden="true" className="text-xs">
+              {mobileOpen ? "×" : "≡"}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      {mobileOpen && (
+        <div
+          className="md:hidden"
+          style={{ background: "rgb(from var(--bg) r g b / 0.95)" }}
+        >
+          <ul className="mx-auto max-w-7xl px-6 pb-6 pt-2 font-mono text-xs uppercase tracking-widest text-ink">
+            {navLinks.map((link) => (
+              <li key={link.id} className="py-2">
+                <a
+                  href={`#${link.id}`}
+                  onClick={() => setMobileOpen(false)}
+                  className="block transition-opacity hover:opacity-60"
+                >
+                  {link.title}
+                </a>
               </li>
             ))}
           </ul>
-          <button className="hidden sm:flex items-center justify-center h-10 w-32 rounded-md bg-gradient-to-r from-purple-600 to-blue-500 text-white p-[1.5px] duration-300">
-            <div className="rounded-md bg-test h-full w-full flex items-center justify-center duration-300 hover:bg-gradient-to-r from-purple-600 to-blue-500">
-              contact me
-            </div>
-          </button>
         </div>
-
-        <div className="sm:hidden flex flex-1 justify-end items-center">
-          <img
-            src={toggle ? close : menu}
-            alt="menu"
-            className="w-[28px] h-[28px] object-contain cursor-pointer"
-            onClick={() => setToggle(!toggle)}
-          />
-          <div
-            className={`${
-              !toggle ? "hidden" : "flex"
-            } p-6 bg-[#0a0a0a] absolute top-20 right-0 mx-4 my-2 min-w-[140px] z-10 rounded-xl`}
-          >
-            <ul className="list-none flex justify-end items-start flex-1 flex-col gap-4">
-              {navLinks.map((nav) => (
-                <li
-                  key={nav.id}
-                  className={`font-poppins font-medium cursor-pointer text-[16px] ${
-                    active === nav.title ? "text-white" : "text-secondary"
-                  }`}
-                  onClick={() => {
-                    setToggle(!toggle);
-                    setActive(nav.title);
-                  }}
-                >
-                  <a href={`#${nav.id}`}>{nav.title}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
+      )}
     </nav>
   );
-};
-
-export default Navbar;
+}
