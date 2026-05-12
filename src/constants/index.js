@@ -224,3 +224,36 @@ const projects = [
 ];
 
 export { services, technologies, experiences, projects };
+
+// ----------------------------------------------------------------------------
+// New exports introduced by Phase 0 of the v2 redesign.
+// These are consumed by section components that get rewritten in Phase 1+.
+// Placeholder content is in place; real content lands during each phase's
+// content gate (see docs/superpowers/specs/2026-05-12-portfolio-redesign-design.md §5).
+// ----------------------------------------------------------------------------
+
+export const manifestoBullets = [
+  "Motion",
+  "Scroll-driven UI",
+  "WebGL",
+  "Design systems",
+];
+
+export const personalityPills = [
+  "GSAP",
+  "React",
+  "WebGL",
+  "Design Engineering",
+  "Good vibes",
+];
+
+export const socials = [
+  { name: "Email", url: "mailto:adasoo747@gmail.com" },
+  { name: "GitHub", url: "https://github.com/adnaandasoo4" },
+  { name: "LinkedIn", url: "https://linkedin.com/in/" },
+];
+
+export const now = {
+  label: "Now",
+  body: "Currently building portfolio.v2 — shipping motion-led case studies for selected work.",
+};
