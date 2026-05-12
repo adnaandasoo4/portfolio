@@ -1,4 +1,3 @@
-import { BallCanvas } from './canvas';
 import Hero from './Hero';
 import Navbar from './Navbar';
 import Manifesto from './Manifesto';
@@ -15,5 +14,4 @@ export {
   Experience,
   Works,
   Contact,
-  BallCanvas,
 };
