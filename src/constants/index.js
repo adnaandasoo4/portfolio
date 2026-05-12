@@ -18,8 +18,6 @@ import {
   meta,
   starbucks,
   tesla,
-  fannie,
-  freelance,
   carrent,
   jobit,
   tripguide,
@@ -118,42 +116,24 @@ const technologies = [
 const experiences = [
   {
     title: "Freelance Web Developer",
-    company_name: "UI / UX Design",
-    icon: freelance,
-    iconBg: "#383E56",
-    date: "June 2019 - Jan 2020",
-    points: [
-      "Developing and maintaining web applications using React.js and other related technologies.",
-      "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-      "Implementing responsive design and ensuring cross-browser compatibility.",
-      "Participating in code reviews and providing constructive feedback to other developers.",
-    ],
+    company_name: "UI / UX clients",
+    date: "Jun 2019 — Jan 2020",
+    description:
+      "Built and maintained React-based marketing sites and small web apps for design-led clients. Owned the engineering side end-to-end — scoping, implementation, browser QA, and handoff.",
   },
   {
     title: "Software Engineer Intern",
     company_name: "Fannie Mae",
-    icon: fannie,
-    iconBg: "#E6DEDD",
-    date: "June 2021 - Aug 2021",
-    points: [
-      "Developing and maintaining web applications using React.js and other related technologies.",
-      "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-      "Implementing responsive design and ensuring cross-browser compatibility.",
-      "Participating in code reviews and providing constructive feedback to other developers.",
-    ],
+    date: "Jun 2021 — Aug 2021",
+    description:
+      "Shipped internal React components on a financial-services platform team. Pair-programmed with senior engineers and presented final work to the broader org.",
   },
   {
     title: "Full Stack Developer",
     company_name: "Fannie Mae",
-    icon: fannie,
-    iconBg: "#E6DEDD",
-    date: "July 2023 - Present",
-    points: [
-      "Developing and maintaining web applications using React.js and other related technologies.",
-      "Collaborating with cross-functional teams including designers, product managers, and other developers to create high-quality products.",
-      "Implementing responsive design and ensuring cross-browser compatibility.",
-      "Participating in code reviews and providing constructive feedback to other developers.",
-    ],
+    date: "Jul 2023 — Present",
+    description:
+      "Owning frontend and full-stack work on data-heavy compliance dashboards. Day-to-day: React, TypeScript, Node, and shipping features that go through change-management review.",
   },
 ];
 
@@ -280,4 +260,11 @@ export const manifesto = {
   // re-render automatically. Keep under ~60ch for line-length comfort.
   intro:
     "Frontend engineer focused on motion, scroll-driven interfaces, and craft-level UI. I care about how software feels — restraint, rhythm, and the moments that surprise.",
+};
+
+export const experience = {
+  // Small uppercase mono label rendered above the role list. Numbering follows
+  // the spec — Manifesto is 01, Selected Work (Phase 5) is 02, Experience is 03,
+  // Tech (Phase 4) is 04. The "02" gap is intentional mid-transition.
+  label: "03 — Experience",
 };
