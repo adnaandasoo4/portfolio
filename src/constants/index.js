@@ -197,21 +197,19 @@ export const manifesto = {
 };
 
 export const experience = {
-  // Small uppercase mono label rendered above the role list. Numbering follows
-  // the spec — Manifesto is 01, Selected Work (Phase 5) is 02, Experience is 03,
-  // Tech (Phase 4) is 04. The "02" gap is intentional mid-transition.
-  label: "03 — Experience",
+  // Small uppercase mono label. Order matches the nav bar:
+  // 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
+  label: "02 — Experience",
 };
 
 export const tech = {
-  // Small uppercase mono label for the section header. Section number follows
-  // the spec — Hero (no label), Manifesto 01, Selected Work 02 (Phase 5),
-  // Experience 03, Tech 04.
-  label: "04 — Stack",
+  // Small uppercase mono label. Order matches the nav bar:
+  // 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
+  label: "03 — Stack",
 };
 
 export const selectedWork = {
-  // Small uppercase mono label rendered above the slide track. Numbering follows
-  // the spec — Manifesto 01, Selected Work 02, Experience 03, Tech 04.
-  label: "02 — Selected Work",
+  // Small uppercase mono label rendered above the slide track. Order matches
+  // the nav bar: 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
+  label: "04 — Selected Work",
 };

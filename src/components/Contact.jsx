@@ -30,12 +30,12 @@ export default function Contact() {
           href={`mailto:${footer.email}`}
           className="group block text-ink"
           style={{
-            fontFamily:
-              "Geist, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-            fontWeight: 900,
+            fontFamily: "Azonix, Geist, ui-sans-serif, system-ui, sans-serif",
+            fontWeight: 400,
             fontSize: "clamp(60px, 12vw, 180px)",
             lineHeight: "0.92",
-            letterSpacing: "-0.02em",
+            letterSpacing: "-0.01em",
+            textTransform: "uppercase",
           }}
         >
           {footer.headline}{" "}

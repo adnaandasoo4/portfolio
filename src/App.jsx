@@ -25,9 +25,9 @@ const App = () => {
             <Navbar />
             <Hero />
             <Manifesto />
-            <SelectedWork />
             <Experience />
             <Tech />
+            <SelectedWork />
             <Contact />
           </div>
         </BrowserRouter>
