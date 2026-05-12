@@ -272,3 +272,12 @@ export const footer = {
   location: "Atlanta · GMT-5",
   copyright: "© 2026 Adnaan Dasoo · Frontend Developer",
 };
+
+export const manifesto = {
+  // Small uppercase mono label rendered above the intro. The em-dash is U+2014.
+  label: "01 — Index",
+  // Two-sentence intro, rendered at display weight. Edit anytime — components
+  // re-render automatically. Keep under ~60ch for line-length comfort.
+  intro:
+    "Frontend engineer focused on motion, scroll-driven interfaces, and craft-level UI. I care about how software feels — restraint, rhythm, and the moments that surprise.",
+};
