@@ -1,5 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap");
-@import url("https://fonts.cdnfonts.com/css/azonix");
+
+@font-face {
+  font-family: 'Azonix';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Azonix'), url('/fonts/azonix/Azonix.woff') format('woff');
+}
 
 @tailwind base;
 @tailwind components;
@@ -25,12 +32,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Geist", system-ui, -apple-system, sans-serif;
 }
 
 html, body {
   background: var(--bg);
   color: var(--ink);
+  font-family: "Geist", system-ui, -apple-system, sans-serif;
 }
 
 .hash-span {
