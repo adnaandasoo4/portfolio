@@ -19,8 +19,12 @@ export default function Navbar() {
       >
         <a
           href="#"
+          aria-label="Home"
           className="font-display text-base tracking-wider transition-opacity hover:opacity-70"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
         >
           AD.
         </a>
