@@ -1,16 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.cdnfonts.com/css/azonix");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root[data-theme="light"] {
+  --bg: #F2EFE9;
+  --ink: #0A0A0A;
+  --accent: #3A6B3A;
+  --border: rgba(10, 10, 10, 0.18);
+  --muted: rgba(10, 10, 10, 0.62);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0A0A0A;
+  --ink: #F2EFE9;
+  --accent: #3A6B3A;
+  --border: rgba(242, 239, 233, 0.18);
+  --muted: rgba(242, 239, 233, 0.62);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
-  scroll-behavior: smooth;
-  color-scheme: dark;
+  font-family: "Geist", system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
 }
 
 .hash-span {
