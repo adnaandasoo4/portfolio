@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useLenis } from "../utils/lenis";
-import { gsap, ScrollTrigger } from "../utils/gsap";
+import { gsap } from "../utils/gsap";
 import { selectedWork, projects } from "../constants";
 import { SectionWrapper } from "../hoc";
 
@@ -23,7 +23,7 @@ function SelectedWork() {
 
     const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 768px)", () => {
+    mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
       const section = sectionRef.current;
       const track = trackRef.current;
       // Distance to translate = total track width minus one viewport
@@ -166,4 +166,4 @@ function SelectedWork() {
   );
 }
 
-export default SectionWrapper(SelectedWork, "projects", { scrollTriggered: true });
+export default SectionWrapper(SelectedWork, "projects", { scrollTriggered: true, fullBleed: true });

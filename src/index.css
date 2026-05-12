@@ -38,6 +38,7 @@ html, body {
   background: var(--bg);
   color: var(--ink);
   font-family: "Geist", system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
 .hash-span {
