@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { Contact, Experience, Hero, Manifesto, Navbar, Tech, Works } from './components';
+import { Contact, Experience, Hero, Manifesto, Navbar, SelectedWork, Tech } from './components';
 import { ThemeProvider } from './utils/theme';
 import { LenisProvider, useLenis } from './utils/lenis';
 import { setupGsap } from './utils/gsap';
@@ -25,9 +25,9 @@ const App = () => {
             <Navbar />
             <Hero />
             <Manifesto />
+            <SelectedWork />
             <Experience />
             <Tech />
-            <Works />
             <Contact />
           </div>
         </BrowserRouter>

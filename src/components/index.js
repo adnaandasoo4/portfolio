@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 import Manifesto from './Manifesto';
 import Tech from './Tech';
 import Experience from './Experience';
-import Works from './Works';
+import SelectedWork from './SelectedWork';
 import Contact from './Contact';
 
 export {
@@ -12,6 +12,6 @@ export {
   Manifesto,
   Tech,
   Experience,
-  Works,
+  SelectedWork,
   Contact,
 };
