@@ -4,20 +4,27 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://fonts.cdnfonts.com" />
     <script>
       // Pre-paint theme to avoid flash. Read localStorage first, fall back to OS preference, default light.
+      // Key "theme" must match src/utils/theme.js.
       (function () {
+        var theme = "light";
         try {
           var stored = localStorage.getItem("theme");
           var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-          var theme = stored || (prefersDark ? "dark" : "light");
-          document.documentElement.setAttribute("data-theme", theme);
+          if (stored === "dark" || stored === "light") {
+            theme = stored;
+          } else if (prefersDark) {
+            theme = "dark";
+          }
         } catch (e) {
-          document.documentElement.setAttribute("data-theme", "light");
+          // localStorage may be unavailable (private browsing, etc.). Fall through to default.
         }
+        document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
     <title>Adnaan Dasoo</title>
