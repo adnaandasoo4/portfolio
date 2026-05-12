@@ -3,26 +3,29 @@ import {
   backend,
   creator,
   web,
-  javascript,
-  typescript,
-  html,
-  css,
-  reactjs,
-  redux,
-  tailwind,
-  nodejs,
-  mongodb,
-  git,
-  figma,
-  docker,
   meta,
   starbucks,
   tesla,
   carrent,
   jobit,
   tripguide,
-  threejs,
 } from "../assets";
+
+import {
+  SiHtml5,
+  SiCss3,
+  SiJavascript,
+  SiTypescript,
+  SiReact,
+  SiRedux,
+  SiTailwindcss,
+  SiNodedotjs,
+  SiMongodb,
+  SiThreejs,
+  SiGit,
+  SiFigma,
+  SiDocker,
+} from "react-icons/si";
 
 export const navLinks = [
   {
@@ -59,58 +62,19 @@ const services = [
 ];
 
 const technologies = [
-  {
-    name: "HTML 5",
-    icon: html,
-  },
-  {
-    name: "CSS 3",
-    icon: css,
-  },
-  {
-    name: "JavaScript",
-    icon: javascript,
-  },
-  {
-    name: "TypeScript",
-    icon: typescript,
-  },
-  {
-    name: "React JS",
-    icon: reactjs,
-  },
-  {
-    name: "Redux Toolkit",
-    icon: redux,
-  },
-  {
-    name: "Tailwind CSS",
-    icon: tailwind,
-  },
-  {
-    name: "Node JS",
-    icon: nodejs,
-  },
-  {
-    name: "MongoDB",
-    icon: mongodb,
-  },
-  {
-    name: "Three JS",
-    icon: threejs,
-  },
-  {
-    name: "git",
-    icon: git,
-  },
-  {
-    name: "figma",
-    icon: figma,
-  },
-  {
-    name: "docker",
-    icon: docker,
-  },
+  { name: "HTML 5", Icon: SiHtml5 },
+  { name: "CSS 3", Icon: SiCss3 },
+  { name: "JavaScript", Icon: SiJavascript },
+  { name: "TypeScript", Icon: SiTypescript },
+  { name: "React JS", Icon: SiReact },
+  { name: "Redux Toolkit", Icon: SiRedux },
+  { name: "Tailwind CSS", Icon: SiTailwindcss },
+  { name: "Node JS", Icon: SiNodedotjs },
+  { name: "MongoDB", Icon: SiMongodb },
+  { name: "Three JS", Icon: SiThreejs },
+  { name: "Git", Icon: SiGit },
+  { name: "Figma", Icon: SiFigma },
+  { name: "Docker", Icon: SiDocker },
 ];
 
 const experiences = [
@@ -267,4 +231,11 @@ export const experience = {
   // the spec — Manifesto is 01, Selected Work (Phase 5) is 02, Experience is 03,
   // Tech (Phase 4) is 04. The "02" gap is intentional mid-transition.
   label: "03 — Experience",
+};
+
+export const tech = {
+  // Small uppercase mono label for the section header. Section number follows
+  // the spec — Hero (no label), Manifesto 01, Selected Work 02 (Phase 5),
+  // Experience 03, Tech 04.
+  label: "04 — Stack",
 };
