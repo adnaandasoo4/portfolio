@@ -26,42 +26,32 @@ export default function Contact() {
         </div>
 
         {/* Massive CTA — only the `headlineHighlight` portion (and the arrow)
-            shift to the accent color on hover. The last word of the highlight
-            is kept together with the arrow via whitespace-nowrap so the arrow
-            can't orphan onto a new line. */}
-        {(() => {
-          const words = footer.headlineHighlight.split(" ");
-          const highlightLead = words.slice(0, -1).join(" ");
-          const highlightTail = words[words.length - 1];
-          return (
-            <a
-              href={`mailto:${footer.email}`}
-              className="group block text-ink"
-              style={{
-                fontFamily: "Azonix, Geist, ui-sans-serif, system-ui, sans-serif",
-                fontWeight: 400,
-                fontSize: "clamp(60px, 12vw, 180px)",
-                lineHeight: "0.92",
-                letterSpacing: "-0.01em",
-                textTransform: "uppercase",
-              }}
+            shift to the accent color on hover. The whole highlight + arrow is
+            kept together via whitespace-nowrap so the entire phrase stays on
+            one line even if 'Say hi!' breaks before it. */}
+        <a
+          href={`mailto:${footer.email}`}
+          className="group block text-ink"
+          style={{
+            fontFamily: "Azonix, Geist, ui-sans-serif, system-ui, sans-serif",
+            fontWeight: 400,
+            fontSize: "clamp(60px, 12vw, 180px)",
+            lineHeight: "0.92",
+            letterSpacing: "-0.01em",
+            textTransform: "uppercase",
+          }}
+        >
+          {footer.headlineLead}{" "}
+          <span className="whitespace-nowrap transition-colors duration-300 group-hover:text-accent">
+            {footer.headlineHighlight}{" "}
+            <span
+              aria-hidden="true"
+              className="inline-block transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
             >
-              {footer.headlineLead}{" "}
-              <span className="transition-colors duration-300 group-hover:text-accent">
-                {highlightLead && <>{highlightLead}{" "}</>}
-                <span className="whitespace-nowrap">
-                  {highlightTail}{" "}
-                  <span
-                    aria-hidden="true"
-                    className="inline-block transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
-                  >
-                    ↗
-                  </span>
-                </span>
-              </span>
-            </a>
-          );
-        })()}
+              ↗
+            </span>
+          </span>
+        </a>
 
         {/* Bottom row: email + location on left, socials on right */}
         <div className="mt-24 flex flex-wrap items-end justify-between gap-6">
