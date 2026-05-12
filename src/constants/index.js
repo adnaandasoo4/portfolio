@@ -1,14 +1,4 @@
 import {
-  mobile,
-  backend,
-  creator,
-  web,
-  meta,
-  starbucks,
-  tesla,
-} from "../assets";
-
-import {
   SiHtml5,
   SiCss,
   SiJavascript,
@@ -36,25 +26,6 @@ export const navLinks = [
   {
     id: "projects",
     title: "projects",
-  },
-];
-
-const services = [
-  {
-    title: "Fullstack Developer",
-    icon: web,
-  },
-  {
-    title: "Web Developer",
-    icon: mobile,
-  },
-  {
-    title: "React Developer",
-    icon: backend,
-  },
-  {
-    title: "UI / UX Enthusiast",
-    icon: creator,
   },
 ];
 
@@ -137,7 +108,7 @@ const projects = [
   },
 ];
 
-export { services, technologies, experiences, projects };
+export { technologies, experiences, projects };
 
 // ----------------------------------------------------------------------------
 // New exports introduced by Phase 0 of the v2 redesign.
