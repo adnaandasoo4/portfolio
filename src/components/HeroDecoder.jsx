@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from "react";
 // mid-animation. Letters from this set always render in the same face.
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-// Animation timing. 50 ms tick + reveal-one-letter-every-4-frames matches the visual
-// companion preview the user signed off on in brainstorming. Total decode time for an
-// 11-character target ≈ 11 × 4 × 50ms = 2.2s.
-const TICK_MS = 50;
+// Animation timing. 33 ms tick + reveal-one-letter-every-4-frames runs ~1.5× faster
+// than the original brainstormed 50ms cadence. Total decode time for an 11-character
+// target ≈ 11 × 4 × 33ms ≈ 1.45s.
+const TICK_MS = 33;
 const FRAMES_PER_REVEAL = 4;
 
 /**

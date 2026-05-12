@@ -28,7 +28,7 @@ export default function Contact() {
         {/* Massive CTA */}
         <a
           href={`mailto:${footer.email}`}
-          className="group block text-ink"
+          className="group block text-ink transition-colors duration-300 hover:text-accent"
           style={{
             fontFamily: "Azonix, Geist, ui-sans-serif, system-ui, sans-serif",
             fontWeight: 400,
