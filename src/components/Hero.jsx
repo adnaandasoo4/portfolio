@@ -9,8 +9,8 @@ const ease = [0.65, 0, 0.35, 1];
  * Hero section. Renders a full-viewport stage with the decoded name + subtitle in
  * the middle row, and a bottom row containing location/availability on the left
  * and the Now card on the right. Drops the old "Hi, I'm Adnaan" headline, the
- * orange gradient sidebar, the (commented-out) ComputersCanvas, and the bouncing
- * scroll indicator.
+ * orange gradient sidebar, the ComputersCanvas (now removed entirely), and the
+ * bouncing scroll indicator.
  */
 export default function Hero() {
   return (
@@ -25,7 +25,7 @@ export default function Hero() {
           <HeroDecoder
             target={hero.name}
             className="font-display text-ink"
-            // Display sizing applied via inline style because clamp() is awkward in Tailwind config.
+            data-hero-display=""
           />
           <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted">
             {hero.subtitle}
@@ -56,10 +56,10 @@ export default function Hero() {
       </div>
 
       <style>{`
-        section [data-hero-decoder-style] {}
-        /* The HeroDecoder renders a <span>; sizing is set via this descendant rule
-           so we don't need to inline a clamp() in JSX style. */
-        section :where(.font-display.text-ink) {
+        /* Scoped to the Hero name span via its [data-hero-display] attribute so
+           later sections that also use the font-display + text-ink combo don't
+           inherit the giant clamp() sizing. */
+        [data-hero-display] {
           font-size: clamp(60px, 11vw, 168px);
           line-height: 0.92;
           letter-spacing: -0.01em;

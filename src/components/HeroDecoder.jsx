@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
 // Glyph set the decoder cycles through before each letter lands on its target.
-// Mixed alphanumeric + symbols echoes the editorial / hacker vibe agreed in the design spec.
-const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+// Restricted to uppercase A-Z because the Hero's display font (Azonix) is
+// uppercase-only — including digits/symbols would trigger font-fallback flicker
+// mid-animation. Letters from this set always render in the same face.
+const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // Animation timing. 50 ms tick + reveal-one-letter-every-4-frames matches the visual
 // companion preview the user signed off on in brainstorming. Total decode time for an
@@ -22,8 +24,20 @@ const FRAMES_PER_REVEAL = 4;
  *   - target: string to decode. May contain "\n" for line breaks.
  *   - className: applied to the outer <span>.
  */
-export default function HeroDecoder({ target, className = "" }) {
-  const [display, setDisplay] = useState(target);
+function makeScrambledInitial(target) {
+  return target
+    .split("")
+    .map((c) => {
+      if (c === "\n" || c === " ") return c;
+      return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+    })
+    .join("");
+}
+
+export default function HeroDecoder({ target, className = "", ...rest }) {
+  // Initialize with a scrambled placeholder so the first paint doesn't briefly
+  // show the resolved target before the decoder starts.
+  const [display, setDisplay] = useState(() => makeScrambledInitial(target));
   const elementRef = useRef(null);
   const intervalRef = useRef(null);
   const decodingRef = useRef(false);
@@ -98,7 +112,7 @@ export default function HeroDecoder({ target, className = "" }) {
   // Render: split by "\n" so each line wraps in its own block span.
   const lines = display.split("\n");
   return (
-    <span ref={elementRef} className={className}>
+    <span ref={elementRef} className={className} {...rest}>
       {lines.map((line, i) => (
         <span key={i} className="block">
           {line}
