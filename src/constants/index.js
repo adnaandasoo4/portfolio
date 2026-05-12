@@ -13,7 +13,7 @@ import {
 
 import {
   SiHtml5,
-  SiCss3,
+  SiCss,
   SiJavascript,
   SiTypescript,
   SiReact,
@@ -21,7 +21,7 @@ import {
   SiTailwindcss,
   SiNodedotjs,
   SiMongodb,
-  SiThreejs,
+  SiThreedotjs,
   SiGit,
   SiFigma,
   SiDocker,
@@ -63,7 +63,7 @@ const services = [
 
 const technologies = [
   { name: "HTML 5", Icon: SiHtml5 },
-  { name: "CSS 3", Icon: SiCss3 },
+  { name: "CSS 3", Icon: SiCss },
   { name: "JavaScript", Icon: SiJavascript },
   { name: "TypeScript", Icon: SiTypescript },
   { name: "React JS", Icon: SiReact },
@@ -71,7 +71,7 @@ const technologies = [
   { name: "Tailwind CSS", Icon: SiTailwindcss },
   { name: "Node JS", Icon: SiNodedotjs },
   { name: "MongoDB", Icon: SiMongodb },
-  { name: "Three JS", Icon: SiThreejs },
+  { name: "Three JS", Icon: SiThreedotjs },
   { name: "Git", Icon: SiGit },
   { name: "Figma", Icon: SiFigma },
   { name: "Docker", Icon: SiDocker },
