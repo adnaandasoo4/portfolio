@@ -15,9 +15,9 @@ module.exports = {
         "white-100": "#f3f3f3",
         // new theme-variable-backed tokens (Phase 0)
         ink: "var(--ink)",
-        cream: "var(--bg)",
+        paper: "var(--bg)",
         accent: "var(--accent)",
-        "border-token": "var(--border)",
+        edge: "var(--border)",
         muted: "var(--muted)",
       },
       boxShadow: {
@@ -31,8 +31,26 @@ module.exports = {
       },
       fontFamily: {
         display: ["Azonix", "Geist", "system-ui", "sans-serif"],
-        sans: ["Geist", "system-ui", "sans-serif"],
+        sans: [
+          "Geist",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
         mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+        // transitional alias so `font-poppins` references in legacy components
+        // still resolve to our new sans during Phase 0. Remove when those
+        // components are rewritten in later phases.
+        poppins: [
+          "Geist",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
       },
     },
   },
