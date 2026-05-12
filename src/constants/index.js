@@ -151,8 +151,12 @@ export const hero = {
 };
 
 export const footer = {
-  // The arrow ↗ is appended by the JSX, don't include it in the string.
-  headline: "Say hi! Let's talk",
+  // The CTA renders as two phrases. `headlineLead` is the first part, no hover
+  // effect. `headlineHighlight` turns the accent color on link hover, and its
+  // last word stays on the same line as the trailing arrow (whitespace-nowrap
+  // in the component).
+  headlineLead: "Say hi!",
+  headlineHighlight: "Let's talk",
   email: "adnaandasoo@gmail.com",
   location: "Atlanta · GMT-5",
   copyright: "© 2026 Adnaan Dasoo · Frontend Developer",
