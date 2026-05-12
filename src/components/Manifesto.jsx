@@ -1,20 +1,7 @@
 import { motion } from "framer-motion";
 import { manifesto, manifestoBullets } from "../constants";
 import { SectionWrapper } from "../hoc";
-
-// Reveal variant with a per-element delay supplied via `custom`. Children inside
-// the SectionWrapper-wrapped section all receive the "show" state at once when
-// the section scrolls into view; each element's own `transition.delay` (from
-// `custom`) staggers them. This avoids needing to modify the SectionWrapper HOC.
-const ease = [0.65, 0, 0.35, 1];
-const reveal = {
-  hidden: { opacity: 0, y: 12 },
-  show: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease, delay },
-  }),
-};
+import { revealVariant as reveal } from "../utils/motion";
 
 function Manifesto() {
   return (
