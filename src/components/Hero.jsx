@@ -15,7 +15,7 @@ const ease = [0.65, 0, 0.35, 1];
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen w-full flex-col px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
-      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end gap-12">
+      <div className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col justify-end gap-12">
         {/* Name + subtitle */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
