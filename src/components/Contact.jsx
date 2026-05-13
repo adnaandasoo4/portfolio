@@ -12,8 +12,7 @@ export default function Contact() {
       id="contact"
       className="px-6 pb-10 pt-32 sm:px-16"
     >
-      <div className="mx-auto max-w-7xl">
-        {/* Personality pills row, right-aligned */}
+      {/* Personality pills row, right-aligned */}
         <div className="mb-24 flex flex-wrap justify-end gap-2">
           {personalityPills.map((pill) => (
             <span
@@ -75,10 +74,9 @@ export default function Contact() {
           </ul>
         </div>
 
-        {/* Divider + copyright */}
-        <div className="mt-10 border-t border-edge pt-6 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
-          {footer.copyright}
-        </div>
+      {/* Divider + copyright */}
+      <div className="mt-10 border-t border-edge pt-6 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+        {footer.copyright}
       </div>
     </footer>
   );

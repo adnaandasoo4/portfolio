@@ -12,9 +12,11 @@ import { staggerContainer } from "../utils/motion";
  *   of Framer Motion reveal variants because the inner component drives its own
  *   GSAP ScrollTrigger animations (used by SelectedWork). The outer <section> is
  *   still rendered, just without the FM viewport reveal.
- * @param {boolean} [options.fullBleed=false] - When true, drops `max-w-7xl mx-auto`
- *   and the shared horizontal/vertical padding so the section can span the full
- *   viewport. Used by SelectedWork whose slides are `w-screen` each.
+ * @param {boolean} [options.fullBleed=false] - When true, drops the shared
+ *   horizontal/vertical padding so the section can span 100% of the viewport
+ *   edge-to-edge. Used by SelectedWork whose slides are `w-screen` each.
+ *   (Note: sections are full-bleed by default now — `max-w-7xl mx-auto` was
+ *   removed in the width-unification pass. `fullBleed` only controls padding.)
  */
 const SectionWrapper = (Component, idName, options) => {
   const { scrollTriggered = false, fullBleed = false } = options ?? {};
@@ -31,7 +33,7 @@ const SectionWrapper = (Component, idName, options) => {
 
     const className = fullBleed
       ? "relative z-0"
-      : "sm:px-16 px-6 sm:py-16 py-10 max-w-7xl mx-auto relative z-0";
+      : "sm:px-16 px-6 sm:py-16 py-10 relative z-0";
 
     return (
       <motion.section {...motionProps} className={className}>
