@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://api.fontshare.com/v2/css?f%5B%5D=cabinet-grotesk@900&display=swap");
 
+/* Azonix — used only for the Navbar "AD." logo. Kept self-hosted from
+   the v1 setup. Not included in the Tailwind `display` family because the
+   site display font is now Cabinet Grotesk; Azonix is opted in by inline
+   style on the one element that wants its particular "A" form. */
 @font-face {
   font-family: 'Azonix';
   font-style: normal;
@@ -21,7 +26,7 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #0A0A0A;
+  --bg: #1A1A1A;
   --ink: #F2EFE9;
   --accent: #3A6B3A;
   --border: rgba(242, 239, 233, 0.18);

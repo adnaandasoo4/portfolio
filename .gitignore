@@ -15,6 +15,9 @@ dist-ssr
 # Visual brainstorming companion (local-only mockups)
 .superpowers/
 
+# Claude Code per-project metadata
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

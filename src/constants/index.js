@@ -1,48 +1,44 @@
 import {
-  SiHtml5,
-  SiCss,
-  SiJavascript,
-  SiTypescript,
   SiReact,
-  SiRedux,
+  SiTypescript,
+  SiFramer,
   SiTailwindcss,
-  SiNodedotjs,
-  SiMongodb,
-  SiThreedotjs,
-  SiGit,
+  SiVite,
+  SiSupabase,
+  SiVercel,
   SiFigma,
-  SiDocker,
 } from "react-icons/si";
+import { NextjsWordmark, GsapWordmark } from "../components/icons/TechLogos";
 
+// Nav anchors. `id` is the in-page anchor (must match the SectionWrapper id
+// for that component); `title` is the label rendered in the Navbar + footer.
+// The label/anchor mismatch on "work" is intentional: the Experience component
+// historically registered itself at #work, while the user-facing nav reserves
+// the "work" label for the Selected Work / projects section.
 export const navLinks = [
-  {
-    id: "about",
-    title: "about",
-  },
-  {
-    id: "work",
-    title: "experience",
-  },
-  {
-    id: "projects",
-    title: "projects",
-  },
+  { id: "work",     title: "experience" }, // → Experience section
+  { id: "projects", title: "work" },        // → Selected Work section
+  { id: "contact",  title: "contact" },     // → Footer
 ];
 
+// Tech stack rendered by <Tech /> as a bento-style grid (Zubiate / itsjay.us style):
+// top row = 3 primary tools rendered in larger cells, bottom row = 7 supporting
+// tools in smaller cells. `primary: true` opts an entry into the top row.
+// Mirrors the itsjay.us stack 1:1 — same brands, same monochrome Simple Icons logos.
+// `wordmark: true` entries are wide logotype SVGs (Next.js / GSAP). Tech.jsx
+// reads the flag and sizes those cells with `h-X w-auto` instead of the
+// square `h-X w-X` it applies to the brand-mark icons.
 const technologies = [
-  { name: "HTML 5", Icon: SiHtml5 },
-  { name: "CSS 3", Icon: SiCss },
-  { name: "JavaScript", Icon: SiJavascript },
-  { name: "TypeScript", Icon: SiTypescript },
-  { name: "React JS", Icon: SiReact },
-  { name: "Redux Toolkit", Icon: SiRedux },
-  { name: "Tailwind CSS", Icon: SiTailwindcss },
-  { name: "Node JS", Icon: SiNodedotjs },
-  { name: "MongoDB", Icon: SiMongodb },
-  { name: "Three JS", Icon: SiThreedotjs },
-  { name: "Git", Icon: SiGit },
-  { name: "Figma", Icon: SiFigma },
-  { name: "Docker", Icon: SiDocker },
+  { name: "React",       Icon: SiReact,         primary: true },
+  { name: "Next.js",     Icon: NextjsWordmark,  primary: true, wordmark: true },
+  { name: "TypeScript",  Icon: SiTypescript,    primary: true },
+  { name: "GSAP",        Icon: GsapWordmark,    wordmark: true },
+  { name: "Motion",      Icon: SiFramer },
+  { name: "Tailwind",    Icon: SiTailwindcss },
+  { name: "Vite",        Icon: SiVite },
+  { name: "Supabase",    Icon: SiSupabase },
+  { name: "Vercel",      Icon: SiVercel },
+  { name: "Figma",       Icon: SiFigma },
 ];
 
 const experiences = [
@@ -63,19 +59,30 @@ const experiences = [
   {
     title: "Full Stack Developer",
     company_name: "Fannie Mae",
-    date: "Jul 2023 — Present",
+    date: "Jul 2023 — Aug 2025",
     description:
-      "Owning frontend and full-stack work on data-heavy compliance dashboards. Day-to-day: React, TypeScript, Node, and shipping features that go through change-management review.",
+      "Owned frontend and full-stack work on data-heavy compliance dashboards. Day-to-day: React, TypeScript, Node, and shipping features that go through change-management review.",
+  },
+  {
+    title: "Software Engineer",
+    company_name: "CareFirst BlueCross BlueShield",
+    date: "Dec 2025 — Present",
+    description:
+      "Placeholder — describe scope, stack, and notable shipped work here. Likely React/TypeScript on healthcare-platform engineering; replace with the real one-paragraph summary when ready.",
   },
 ];
 
+// Placeholder cover screenshots in /public/work/. Five awwwards-style site
+// screenshots used as stand-ins until real project covers replace them.
+// To swap one out, drop a new file at the same path (or change the path
+// here) — Tech.jsx and SelectedWork.jsx both consume `coverImage` directly.
 const projects = [
   {
     name: "Compliance Dashboard",
     description:
       "Internal financial-services dashboard for change-management review. React + TypeScript on a backend team's data feed.",
     techStack: ["React", "TypeScript", "Node", "PostgreSQL"],
-    coverImage: null,
+    coverImage: "/work/compliance-dashboard.png",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -84,7 +91,7 @@ const projects = [
     description:
       "This site. Typographic redesign with GSAP pinned scroll, Lenis smooth-scroll, Framer Motion reveals, and a custom theme system.",
     techStack: ["React", "Vite", "GSAP", "Lenis", "Tailwind"],
-    coverImage: null,
+    coverImage: "/work/portfolio-v2.png",
     liveUrl: "https://github.com/adnaandasoo4/portfolio",
     sourceUrl: "https://github.com/adnaandasoo4/portfolio",
   },
@@ -93,7 +100,7 @@ const projects = [
     description:
       "Browser-based playground for a component library — live token previews, prop controls, and copyable usage snippets.",
     techStack: ["React", "TypeScript", "Tailwind", "MDX"],
-    coverImage: null,
+    coverImage: "/work/design-system-explorer.png",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -102,7 +109,16 @@ const projects = [
     description:
       "Reusable React hooks + components for scroll-driven and gesture-driven UI. Designed for production performance at 60fps.",
     techStack: ["React", "GSAP", "Motion", "TypeScript"],
-    coverImage: null,
+    coverImage: "/work/motion-library.png",
+    liveUrl: null,
+    sourceUrl: null,
+  },
+  {
+    name: "Realtime Editor",
+    description:
+      "Collaborative document editor with CRDT-based operational transforms and WebRTC peer sync. Sub-50ms cursor latency across regions.",
+    techStack: ["React", "TypeScript", "WebRTC", "Y.js"],
+    coverImage: "/work/realtime-editor.png",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -122,14 +138,6 @@ export const manifestoBullets = [
   "Scroll-driven UI",
   "WebGL",
   "Design systems",
-];
-
-export const personalityPills = [
-  "GSAP",
-  "React",
-  "WebGL",
-  "Design Engineering",
-  "Good vibes",
 ];
 
 export const socials = [
@@ -160,6 +168,10 @@ export const footer = {
   email: "adnaandasoo@gmail.com",
   location: "Atlanta · GMT-5",
   copyright: "© 2026 Adnaan Dasoo · Frontend Developer",
+  // Giant wordmark anchored to the bottom of the footer. Rendered twice — a
+  // muted "ghost" copy offset upward behind a solid copy — for the double-shadow
+  // effect inspired by ethansuero.com.
+  wordmark: "ADNAAN DASOO",
 };
 
 export const manifesto = {
@@ -184,7 +196,7 @@ export const tech = {
 };
 
 export const selectedWork = {
-  // Small uppercase mono label rendered above the slide track. Order matches
-  // the nav bar: 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
-  label: "04 — Selected Work",
+  // Small uppercase mono label rendered on the left of the section header.
+  // The big centered title is hardcoded as "Featured Work" in SelectedWork.jsx.
+  label: "04 — Featured Work",
 };

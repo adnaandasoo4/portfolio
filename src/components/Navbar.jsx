@@ -20,7 +20,8 @@ export default function Navbar() {
         <a
           href="#"
           aria-label="Home"
-          className="font-display text-base tracking-wider transition-opacity hover:opacity-70"
+          className="text-base tracking-wider transition-opacity hover:opacity-70"
+          style={{ fontFamily: "Azonix, Cabinet Grotesk, system-ui, sans-serif" }}
           onClick={(e) => {
             e.preventDefault();
             window.scrollTo({ top: 0, behavior: "smooth" });

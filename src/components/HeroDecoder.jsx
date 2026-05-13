@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
 // Glyph set the decoder cycles through before each letter lands on its target.
-// Restricted to uppercase A-Z because the Hero's display font (Azonix) is
-// uppercase-only — including digits/symbols would trigger font-fallback flicker
-// mid-animation. Letters from this set always render in the same face.
+// Uppercase A-Z to match the Hero's content (which is already uppercase) and
+// keep the cipher reading as a uniform-height block. Digits/symbols would
+// vary in metrics and break the visual rhythm mid-animation.
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // Animation timing. 33 ms tick + reveal-one-letter-every-4-frames runs ~1.5× faster

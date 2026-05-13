@@ -58,11 +58,13 @@ export default function Hero() {
       <style>{`
         /* Scoped to the Hero name span via its [data-hero-display] attribute so
            later sections that also use the font-display + text-ink combo don't
-           inherit the giant clamp() sizing. */
+           inherit the giant clamp() sizing. Weight 900 lands on Cabinet Grotesk
+           Black (the only Cabinet Grotesk weight loaded in index.css). */
         [data-hero-display] {
           font-size: clamp(60px, 11vw, 168px);
           line-height: 0.92;
-          letter-spacing: -0.01em;
+          letter-spacing: 0.04em;
+          font-weight: 900;
         }
       `}</style>
     </section>

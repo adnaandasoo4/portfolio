@@ -15,7 +15,7 @@ module.exports = {
         xs: "450px",
       },
       fontFamily: {
-        display: ["Azonix", "Geist", "system-ui", "sans-serif"],
+        display: ["Cabinet Grotesk", "Geist", "system-ui", "sans-serif"],
         sans: [
           "Geist",
           "ui-sans-serif",
