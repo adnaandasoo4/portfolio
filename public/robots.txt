@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Don't crawl the resume directly — let people land on the site first
+Disallow: /resume.pdf
