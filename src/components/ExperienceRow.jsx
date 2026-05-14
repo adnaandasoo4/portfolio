@@ -43,14 +43,53 @@ export default function ExperienceRow({
           aria-controls={`exp-desc-${index}`}
           className="w-full text-left py-6 outline-none transition-opacity focus-visible:opacity-90"
         >
-          <span className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <span>
-              <span className="font-medium">{entry.title}</span>
-              <span className="ml-2 text-muted font-normal">{entry.company_name}</span>
+          <span className="flex items-center justify-between gap-x-4">
+            {/* Inner content block grows to fill the row (flex-1) and
+                spreads title-on-left / date-on-right (justify-between).
+                On desktop this reproduces the original layout exactly —
+                the indicator is hidden so the date sits at the far
+                right. On mobile the indicator is visible at the far
+                right of the row, with the date pushed left to make
+                room. */}
+            <span className="flex flex-1 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <span>
+                <span className="font-medium">{entry.title}</span>
+                <span className="ml-2 text-muted font-normal">{entry.company_name}</span>
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted whitespace-nowrap">
+                {entry.date}
+              </span>
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted whitespace-nowrap">
-              {entry.date}
-            </span>
+            {/* Mobile-only click affordance. '+' rotates 45° on open to
+                read as '×'. Hidden on sm:+ because hover-to-expand on
+                desktop already makes the row's interactivity obvious. */}
+            <svg
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+              className={`h-4 w-4 shrink-0 text-muted transition-transform duration-300 sm:hidden ${
+                isOpen ? "rotate-45" : ""
+              }`}
+              style={{ transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)" }}
+            >
+              <line
+                x1="2.5"
+                y1="8"
+                x2="13.5"
+                y2="8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <line
+                x1="8"
+                y1="2.5"
+                x2="8"
+                y2="13.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
           </span>
           <span
             className={`grid transition-[grid-template-rows,opacity,margin-top] duration-300 ${
