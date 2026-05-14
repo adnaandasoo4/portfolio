@@ -29,16 +29,16 @@ export const navLinks = [
 // reads the flag and sizes those cells with `h-X w-auto` instead of the
 // square `h-X w-X` it applies to the brand-mark icons.
 const technologies = [
-  { name: "React",       Icon: SiReact,         primary: true },
-  { name: "Next.js",     Icon: NextjsWordmark,  primary: true, wordmark: true },
-  { name: "TypeScript",  Icon: SiTypescript,    primary: true },
-  { name: "GSAP",        Icon: GsapWordmark,    wordmark: true },
-  { name: "Motion",      Icon: SiFramer },
-  { name: "Tailwind",    Icon: SiTailwindcss },
-  { name: "Vite",        Icon: SiVite },
-  { name: "Supabase",    Icon: SiSupabase },
-  { name: "Vercel",      Icon: SiVercel },
-  { name: "Figma",       Icon: SiFigma },
+  { name: "React",       Icon: SiReact,         primary: true,                  url: "https://react.dev/" },
+  { name: "Next.js",     Icon: NextjsWordmark,  primary: true, wordmark: true,  url: "https://nextjs.org/" },
+  { name: "TypeScript",  Icon: SiTypescript,    primary: true,                  url: "https://www.typescriptlang.org/" },
+  { name: "GSAP",        Icon: GsapWordmark,                   wordmark: true,  url: "https://gsap.com/" },
+  { name: "Motion",      Icon: SiFramer,                                        url: "https://motion.dev/" },
+  { name: "Tailwind",    Icon: SiTailwindcss,                                   url: "https://tailwindcss.com/" },
+  { name: "Vite",        Icon: SiVite,                                          url: "https://vitejs.dev/" },
+  { name: "Supabase",    Icon: SiSupabase,                                      url: "https://supabase.com/" },
+  { name: "Vercel",      Icon: SiVercel,                                        url: "https://vercel.com/" },
+  { name: "Figma",       Icon: SiFigma,                                         url: "https://www.figma.com/" },
 ];
 
 const experiences = [
@@ -82,7 +82,7 @@ const projects = [
     description:
       "Internal financial-services dashboard for change-management review. React + TypeScript on a backend team's data feed.",
     techStack: ["React", "TypeScript", "Node", "PostgreSQL"],
-    coverImage: "/work/compliance-dashboard.png",
+    coverImage: "/work/compliance-dashboard.jpg",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -91,7 +91,7 @@ const projects = [
     description:
       "This site. Typographic redesign with GSAP pinned scroll, Lenis smooth-scroll, Framer Motion reveals, and a custom theme system.",
     techStack: ["React", "Vite", "GSAP", "Lenis", "Tailwind"],
-    coverImage: "/work/portfolio-v2.png",
+    coverImage: "/work/portfolio-v2.jpg",
     liveUrl: "https://github.com/adnaandasoo4/portfolio",
     sourceUrl: "https://github.com/adnaandasoo4/portfolio",
   },
@@ -100,7 +100,7 @@ const projects = [
     description:
       "Browser-based playground for a component library — live token previews, prop controls, and copyable usage snippets.",
     techStack: ["React", "TypeScript", "Tailwind", "MDX"],
-    coverImage: "/work/design-system-explorer.png",
+    coverImage: "/work/design-system-explorer.jpg",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -109,7 +109,7 @@ const projects = [
     description:
       "Reusable React hooks + components for scroll-driven and gesture-driven UI. Designed for production performance at 60fps.",
     techStack: ["React", "GSAP", "Motion", "TypeScript"],
-    coverImage: "/work/motion-library.png",
+    coverImage: "/work/motion-library.jpg",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -118,7 +118,7 @@ const projects = [
     description:
       "Collaborative document editor with CRDT-based operational transforms and WebRTC peer sync. Sub-50ms cursor latency across regions.",
     techStack: ["React", "TypeScript", "WebRTC", "Y.js"],
-    coverImage: "/work/realtime-editor.png",
+    coverImage: "/work/realtime-editor.jpg",
     liveUrl: null,
     sourceUrl: null,
   },
@@ -133,54 +133,71 @@ export { technologies, experiences, projects };
 // content gate (see docs/superpowers/specs/2026-05-12-portfolio-redesign-design.md §5).
 // ----------------------------------------------------------------------------
 
-export const manifestoBullets = [
+// Buzzword reel rendered by BuzzwordMarquee between the Experience and Tech
+// sections. Mix of tech, craft, and product-thinking terms. The marquee
+// duplicates this list once internally for seamless looping, so this is the
+// single source.
+export const buzzwords = [
   "Motion",
   "Scroll-driven UI",
   "WebGL",
   "Design systems",
+  "Frontend craft",
+  "TypeScript",
+  "Performance",
+  "Accessibility",
+  "Creative dev",
+  "Micro-interactions",
+  "0→1 product work",
+  "Systems thinking",
+  "Animation polish",
+  "Component architecture",
 ];
 
 export const socials = [
   { name: "Email", url: "mailto:adnaandasoo@gmail.com" },
   { name: "GitHub", url: "https://github.com/adnaandasoo4" },
+  { name: "LinkedIn", url: "https://www.linkedin.com/in/adnaan-dasoo/" },
+  { name: "Instagram", url: "https://www.instagram.com/adnaan.dasoo/" },
 ];
 
-export const now = {
-  label: "Now",
-  body: "Currently building portfolio.v2 — shipping motion-led case studies for selected work.",
-};
-
 export const hero = {
-  // Target string for HeroDecoder. \n is treated as a line break.
-  name: "ADNAAN\nDASOO",
-  subtitle: "Frontend · Creative Developer",
-  location: "Atlanta · GMT-5",
-  availability: "Available for work",
+  // Big WebGL display word at the bottom of the section.
+  name: "ADNAAN",
+  // Two-line mono kicker rendered top-right at the same scale as the
+  // SUERO reference's "DIGITAL DESIGN STUDIO / WEBFLOW PREMIUM PARTNER".
+  kicker: ["Software Engineer", "Creative Developer"],
+  // Vertical label under the animated scroll-stream indicator.
+  scrollPrompt: "Scroll",
 };
 
 export const footer = {
-  // The CTA renders as two phrases. `headlineLead` is the first part, no hover
-  // effect. `headlineHighlight` turns the accent color on link hover, and its
-  // last word stays on the same line as the trailing arrow (whitespace-nowrap
-  // in the component).
+  // Small mono label rendered above the display CTA.
+  kicker: "Get in touch",
+  // CTA renders on two lines. `headlineLead` (line 1) is static; on link hover
+  // `headlineHighlight` (line 2) turns the accent color and its trailing arrow
+  // nudges up-right. Its last word stays on the same line as the arrow via
+  // whitespace-nowrap in the component.
   headlineLead: "Say hi!",
   headlineHighlight: "Let's talk",
   email: "adnaandasoo@gmail.com",
-  location: "Atlanta · GMT-5",
-  copyright: "© 2026 Adnaan Dasoo · Frontend Developer",
-  // Giant wordmark anchored to the bottom of the footer. Rendered twice — a
-  // muted "ghost" copy offset upward behind a solid copy — for the double-shadow
-  // effect inspired by ethansuero.com.
-  wordmark: "ADNAAN DASOO",
+  location: "Baltimore · GMT-5",
+  copyright: "© 2026 Adnaan Dasoo · Software Engineer",
 };
 
 export const manifesto = {
   // Small uppercase mono label rendered above the intro. The em-dash is U+2014.
-  label: "01 — Index",
-  // Two-sentence intro, rendered at display weight. Edit anytime — components
-  // re-render automatically. Keep under ~60ch for line-length comfort.
-  intro:
-    "Frontend engineer focused on motion, scroll-driven interfaces, and craft-level UI. I care about how software feels — restraint, rhythm, and the moments that surprise.",
+  label: "01 — About",
+  // Intro is an array of segments rather than a single string so individual
+  // keywords can carry their own color. Segments with `highlight: true` render
+  // in slate-gray; the rest inherit the paragraph's ink color.
+  intro: [
+    { text: "I build interactive experiences that feel " },
+    { text: "intentional", highlight: true },
+    { text: ". Every hover, scroll, and transition earns its keep. Playful motion? " },
+    { text: "Obsessed", highlight: true },
+    { text: ". Performance? Non-negotiable. The tiny details nobody asked for? Those are the best part." },
+  ],
 };
 
 export const experience = {

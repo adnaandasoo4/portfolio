@@ -1,9 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap");
-@import url("https://api.fontshare.com/v2/css?f%5B%5D=cabinet-grotesk@900&display=swap");
+
+/* Clash Display — site display typeface used by Hero, Contact (footer) and
+   Selected Work tile covers. Variable WOFF2 covers weights 200–700 in a
+   single ~29KB file, so we never need to pull additional weight files. */
+@font-face {
+  font-family: 'Clash Display';
+  src: url('/fonts/clash-display/ClashDisplay-Variable.woff2') format('woff2');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* Azonix — used only for the Navbar "AD." logo. Kept self-hosted from
-   the v1 setup. Not included in the Tailwind `display` family because the
-   site display font is now Cabinet Grotesk; Azonix is opted in by inline
+   the v1 setup. Not included in the Tailwind `display` family because
+   the site display font is Clash Display; Azonix is opted in by inline
    style on the one element that wants its particular "A" form. */
 @font-face {
   font-family: 'Azonix';
@@ -23,6 +33,13 @@
   --accent: #3A6B3A;
   --border: rgba(10, 10, 10, 0.18);
   --muted: rgba(10, 10, 10, 0.62);
+  /* Slightly darker than --bg — used for the Hero wordmark to get the
+     "ghost / dark-on-dark" Suero effect without disappearing entirely. */
+  --display-subtle: #DCD9D3;
+  /* Warm orange used as a wayfinding accent — the scroll-stream and
+     the footer CTA hover. Intentionally outside the green/slate palette
+     so it reads as an interaction signal, not a brand color. */
+  --flag: #F97316;
 }
 
 :root[data-theme="dark"] {
@@ -31,6 +48,10 @@
   --accent: #3A6B3A;
   --border: rgba(242, 239, 233, 0.18);
   --muted: rgba(242, 239, 233, 0.62);
+  /* Pitch black — sits below the #1A1A1A bg luminance as a clear
+     dark-on-dark ghost wordmark. */
+  --display-subtle: #000000;
+  --flag: #F97316;
 }
 
 * {

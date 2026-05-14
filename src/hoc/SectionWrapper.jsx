@@ -19,7 +19,11 @@ import { staggerContainer } from "../utils/motion";
  *   can span 100% of the viewport. Used by SelectedWork whose slides are `w-screen` each.
  */
 const SectionWrapper = (Component, idName, options) => {
-  const { scrollTriggered = false, fullBleed = false } = options ?? {};
+  const {
+    scrollTriggered = false,
+    fullBleed = false,
+    dataCursor,
+  } = options ?? {};
 
   return function HOC() {
     const motionProps = scrollTriggered
@@ -36,7 +40,11 @@ const SectionWrapper = (Component, idName, options) => {
       : "sm:px-16 px-6 sm:py-16 py-10 max-w-screen-2xl mx-auto relative z-0";
 
     return (
-      <motion.section {...motionProps} className={className}>
+      <motion.section
+        {...motionProps}
+        className={className}
+        data-cursor={dataCursor}
+      >
         <span className='hash-span' id={idName}>
           &nbsp;
         </span>

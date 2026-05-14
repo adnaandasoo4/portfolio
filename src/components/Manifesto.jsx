@@ -1,21 +1,22 @@
 import { motion } from "framer-motion";
-import { manifesto, manifestoBullets } from "../constants";
+import { manifesto } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { revealVariant as reveal } from "../utils/motion";
 
 function Manifesto() {
   return (
     <div className="flex flex-col gap-10 py-24">
-      {/* Section number + label */}
       <motion.span
         variants={reveal}
         custom={0}
-        className="font-mono text-[10px] uppercase tracking-widest text-muted"
+        className="font-mono text-xs uppercase tracking-widest text-muted"
       >
         {manifesto.label}
       </motion.span>
 
-      {/* Intro paragraph in display weight */}
+      {/* Intro paragraph in display weight. Iterates segments so the
+          highlight keywords (intentional / obsessed) render in slate-gray
+          against the ink paragraph. */}
       <motion.p
         variants={reveal}
         custom={0.1}
@@ -28,28 +29,18 @@ function Manifesto() {
           maxWidth: "60ch",
         }}
       >
-        {manifesto.intro}
-      </motion.p>
-
-      {/* Skill / value pills */}
-      <motion.ul
-        variants={reveal}
-        custom={0.25}
-        className="flex flex-wrap gap-2"
-      >
-        {manifestoBullets.map((bullet, i) => (
-          <motion.li
-            key={bullet}
-            variants={reveal}
-            custom={0.3 + i * 0.05}
-            className="rounded-full border border-edge px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted"
+        {manifesto.intro.map((seg, i) => (
+          <span
+            key={i}
+            className={seg.highlight ? "text-slate-500" : undefined}
           >
-            {bullet}
-          </motion.li>
+            {seg.text}
+          </span>
         ))}
-      </motion.ul>
+      </motion.p>
     </div>
   );
 }
 
-export default SectionWrapper(Manifesto, "about");
+const ManifestoSection = SectionWrapper(Manifesto, "about");
+export default ManifestoSection;

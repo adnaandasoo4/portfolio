@@ -1,72 +1,99 @@
+import { lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { hero } from "../constants";
-import HeroDecoder from "./HeroDecoder";
-import Now from "./Now";
+
+// HeroBigText pulls in Three.js (~365 KB). Code-splitting it into its own
+// chunk lets the rest of the page (Manifesto, Experience, Tech, Selected
+// Work, Contact) finish downloading first; the wordmark fills in as Three
+// loads in parallel. Fallback is null so the wordmark area stays empty
+// during the swap — the page background already covers it.
+const HeroBigText = lazy(() => import("./HeroBigText"));
 
 const ease = [0.65, 0, 0.35, 1];
 
 /**
- * Hero section. Renders a full-viewport stage with the decoded name + subtitle in
- * the middle row, and a bottom row containing location/availability on the left
- * and the Now card on the right. Drops the old "Hi, I'm Adnaan" headline, the
- * orange gradient sidebar, the ComputersCanvas (now removed entirely), and the
- * bouncing scroll indicator.
+ * Hero section.
+ *
+ * Layout:
+ * - Top-right: animated scroll-stream indicator (vertical line with an
+ *   orange streak travelling top→bottom on loop, vertical "SCROLL" label
+ *   below). Sits at the top of the inner content rail so it's the first
+ *   right-side element a visitor sees.
+ * - Bottom-right (above the wordmark): two-line kicker — Software
+ *   Engineer / Creative Developer, in display-friendly mono at ink color.
+ * - Bottom: HeroBigText — full-bleed WebGL wordmark with through-glass
+ *   blur localized around the cursor on hover.
+ *
+ * @param {object} props
+ * @param {boolean} [props.ready=true] - When false, the in-section
+ *   motion elements stay at their initial state and don't animate. Used
+ *   by the App-level Preloader: when the preloader is in its counting
+ *   phase, ready is false and the Hero is hidden; when the preloader
+ *   begins its reveal/split, ready flips to true and the kicker + scroll
+ *   indicator animate in alongside the splitting overlay.
  */
-export default function Hero() {
+export default function Hero({ ready = true }) {
   return (
-    <section className="relative flex min-h-screen w-full flex-col px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
-      <div className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col justify-end gap-12">
-        {/* Name + subtitle */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease }}
-        >
-          <HeroDecoder
-            target={hero.name}
-            className="font-display text-ink"
-            data-hero-display=""
-          />
-          <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted">
-            {hero.subtitle}
-          </p>
-        </motion.div>
-
-        {/* Bottom row: location + availability pill on the left, Now card on the right */}
-        <motion.div
-          className="grid grid-cols-1 gap-6 sm:grid-cols-[1fr_auto] sm:items-end"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5, ease }}
-        >
-          <div className="flex flex-col gap-2 font-mono text-[10px] uppercase tracking-widest text-muted">
-            <span>{hero.location}</span>
-            <span className="inline-flex w-fit items-center gap-2 rounded-full border border-edge px-2.5 py-1 text-ink">
-              <span
-                aria-hidden="true"
-                className="block h-1.5 w-1.5 rounded-full bg-accent"
-                style={{ boxShadow: "0 0 0 3px rgb(from var(--accent) r g b / 0.18)" }}
+    <section className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
+      {/* Inner content container — same 1536px rail as every other section,
+          and same internal px-6 sm:px-16 padding the navbar uses, so the
+          scroll indicator's right edge lines up with the navbar's theme
+          toggle on wide displays. (Without the padding, the inner rail's
+          edge sits flush with the section's content edge, which is 64px
+          to the right of the navbar's right-aligned items.) */}
+      <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-6 sm:px-16">
+        <div className="flex justify-end">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={ready ? { opacity: 1 } : false}
+            transition={{ duration: 0.6, delay: 0.25, ease }}
+            className="flex flex-col items-center gap-3"
+          >
+            {/* Vertical track + orange streak that loops top→bottom. */}
+            <div className="relative h-20 w-px overflow-hidden bg-edge">
+              <motion.div
+                className="absolute left-0 top-0 h-4 w-px bg-flag"
+                initial={{ y: -16 }}
+                animate={{ y: 80 }}
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
               />
-              {hero.availability}
+            </div>
+            <span
+              className="font-mono text-[10px] uppercase tracking-widest text-muted"
+              style={{ writingMode: "vertical-rl" }}
+            >
+              {hero.scrollPrompt}
             </span>
-          </div>
-
-          <Now />
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
-      <style>{`
-        /* Scoped to the Hero name span via its [data-hero-display] attribute so
-           later sections that also use the font-display + text-ink combo don't
-           inherit the giant clamp() sizing. Weight 900 lands on Cabinet Grotesk
-           Black (the only Cabinet Grotesk weight loaded in index.css). */
-        [data-hero-display] {
-          font-size: clamp(60px, 11vw, 168px);
-          line-height: 0.92;
-          letter-spacing: 0.04em;
-          font-weight: 900;
-        }
-      `}</style>
+      {/* Kicker — Software Engineer / Creative Developer. Anchored just
+          above the wordmark and right-aligned with the inner rail. */}
+      <div className="pointer-events-none absolute bottom-[24vw] left-0 right-0 z-10 mx-auto w-full max-w-screen-2xl px-6 sm:px-16">
+        <div className="flex justify-end">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={ready ? { opacity: 1, y: 0 } : false}
+            transition={{ duration: 0.6, delay: 0.5, ease }}
+            className="font-mono text-sm uppercase tracking-widest text-ink sm:text-right"
+          >
+            {hero.kicker.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* WebGL display word, full-bleed at the bottom. Lazy-loaded so
+          Three.js doesn't block the rest of the page's initial paint. */}
+      <Suspense fallback={null}>
+        <HeroBigText text={hero.name} />
+      </Suspense>
     </section>
   );
 }

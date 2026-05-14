@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { tech, technologies } from "../constants";
 import { SectionWrapper } from "../hoc";
@@ -20,23 +20,26 @@ function Tech() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const [bounds, setBounds] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
-  // Recompute the highlight rect whenever the hovered cell changes. We measure
-  // off the live DOM rather than tracking grid math so cells can be any size /
-  // span without keeping a separate layout model in sync.
-  useEffect(() => {
-    if (hoveredIdx === null) return;
-    const cell = cellRefs.current[hoveredIdx];
+  // Compute the highlight rect inside the hover handler and batch both
+  // state updates in the same event tick. React 18 collapses paired
+  // setState calls into a single render, so the morphing highlight
+  // animates directly to the new bounds without a one-frame gap that a
+  // setState-in-useEffect approach would introduce.
+  const handleEnter = (idx) => {
+    const cell = cellRefs.current[idx];
     const container = containerRef.current;
-    if (!cell || !container) return;
-    const cRect = container.getBoundingClientRect();
-    const tRect = cell.getBoundingClientRect();
-    setBounds({
-      x: tRect.left - cRect.left,
-      y: tRect.top - cRect.top,
-      width: tRect.width,
-      height: tRect.height,
-    });
-  }, [hoveredIdx]);
+    if (cell && container) {
+      const cRect = container.getBoundingClientRect();
+      const tRect = cell.getBoundingClientRect();
+      setBounds({
+        x: tRect.left - cRect.left,
+        y: tRect.top - cRect.top,
+        width: tRect.width,
+        height: tRect.height,
+      });
+    }
+    setHoveredIdx(idx);
+  };
 
   const primary = technologies.filter((t) => t.primary);
   const supporting = technologies.filter((t) => !t.primary);
@@ -52,21 +55,28 @@ function Tech() {
     // Icon color flips ink → paper on hover so it reads on top of the
     // dark morphing highlight that slides in.
     return (
-      <div
+      <a
         key={entry.name}
         ref={(el) => (cellRefs.current[idx] = el)}
-        onMouseEnter={() => setHoveredIdx(idx)}
-        className={`relative flex items-center justify-center border-edge ${
+        href={entry.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${entry.name} (opens in new tab)`}
+        data-cursor="tech break?"
+        onMouseEnter={() => handleEnter(idx)}
+        className={`relative flex items-center justify-center border-edge focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink ${
           isPrimary ? "col-span-7 row-start-1 border-b" : "col-span-3 row-start-2"
         } ${isLastInRow ? "" : "border-r"}`}
       >
         <entry.Icon
-          className={`relative z-10 transition-colors duration-200 ${
+          className={`relative z-10 max-w-full transition-colors duration-200 ${
             entry.wordmark
               ? // Wordmarks (Next.js / GSAP) are wide — fix the height and let
                 // width follow the SVG's viewBox aspect ratio. Heights are a
                 // notch below the square brand-mark heights so the wide
                 // letterforms don't overpower the rest of the grid.
+                // max-w-full above ensures wide wordmarks shrink rather than
+                // overflow narrow supporting cells at 360px viewport.
                 isPrimary
                   ? "h-7 w-auto sm:h-9"
                   : "h-5 w-auto sm:h-7"
@@ -79,7 +89,7 @@ function Tech() {
           aria-hidden="true"
         />
         <span className="sr-only">{entry.name}</span>
-      </div>
+      </a>
     );
   };
 
@@ -88,12 +98,44 @@ function Tech() {
       <motion.span
         variants={reveal}
         custom={0}
-        className="font-mono text-[10px] uppercase tracking-widest text-muted"
+        className="font-mono text-xs uppercase tracking-widest text-muted"
       >
         {tech.label}
       </motion.span>
 
-      <motion.div variants={reveal} custom={0.1}>
+      {/* Mobile: simple 2-column icon grid. Drops the bento layout's
+          primary/supporting distinction and the morphing-highlight
+          interaction because they don't translate to a touch interface.
+          Cells are square, bordered, and tappable straight through to
+          the brand's site. */}
+      <motion.div
+        variants={reveal}
+        custom={0.1}
+        className="grid grid-cols-2 gap-3 sm:hidden"
+      >
+        {technologies.map((entry) => (
+          <a
+            key={entry.name}
+            href={entry.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${entry.name} (opens in new tab)`}
+            data-cursor="tech break?"
+            className="flex aspect-square items-center justify-center border border-edge text-ink"
+          >
+            <entry.Icon
+              className={`max-w-full text-ink ${
+                entry.wordmark ? "h-7 w-auto" : "h-12 w-12"
+              }`}
+              aria-hidden="true"
+            />
+            <span className="sr-only">{entry.name}</span>
+          </a>
+        ))}
+      </motion.div>
+
+      {/* Desktop: existing bento grid with morphing highlight on hover. */}
+      <motion.div variants={reveal} custom={0.1} className="hidden sm:block">
         <div
           ref={containerRef}
           className="relative grid grid-cols-[repeat(21,minmax(0,1fr))] overflow-hidden"
@@ -136,4 +178,5 @@ function Tech() {
   );
 }
 
-export default SectionWrapper(Tech, "tech");
+const TechSection = SectionWrapper(Tech, "tech");
+export default TechSection;

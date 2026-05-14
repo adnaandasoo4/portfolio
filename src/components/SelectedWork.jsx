@@ -41,28 +41,17 @@ function SelectedWork() {
       const wrapper = trackWrapperRef.current;
       const track = trackRef.current;
       // Horizontal distance the track translates by — the content that
-      // overflows the viewport. With pl-[50vw] lead-in and pr-[80vw] trail,
-      // this works out to roughly 1.9 viewport widths.
+      // overflows the viewport. With pl-[50vw] lead-in and pr-[40vw] trail,
+      // this works out to roughly 1.4 viewport widths.
       const horizontalDistance = () =>
         Math.max(0, track.scrollWidth - window.innerWidth);
-      // Rest phase: after the horizontal motion completes, the pin stays
-      // engaged for an additional fraction of horizontalDistance worth of
-      // vertical scroll — tiles sit still at their final position, giving
-      // the user a clear beat to look at the last project before vertical
-      // scroll resumes. 0.7 → ~41% of the total pin is rest.
-      const REST_FRACTION = 0.7;
+      // Pin duration = horizontal distance, so the tiles translate
+      // continuously from pin-engage to pin-release. No rest phase —
+      // tiles move the entire time the pin is engaged.
       const pinDuration = () =>
-        Math.max(
-          horizontalDistance() * (1 + REST_FRACTION),
-          window.innerHeight * 0.8
-        );
+        Math.max(horizontalDistance(), window.innerHeight * 0.8);
       if (horizontalDistance() === 0) return;
 
-      // Use a timeline with a motion tween + empty rest tween so the motion
-      // visibly completes inside the pinned section and the user sees the
-      // tiles parked at their final position before scroll resumes. A
-      // single `gsap.to` with scrub would stretch the motion over the full
-      // pin duration instead of completing early.
       const tl = gsap.timeline({
         scrollTrigger: {
           // Trigger fires when the tile row's vertical center reaches the
@@ -96,10 +85,6 @@ function SelectedWork() {
         },
         0
       );
-      // Empty tween for the rest phase. Holds the track at its end position
-      // while the scrub continues consuming vertical scroll — produces the
-      // "tiles parked, no motion" beat the user asked for.
-      tl.to({}, { duration: REST_FRACTION }, ">");
 
       return () => {
         tl.scrollTrigger?.kill();
@@ -119,7 +104,7 @@ function SelectedWork() {
           "04 — Featured Work" label aligns vertically with the labels on
           Manifesto / Experience / Tech. */}
       <div className="mx-auto flex max-w-screen-2xl items-baseline justify-between px-6 pt-24 sm:px-16">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+        <span className="font-mono text-xs uppercase tracking-widest text-muted">
           {selectedWork.label}
         </span>
       </div>
@@ -129,46 +114,48 @@ function SelectedWork() {
           on top of the hovered tile (rather than in viewport center). */}
       <div
         ref={trackWrapperRef}
-        className="relative mt-12 overflow-hidden"
+        // Mobile uses a normal vertical stack (no overflow gymnastics).
+        // md+ flips to overflow-hidden so GSAP can drive the pinned
+        // horizontal scrub without competing with native scroll.
+        className="relative mt-12 md:overflow-hidden"
         onMouseLeave={() => setHoveredIdx(null)}
       >
         <div
           ref={trackRef}
-          // Desktop: pl-[50vw] starts the first tile's left edge at viewport
-          // center (empty space on the left, tiles on the right). pr-[40vw]
-          // ends the translation roughly when the LAST tile reaches viewport
-          // center — so the user sees the last project fully framed instead
-          // of partially exiting off the left edge. With 5 landscape tiles at
-          // 30vw each, the natural horizontalDistance is ~145vw; the
-          // 1 + REST_FRACTION factor extends that to a longer overall pin
-          // (~245vw of vertical scroll, ~2.3 viewport-heights), most of the
-          // extra time is held as the static "rest" beat after motion ends.
-          // Mobile keeps the standard section padding for native horizontal
-          // scroll-snap behavior.
-          className="flex gap-3 px-6 sm:px-16 md:gap-4 md:pl-[50vw] md:pr-[40vw]"
+          // Mobile: flex-col stacks tiles vertically, full-width within
+          // section padding. Tap each tile to open the project.
+          // Desktop: pl-[50vw] starts the first tile's left edge at
+          // viewport center, pr-[40vw] ends translation roughly when the
+          // LAST tile reaches viewport center. flex-row + GSAP transform
+          // drives the horizontal pinned scroll.
+          className="flex flex-col gap-6 px-6 md:flex-row md:gap-4 md:px-16 md:pl-[50vw] md:pr-[40vw]"
           style={{ willChange: "transform" }}
         >
           {projects.map((project, i) => {
             const isHovered = hoveredIdx === i;
+            const href = project.liveUrl || project.sourceUrl || "#";
+            const isExternal = href !== "#";
             return (
-              <article
+              <a
                 key={project.name}
+                href={href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                data-cursor="check out my work"
+                aria-label={project.name}
                 onMouseEnter={() => setHoveredIdx(i)}
-                className="relative flex-shrink-0 overflow-hidden bg-edge"
-                style={{
-                  // Tiles shaped like website screenshots — landscape 16:10
-                  // instead of the prior 3:4 portrait. Width clamp bumped up
-                  // slightly so the new shorter height doesn't make tiles
-                  // feel small.
-                  width: "clamp(320px, 30vw, 480px)",
-                  aspectRatio: "16 / 10",
-                }}
+                // Mobile: full-width tile in the vertical stack.
+                // Desktop: clamp width on the horizontal track.
+                className="relative block w-full overflow-hidden bg-edge md:w-[clamp(280px,45vw,720px)] md:flex-shrink-0"
+                style={{ aspectRatio: "16 / 10" }}
               >
                 {/* Tile background — cover image fills the whole tile. */}
                 {project.coverImage ? (
                   <img
                     src={project.coverImage}
                     alt={project.name}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 ) : (
@@ -185,8 +172,8 @@ function SelectedWork() {
                       className="mt-3 text-center"
                       style={{
                         fontFamily:
-                          "Cabinet Grotesk, Geist, system-ui, sans-serif",
-                        fontWeight: 900,
+                          "Clash Display, Geist, system-ui, sans-serif",
+                        fontWeight: 700,
                         fontSize: "clamp(18px, 1.8vw, 28px)",
                         letterSpacing: "0.02em",
                         textTransform: "uppercase",
@@ -209,8 +196,12 @@ function SelectedWork() {
                     top/bottom — gives the overlay a frame-like silhouette
                     that reads clearly against the cover image underneath. */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  {/* Hover preview uses a CSS background-image rather than
+                      a second <img> — the browser caches the URL after the
+                      tile <img> above downloads it once, and dropping the
+                      duplicate DOM node keeps the tree leaner. */}
                   <div
-                    className="relative overflow-hidden border-y-[8px] border-x-[24px] border-white bg-ink"
+                    className="relative overflow-hidden border-y-[8px] border-x-[24px] border-white bg-ink bg-cover bg-center"
                     style={{
                       width: "65%",
                       aspectRatio: "16 / 10",
@@ -219,18 +210,13 @@ function SelectedWork() {
                         : "inset(50% 0 50% 0)",
                       transition:
                         "clip-path 500ms cubic-bezier(0.65, 0, 0.35, 1)",
+                      backgroundImage: project.coverImage
+                        ? `url(${project.coverImage})`
+                        : undefined,
                     }}
-                  >
-                    {project.coverImage && (
-                      <img
-                        src={project.coverImage}
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover"
-                      />
-                    )}
-                  </div>
+                  />
                 </div>
-              </article>
+              </a>
             );
           })}
         </div>
@@ -252,4 +238,5 @@ function SelectedWork() {
   );
 }
 
-export default SectionWrapper(SelectedWork, "projects", { scrollTriggered: true, fullBleed: true });
+const SelectedWorkSection = SectionWrapper(SelectedWork, "projects", { scrollTriggered: true, fullBleed: true });
+export default SelectedWorkSection;

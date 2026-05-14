@@ -16,5 +16,12 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'react/prop-types': 'off',
   },
+  overrides: [
+    {
+      files: ['tailwind.config.js', 'postcss.config.js'],
+      env: { node: true },
+    },
+  ],
 }

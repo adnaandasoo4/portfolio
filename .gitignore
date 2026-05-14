@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment files (none currently, but ignored defensively)
+.env
+.env.*
+!.env.example
+
 # Visual brainstorming companion (local-only mockups)
 .superpowers/
 

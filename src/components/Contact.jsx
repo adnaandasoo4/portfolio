@@ -1,87 +1,68 @@
-import { footer, navLinks, socials } from "../constants";
-
-// Display font stack used for the big CTA and the bottom wordmark.
-// Loaded from Fontshare at weight 900 in index.css (Cabinet Grotesk Black).
-// Hoisted so both elements share the exact same fallback chain.
-const DISPLAY_FONT_STACK =
-  "Cabinet Grotesk, Geist, ui-sans-serif, system-ui, sans-serif";
+import { footer, socials } from "../constants";
 
 /**
- * Footer — full-viewport "set-piece" footer inspired by ethansuero.com.
+ * Footer — compact set-piece modeled on davidrodriguez.studio's /contact:
+ * small mono kicker, two-line display CTA, then a single mono row at the
+ * bottom (email + location | copyright | socials). No forced viewport
+ * gap, no giant wordmark — the empty space is left to breathe naturally
+ * from the section's own pt-32 + mt-24 rhythm.
  *
- * Layout (top → bottom):
- *   1. Headline CTA on the left, anchor nav on the right
- *   2. Flex spacer
- *   3. Small mono row: email + location | socials | copyright
- *   4. Giant "ADNAAN DASOO" wordmark anchored to the footer's bottom edge,
- *      rendered twice: a muted ghost copy offset upward, layered behind a solid
- *      copy that bleeds slightly below the container — the double-shadow effect.
- *
- * The personality pills row from the previous footer iteration is removed —
- * it read as jargon clutter against the cleaner minimal direction.
+ * Font family pulls from tailwind's `font-display` token (Clash Display
+ * Bold), the same source Hero uses, so the two display moments share a
+ * single typeface definition.
  */
 export default function Contact() {
   return (
     <footer
       id="contact"
-      className="relative flex min-h-screen w-full flex-col overflow-hidden px-6 pt-32 sm:px-16"
+      className="relative flex w-full flex-col px-6 pt-32 sm:px-16"
     >
-      <div className="mx-auto flex w-full max-w-screen-2xl flex-1 flex-col">
-        {/* Top: huge CTA on the left, vertical anchor nav on the right */}
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-[1fr_auto] sm:items-start">
-          <a
-            href={`mailto:${footer.email}`}
-            className="group block text-ink"
-            style={{
-              fontFamily: DISPLAY_FONT_STACK,
-              fontWeight: 900,
-              fontSize: "clamp(60px, 12vw, 180px)",
-              lineHeight: "0.92",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-            }}
-          >
-            {footer.headlineLead}{" "}
-            <span className="whitespace-nowrap transition-colors duration-300 group-hover:text-accent">
-              {footer.headlineHighlight}{" "}
-              <span
-                aria-hidden="true"
-                className="inline-block transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
+      <div className="mx-auto flex w-full max-w-screen-2xl flex-col">
+        <span className="font-mono text-xs uppercase tracking-widest text-muted">
+          {footer.kicker}
+        </span>
+
+        <a
+          href={`mailto:${footer.email}`}
+          data-cursor="say hi 👋"
+          className="group mt-10 inline-block font-display text-ink"
+          style={{
+            fontWeight: 700,
+            fontSize: "clamp(56px, 11vw, 180px)",
+            lineHeight: "0.95",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          <span className="block">{footer.headlineLead}</span>
+          <span className="block whitespace-nowrap transition-colors duration-300 group-hover:text-flag">
+            {footer.headlineHighlight}{" "}
+            <span
+              aria-hidden="true"
+              className="inline-block align-baseline transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
+            >
+              {/*
+                Line-art arrow. viewBox is 100×100; stroke width 10 reads
+                visually heavy enough to sit next to the 900-weight display
+                text without looking thin. strokeLinecap="butt" gives the
+                clean square corners shown in the reference photo.
+              */}
+              <svg
+                viewBox="0 0 100 100"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="10"
+                strokeLinecap="butt"
+                strokeLinejoin="miter"
+                className="inline-block h-[0.78em] w-[0.78em]"
               >
-                ↗
-              </span>
+                <line x1="22" y1="78" x2="78" y2="22" />
+                <polyline points="36,22 78,22 78,64" />
+              </svg>
             </span>
-          </a>
+          </span>
+        </a>
 
-          <nav>
-            <ul className="flex flex-col gap-2 font-mono text-xs uppercase tracking-widest sm:text-sm sm:items-end">
-              {navLinks.map((link) => (
-                <li key={link.id}>
-                  <a
-                    href={`#${link.id}`}
-                    className="text-ink transition-opacity hover:opacity-60"
-                  >
-                    {link.title}
-                  </a>
-                </li>
-              ))}
-              <li>
-                <a
-                  href="#"
-                  className="text-ink transition-opacity hover:opacity-60"
-                >
-                  home
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        {/* Flexible spacer — pushes the small row + wordmark to the bottom */}
-        <div className="flex-1 min-h-[6rem]" />
-
-        {/* Small mono row: email + location | copyright | socials */}
-        <div className="grid grid-cols-1 gap-6 pb-8 font-mono text-[11px] uppercase tracking-widest text-muted sm:grid-cols-3 sm:items-end">
+        <div className="mt-24 grid grid-cols-1 gap-6 pb-8 font-mono text-[11px] uppercase tracking-widest text-muted sm:grid-cols-3 sm:items-end">
           <div className="flex flex-col gap-1">
             <span>{footer.email}</span>
             <span>{footer.location}</span>
@@ -92,7 +73,8 @@ export default function Contact() {
               <li key={social.name}>
                 <a
                   href={social.url}
-                  className="text-ink transition-opacity hover:opacity-60"
+                  data-cursor="say hi 👋"
+                  className="inline-flex min-h-[44px] items-center text-ink transition-opacity hover:opacity-60 sm:min-h-0"
                   target={social.url.startsWith("http") ? "_blank" : undefined}
                   rel={
                     social.url.startsWith("http")
@@ -106,55 +88,6 @@ export default function Contact() {
             ))}
           </ul>
         </div>
-      </div>
-
-      {/*
-        Giant wordmark with ghost-shadow effect.
-
-        Two absolutely-positioned <span>s share the same content and font sizing
-        but differ in color + vertical offset:
-          - Ghost: muted color, offset upward (bottom: 0.3em) so it appears
-            stacked behind/above the solid copy.
-          - Solid: ink color, bleeds slightly below the container (bottom:
-            -0.12em) so the letters' bottoms kiss the viewport edge.
-
-        Container is full-bleed (extends past the page padding) so the
-        wordmark can stretch edge-to-edge regardless of the inner max-width.
-      */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none relative w-full select-none overflow-hidden"
-        style={{ height: "clamp(110px, 19vw, 320px)" }}
-      >
-        <span
-          className="absolute left-0 right-0 whitespace-nowrap text-center"
-          style={{
-            bottom: "0.3em",
-            fontFamily: DISPLAY_FONT_STACK,
-            fontWeight: 900,
-            fontSize: "clamp(64px, 15vw, 260px)",
-            lineHeight: "0.85",
-            letterSpacing: "0.04em",
-            color: "var(--muted)",
-            opacity: 0.35,
-          }}
-        >
-          {footer.wordmark}
-        </span>
-        <span
-          className="absolute left-0 right-0 whitespace-nowrap text-center"
-          style={{
-            bottom: "-0.12em",
-            fontFamily: DISPLAY_FONT_STACK,
-            fontWeight: 900,
-            fontSize: "clamp(64px, 15vw, 260px)",
-            lineHeight: "0.85",
-            letterSpacing: "0.04em",
-            color: "var(--ink)",
-          }}
-        >
-          {footer.wordmark}
-        </span>
       </div>
     </footer>
   );
