@@ -2,25 +2,43 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx}"],
   mode: "jit",
+  // Theme is driven by `data-theme="dark"` on <html> (set by theme.jsx).
+  // This config enables the `dark:` variant whenever that attribute matches,
+  // so any `dark:text-...` / `dark:bg-...` class will pair with its base
+  // class automatically when the user toggles the navbar theme switch.
+  darkMode: ["class", '[data-theme="dark"]'],
+  // Makes `hover:` and `group-hover:` variants only fire on devices that
+  // actually support hover (mice / trackpads). Touch users never trigger
+  // sticky-hover states from a tap.
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       colors: {
-        primary: "#050816",
-        secondary: "#aaa6c3",
-        tertiary: "#151030",
-        test: '#0b0b0b',
-        "black-100": "#100d25",
-        "black-200": "#090325",
-        "white-100": "#f3f3f3",
-      },
-      boxShadow: {
-        card: "0px 35px 120px -15px #211e35",
+        ink: "var(--ink)",
+        paper: "var(--bg)",
+        accent: "var(--accent)",
+        edge: "var(--border)",
+        muted: "var(--muted)",
+        flag: "var(--flag)",
       },
       screens: {
         xs: "450px",
       },
-      backgroundImage: {
-        "hero-pattern": "url('/src/assets/herobg.png')",
+      fontFamily: {
+        display: ["Clash Display", "Geist", "system-ui", "sans-serif"],
+        sans: [
+          "Geist",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
+        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
     },
   },

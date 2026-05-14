@@ -1,44 +1,99 @@
-import { motion } from 'framer-motion';
-import { styles } from '../styles';
-import { ComputersCanvas } from './canvas';
+import { lazy, Suspense } from "react";
+import { motion } from "framer-motion";
+import { hero } from "../constants";
 
+// HeroBigText pulls in Three.js (~365 KB). Code-splitting it into its own
+// chunk lets the rest of the page (Manifesto, Experience, Tech, Selected
+// Work, Contact) finish downloading first; the wordmark fills in as Three
+// loads in parallel. Fallback is null so the wordmark area stays empty
+// during the swap — the page background already covers it.
+const HeroBigText = lazy(() => import("./HeroBigText"));
 
-const Hero = () => {
+const ease = [0.65, 0, 0.35, 1];
+
+/**
+ * Hero section.
+ *
+ * Layout:
+ * - Top-right: animated scroll-stream indicator (vertical line with an
+ *   orange streak travelling top→bottom on loop, vertical "SCROLL" label
+ *   below). Sits at the top of the inner content rail so it's the first
+ *   right-side element a visitor sees.
+ * - Bottom-right (above the wordmark): two-line kicker — Software
+ *   Engineer / Creative Developer, in display-friendly mono at ink color.
+ * - Bottom: HeroBigText — full-bleed WebGL wordmark with through-glass
+ *   blur localized around the cursor on hover.
+ *
+ * @param {object} props
+ * @param {boolean} [props.ready=true] - When false, the in-section
+ *   motion elements stay at their initial state and don't animate. Used
+ *   by the App-level Preloader: when the preloader is in its counting
+ *   phase, ready is false and the Hero is hidden; when the preloader
+ *   begins its reveal/split, ready flips to true and the kicker + scroll
+ *   indicator animate in alongside the splitting overlay.
+ */
+export default function Hero({ ready = true }) {
   return (
-    <section className='relative w-full h-screen mx-auto'>
-      <div className={`${styles.paddingX} absolute inset-0 top-[120px] max-w-7xl mx-auto flex flex-row items-start gap-5`}>
-        <div className='flex flex-col justify-center items-center mt-5'>
-          <div className='w-5 h-5 rounded-full bg-[#ea553b]' />
-          <div className='w-1 sm:h-80 h-40 orange-gradient' />
-        </div>
-
-        <div>
-          <h1 className={`${styles.heroHeadText} text-white`}>Hi, I'm <span className='text-[#ea553b]'>Adnaan</span></h1>
-          <p className={`${styles.heroSubText} mt-2 text-white-100`}> I develop full stack applications <br className='sm:block hidden'/> and webpages</p>
+    <section className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
+      {/* Inner content container — same 1536px rail as every other section,
+          and same internal px-6 sm:px-16 padding the navbar uses, so the
+          scroll indicator's right edge lines up with the navbar's theme
+          toggle on wide displays. (Without the padding, the inner rail's
+          edge sits flush with the section's content edge, which is 64px
+          to the right of the navbar's right-aligned items.) */}
+      <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-6 sm:px-16">
+        <div className="flex justify-end">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={ready ? { opacity: 1 } : false}
+            transition={{ duration: 0.6, delay: 0.25, ease }}
+            className="flex flex-col items-center gap-3"
+          >
+            {/* Vertical track + orange streak that loops top→bottom. */}
+            <div className="relative h-20 w-px overflow-hidden bg-edge">
+              <motion.div
+                className="absolute left-0 top-0 h-4 w-px bg-flag"
+                initial={{ y: -16 }}
+                animate={{ y: 80 }}
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+            </div>
+            <span
+              className="font-mono text-[10px] uppercase tracking-widest text-muted"
+              style={{ writingMode: "vertical-rl" }}
+            >
+              {hero.scrollPrompt}
+            </span>
+          </motion.div>
         </div>
       </div>
 
-      {/* <ComputersCanvas /> */}
-
-      <div className='absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center'>
-        <a href='#about'>
-          <div className='w-[32px] h-[55px] rounded-3xl border-4 border-secondary flex justify-center items-start p-2'>
-            <motion.div
-              animate={{
-                y: [0, 24],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                repeatType: "loop",
-              }}
-              className='w-2 h-2 rounded-full bg-secondary mb-1'
-            />
-          </div>
-        </a>
+      {/* Kicker — Software Engineer / Creative Developer. Anchored just
+          above the wordmark and right-aligned with the inner rail. */}
+      <div className="pointer-events-none absolute bottom-[24vw] left-0 right-0 z-10 mx-auto w-full max-w-screen-2xl px-6 sm:px-16">
+        <div className="flex justify-end">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={ready ? { opacity: 1, y: 0 } : false}
+            transition={{ duration: 0.6, delay: 0.5, ease }}
+            className="font-mono text-sm uppercase tracking-widest text-ink sm:text-right"
+          >
+            {hero.kicker.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </motion.div>
+        </div>
       </div>
+
+      {/* WebGL display word, full-bleed at the bottom. Lazy-loaded so
+          Three.js doesn't block the rest of the page's initial paint. */}
+      <Suspense fallback={null}>
+        <HeroBigText text={hero.name} />
+      </Suspense>
     </section>
-  )
+  );
 }
-
-export default Hero

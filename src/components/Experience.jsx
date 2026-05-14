@@ -1,76 +1,119 @@
-import React from "react";
-import {
-  VerticalTimeline,
-  VerticalTimelineElement,
-} from "react-vertical-timeline-component";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
-import "react-vertical-timeline-component/style.min.css";
-
-import { styles } from "../styles";
-import { experiences } from "../constants";
+import { experience, experiences } from "../constants";
 import { SectionWrapper } from "../hoc";
-import { textVariant } from "../utils/motion";
+import { revealVariant as reveal } from "../utils/motion";
+import ExperienceRow from "./ExperienceRow";
 
-const ExperienceCard = ({ experience }) => (
-  <VerticalTimelineElement
-      contentStyle={{
-        background: "#1d1836",
-        color: "#fff",
-      }}
-      contentArrowStyle={{ borderRight: "7px solid  #232631" }}
-      date={experience.date}
-      iconStyle={{ background: experience.iconBg }}
-      icon={
-        <div className='flex justify-center items-center w-full h-full'>
-          <img
-            src={experience.icon}
-            alt={experience.company_name}
-            className='w-[60%] h-[60%] object-contain'
-          />
-        </div>
-      }
-    >
-      <div>
-        <h3 className='text-white text-[24px] font-bold'>{experience.title}</h3>
-        <p
-          className='text-secondary text-[16px] font-semibold'
-          style={{ margin: 0 }}
-        >
-          {experience.company_name}
-        </p>
-      </div>
+function Experience() {
+  // Single source of truth for which row is open. Clicking an already-
+  // open row closes it; clicking a different row opens it and auto-
+  // closes the previous one (accordion).
+  const [openIdx, setOpenIdx] = useState(null);
+  // Hover-to-expand is a desktop-only nicety — on touch, `mouseenter`
+  // gets synthesized from a tap which causes a "tap opens via hover,
+  // then click toggles closed" race. Gating to `(hover: hover)` keeps
+  // mobile strictly click-driven.
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    setCanHover(window.matchMedia?.("(hover: hover)").matches ?? false);
+  }, []);
 
-      <ul className='mt-5 list-disc ml-5 space-y-2'>
-        {experience.points.map((point, index) => (
-          <li
-            key={`experience-point-${index}`}
-            className='text-white-100 text-[14px] pl-1 tracking-wider'
-          >
-            {point}
-          </li>
-        ))}
-      </ul>
-    </VerticalTimelineElement>
-)
-
-const Experience = () => {
   return (
-    <>
-      <motion.div variants={textVariant()}>
-      <p className={styles.sectionSubText}>What I've done so far</p>
-        <h2 className={styles.sectionHeadText}>Work Experience.</h2>
-      </motion.div>
+    <div data-cursor="check me out" className="flex flex-col gap-10 py-24">
+      <motion.span
+        variants={reveal}
+        custom={0}
+        className="font-mono text-xs uppercase tracking-widest text-muted"
+      >
+        {experience.label}
+      </motion.span>
 
-      <div className="mt-20 flex flex-col">
-        <VerticalTimeline>
-          {experiences.map((experience, index) => (
-            <ExperienceCard key={index} experience={experience}/>
-          ))}
-        </VerticalTimeline>
-      </div>
-    </>
-  )
+      <motion.ul
+        variants={reveal}
+        custom={0.1}
+        className="flex flex-col"
+      >
+        {experiences.map((entry, i) => (
+          <ExperienceRow
+            key={`${entry.title}-${entry.company_name}-${entry.date}`}
+            entry={entry}
+            index={i}
+            isOpen={openIdx === i}
+            onToggle={() => setOpenIdx(openIdx === i ? null : i)}
+            onHoverEnter={canHover ? () => setOpenIdx(i) : null}
+            onHoverLeave={
+              canHover
+                ? () => setOpenIdx((curr) => (curr === i ? null : curr))
+                : null
+            }
+          />
+        ))}
+      </motion.ul>
+
+      <motion.div
+        variants={reveal}
+        custom={0.15 + experiences.length * 0.06 + 0.15}
+        className="pt-10"
+      >
+        <a
+          href="/resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open resume PDF in a new tab"
+          className="group inline-block focus:outline-none"
+        >
+          {/*
+            Staggered per-letter vertical swap. Each character is its own
+            mini overflow-hidden container with two stacked copies — the
+            outgoing slides up, the incoming slides in from below. The
+            transitionDelay scales with the character's index, so left
+            letters start first and the swap propagates left→right as a
+            diagonal wave even though each letter only moves vertically.
+            Going both directions (in and out) shares the same delay,
+            so the wave plays the same on hover and unhover.
+          */}
+          <span
+            aria-hidden="true"
+            className="block whitespace-nowrap text-xl sm:text-2xl leading-[1.25] text-ink"
+          >
+            {Array.from("Read the Resume ↗").map((char, i) => (
+              <span
+                key={i}
+                className="relative inline-block h-[1.25em] overflow-hidden align-bottom"
+              >
+                <span
+                  className="block transition-transform duration-[360ms] group-hover:-translate-y-full group-focus-visible:-translate-y-full"
+                  style={{
+                    transitionDelay: `${i * 7}ms`,
+                    transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+                  }}
+                >
+                  {char === " " ? " " : char}
+                </span>
+                <span
+                  className="absolute inset-0 translate-y-full transition-transform duration-[360ms] group-hover:translate-y-0 group-focus-visible:translate-y-0"
+                  style={{
+                    transitionDelay: `${i * 7}ms`,
+                    transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+                  }}
+                >
+                  {char === " " ? " " : char}
+                </span>
+              </span>
+            ))}
+          </span>
+          <span
+            className="block h-px origin-left scale-x-0 bg-ink transition-transform duration-[400ms] group-hover:scale-x-100 group-focus-visible:scale-x-100"
+            style={{ transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)" }}
+          />
+        </a>
+      </motion.div>
+    </div>
+  );
 }
 
-export default SectionWrapper(Experience, "work")
+const ExperienceSection = SectionWrapper(Experience, "work", {
+  dataCursor: "check me out",
+});
+export default ExperienceSection;

@@ -1,22 +1,25 @@
-import { EarthCanvas, BallCanvas, ComputersCanvas, StarsCanvas } from './canvas';
 import Hero from './Hero';
 import Navbar from './Navbar';
-import About from './About';
+import Manifesto from './Manifesto';
 import Tech from './Tech';
 import Experience from './Experience';
-import Works from './Works';
+import SelectedWork from './SelectedWork';
 import Contact from './Contact';
+import ScrollToTop from './ScrollToTop';
+import BuzzwordMarquee from './BuzzwordMarquee';
+import CustomCursor from './CustomCursor';
+import Preloader from './Preloader';
 
 export {
   Hero,
   Navbar,
-  About,
+  Manifesto,
   Tech,
   Experience,
-  Works,
+  SelectedWork,
   Contact,
-  EarthCanvas, 
-  BallCanvas, 
-  ComputersCanvas, 
-  StarsCanvas
-}
+  ScrollToTop,
+  BuzzwordMarquee,
+  CustomCursor,
+  Preloader,
+};
