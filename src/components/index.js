@@ -1,6 +1,7 @@
 import Hero from './Hero';
 import Navbar from './Navbar';
 import Manifesto from './Manifesto';
+import Process from './Process';
 import Tech from './Tech';
 import Experience from './Experience';
 import SelectedWork from './SelectedWork';
@@ -14,6 +15,7 @@ export {
   Hero,
   Navbar,
   Manifesto,
+  Process,
   Tech,
   Experience,
   SelectedWork,

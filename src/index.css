@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap");
 
-/* Clash Display — site display typeface used by Hero, Contact (footer) and
-   Selected Work tile covers. Variable WOFF2 covers weights 200–700 in a
-   single ~29KB file, so we never need to pull additional weight files. */
+/* Clash Display — site display typeface used by Hero, Contact (footer)
+   and Selected Work tile covers. Variable WOFF2 covers weights 200–700 in
+   a single ~29KB file, so we never need to pull additional weight files. */
 @font-face {
   font-family: 'Clash Display';
   src: url('/fonts/clash-display/ClashDisplay-Variable.woff2') format('woff2');

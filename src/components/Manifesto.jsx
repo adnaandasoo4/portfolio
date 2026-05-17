@@ -1,18 +1,20 @@
 import { motion } from "framer-motion";
-import { manifesto } from "../constants";
+import { HIDE_SECTION_LABELS, manifesto } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { revealVariant as reveal } from "../utils/motion";
 
 function Manifesto() {
   return (
     <div className="flex flex-col gap-10 py-24">
-      <motion.span
-        variants={reveal}
-        custom={0}
-        className="font-mono text-xs uppercase tracking-widest text-muted"
-      >
-        {manifesto.label}
-      </motion.span>
+      {!HIDE_SECTION_LABELS && (
+        <motion.span
+          variants={reveal}
+          custom={0}
+          className="font-mono text-xs uppercase tracking-widest text-muted"
+        >
+          {manifesto.label}
+        </motion.span>
+      )}
 
       {/* Intro paragraph in display weight. Iterates segments so the
           highlight keywords (intentional / obsessed) render in slate-gray

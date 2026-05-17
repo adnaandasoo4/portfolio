@@ -10,15 +10,33 @@ import {
 } from "react-icons/si";
 import { NextjsWordmark, GsapWordmark } from "../components/icons/TechLogos";
 
-// Nav anchors. `id` is the in-page anchor (must match the SectionWrapper id
-// for that component); `title` is the label rendered in the Navbar + footer.
-// The label/anchor mismatch on "work" is intentional: the Experience component
-// historically registered itself at #work, while the user-facing nav reserves
-// the "work" label for the Selected Work / projects section.
+// Nav links. Three kinds the navbar knows how to handle:
+//
+//   "anchor"     — always smooth-scroll to `#id` on the CURRENT page.
+//                  Used by `contact` because the Contact component is
+//                  rendered at the bottom of every route, so the anchor
+//                  always exists.
+//
+//   "hybrid"     — on the home route, smooth-scroll to `#id`. On any
+//                  other route, navigate to `to`. Used by `work`: home
+//                  visitors land on the featured-work section, anyone
+//                  off-home lands on the full /works index.
+//
+//   "navAnchor"  — always lands on home's `#id` section. On home, just
+//                  scrolls. On any other route, navigates to "/" with a
+//                  `scrollTo` state, and Home reads it to scroll the
+//                  section into view. If `triggersPreloader: true`, the
+//                  navbar also asks App to replay the preloader so the
+//                  navigation feels like a fresh page load.
 export const navLinks = [
-  { id: "work",     title: "experience" }, // → Experience section
-  { id: "projects", title: "work" },        // → Selected Work section
-  { id: "contact",  title: "contact" },     // → Footer
+  {
+    kind: "navAnchor",
+    id: "experience",
+    title: "experience",
+    triggersPreloader: true,
+  },
+  { kind: "route", to: "/works", title: "works" },
+  { kind: "anchor", id: "contact", title: "contact" },
 ];
 
 // Tech stack rendered by <Tech /> as a bento-style grid (Zubiate / itsjay.us style):
@@ -76,49 +94,86 @@ const experiences = [
 // screenshots used as stand-ins until real project covers replace them.
 // To swap one out, drop a new file at the same path (or change the path
 // here) — Tech.jsx and SelectedWork.jsx both consume `coverImage` directly.
+// Each project carries enough metadata to drive both the Selected Work
+// carousel tile and the per-project detail page at /works/:slug.
+//   slug         — kebab-case identifier; the URL segment for the detail page
+//   year         — display year shown in the detail-page metadata grid
+//   services     — short list of disciplines, rendered as a `/`-separated
+//                  string under the Services label on the detail page
+//   description  — single paragraph; shown both on the tile hover card and
+//                  in the long-form body on the detail page
+//   techStack    — tag list shown on the tile hover card
+//   coverImage   — desktop screenshot used for the tile background AND
+//                  the desktop hero image on the detail page
+//   mobileImages — paths for the two phone-frame screenshots rendered
+//                  side-by-side on the detail page. Empty array → the
+//                  detail page renders labeled placeholder boxes instead.
+//   liveUrl      — external link surfaced by the detail page's "Live
+//                  Website ↗" CTA (null hides the button)
+//   sourceUrl    — same idea for the "View Source ↗" CTA
 const projects = [
   {
+    slug: "compliance-dashboard",
     name: "Compliance Dashboard",
+    year: "2024",
+    services: ["Web Development", "Data Visualization"],
     description:
       "Internal financial-services dashboard for change-management review. React + TypeScript on a backend team's data feed.",
     techStack: ["React", "TypeScript", "Node", "PostgreSQL"],
     coverImage: "/work/compliance-dashboard.jpg",
+    mobileImages: [],
     liveUrl: null,
     sourceUrl: null,
   },
   {
+    slug: "portfolio-v2",
     name: "Portfolio v2",
+    year: "2026",
+    services: ["Web Design", "Web Development", "Motion"],
     description:
       "This site. Typographic redesign with GSAP pinned scroll, Lenis smooth-scroll, Framer Motion reveals, and a custom theme system.",
     techStack: ["React", "Vite", "GSAP", "Lenis", "Tailwind"],
     coverImage: "/work/portfolio-v2.jpg",
-    liveUrl: "https://github.com/adnaandasoo4/portfolio",
+    mobileImages: [],
+    liveUrl: "https://adnaandasoo.com",
     sourceUrl: "https://github.com/adnaandasoo4/portfolio",
   },
   {
+    slug: "design-system-explorer",
     name: "Design System Explorer",
+    year: "2025",
+    services: ["Web Development", "Tooling"],
     description:
       "Browser-based playground for a component library — live token previews, prop controls, and copyable usage snippets.",
     techStack: ["React", "TypeScript", "Tailwind", "MDX"],
     coverImage: "/work/design-system-explorer.jpg",
+    mobileImages: [],
     liveUrl: null,
     sourceUrl: null,
   },
   {
+    slug: "motion-library",
     name: "Motion Library",
+    year: "2025",
+    services: ["Web Development", "Motion"],
     description:
       "Reusable React hooks + components for scroll-driven and gesture-driven UI. Designed for production performance at 60fps.",
     techStack: ["React", "GSAP", "Motion", "TypeScript"],
     coverImage: "/work/motion-library.jpg",
+    mobileImages: [],
     liveUrl: null,
     sourceUrl: null,
   },
   {
+    slug: "realtime-editor",
     name: "Realtime Editor",
+    year: "2024",
+    services: ["Web Development", "Realtime Systems"],
     description:
       "Collaborative document editor with CRDT-based operational transforms and WebRTC peer sync. Sub-50ms cursor latency across regions.",
     techStack: ["React", "TypeScript", "WebRTC", "Y.js"],
     coverImage: "/work/realtime-editor.jpg",
+    mobileImages: [],
     liveUrl: null,
     sourceUrl: null,
   },
@@ -169,6 +224,65 @@ export const hero = {
   kicker: ["Software Engineer", "Creative Developer"],
   // Vertical label under the animated scroll-stream indicator.
   scrollPrompt: "Scroll",
+  // Top-left live clock. `timeZone` is an IANA zone passed to
+  // Intl.DateTimeFormat so the displayed time always reflects the author's
+  // local time regardless of the visitor's locale.
+  locale: {
+    label: "Baltimore — Local",
+    timeZone: "America/New_York",
+  },
+};
+
+// Temporary experiment flag — when true, every section's small mono
+// "01 — Section" label is suppressed so the page can be evaluated without
+// section headers. Flip to false to restore the labels in one place.
+export const HIDE_SECTION_LABELS = true;
+
+// Process section — five stages of the design process rendered as large
+// stacked display rows on the right and a content slot on the left that
+// fills with the hovered stage's description + framed identity card.
+// Inspired by the ethansuero.com client-list set piece, repurposed for a
+// design-process narrative. The framed card shows the stage number in
+// Clash Display with the stage name and tool stack beneath.
+export const designProcess = {
+  label: "02 — Process",
+  stages: [
+    {
+      number: "01",
+      name: "Discovery",
+      description:
+        "First conversation. Understand the brand, audience, constraints, and what 'great' looks like. The goal at this stage is alignment, not solutions.",
+      tools: ["Notion", "Loom", "Figjam"],
+    },
+    {
+      number: "02",
+      name: "Strategy",
+      description:
+        "Define the shape of the project. Sitemap, content priorities, success criteria. Decide what the work needs to do before we worry about what it looks like.",
+      tools: ["Figjam", "Whimsical", "Notion"],
+    },
+    {
+      number: "03",
+      name: "Design",
+      description:
+        "Sketch, type system, color, motion language. Iterate fast in low fidelity, then commit to high fidelity once the system is settled.",
+      tools: ["Figma", "Cabinet Grotesk", "After Effects"],
+    },
+    {
+      number: "04",
+      name: "Development",
+      description:
+        "Build the design into production code. Reusable components, motion that respects performance, accessibility on by default.",
+      tools: ["React", "Vite", "Tailwind", "Framer Motion"],
+    },
+    {
+      number: "05",
+      name: "Launch",
+      description:
+        "Ship, measure, and hand over. Deploy with monitoring in place, write the docs, make sure the team can keep moving.",
+      tools: ["Vercel", "GitHub Actions", "Plausible"],
+    },
+  ],
 };
 
 export const footer = {
@@ -178,8 +292,8 @@ export const footer = {
   // `headlineHighlight` (line 2) turns the accent color and its trailing arrow
   // nudges up-right. Its last word stays on the same line as the arrow via
   // whitespace-nowrap in the component.
-  headlineLead: "Say hi!",
-  headlineHighlight: "Let's talk",
+  headlineLead: "Got an idea?",
+  headlineHighlight: "Let's build it",
   email: "adnaandasoo@gmail.com",
   location: "Baltimore · GMT-5",
   copyright: "© 2026 Adnaan Dasoo · Software Engineer",
@@ -204,16 +318,25 @@ export const experience = {
   // Small uppercase mono label. Order matches the nav bar:
   // 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
   label: "02 — Experience",
+  // Big display heading rendered in Clash Display above the experience accordion.
+  // Independent of HIDE_SECTION_LABELS — matches the Tech and Selected Work
+  // headings for consistent section-top treatment.
+  heading: "Experience",
 };
 
 export const tech = {
   // Small uppercase mono label. Order matches the nav bar:
   // 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
   label: "03 — Stack",
+  // Big display heading rendered in Clash Display above the bento grid. Independent
+  // of HIDE_SECTION_LABELS — section numbers come and go; this stays.
+  heading: "Tech Stack",
 };
 
 export const selectedWork = {
   // Small uppercase mono label rendered on the left of the section header.
-  // The big centered title is hardcoded as "Featured Work" in SelectedWork.jsx.
   label: "04 — Featured Work",
+  // Big display heading rendered in Clash Display above the horizontal carousel.
+  // Independent of HIDE_SECTION_LABELS.
+  heading: "Selected Work",
 };

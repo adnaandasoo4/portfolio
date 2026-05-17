@@ -1,4 +1,4 @@
-import { footer, socials } from "../constants";
+import { HIDE_SECTION_LABELS, footer, socials } from "../constants";
 
 /**
  * Footer — compact set-piece modeled on davidrodriguez.studio's /contact:
@@ -18,9 +18,11 @@ export default function Contact() {
       className="relative flex w-full flex-col px-6 pt-32 sm:px-16"
     >
       <div className="mx-auto flex w-full max-w-screen-2xl flex-col">
-        <span className="font-mono text-xs uppercase tracking-widest text-muted">
-          {footer.kicker}
-        </span>
+        {!HIDE_SECTION_LABELS && (
+          <span className="font-mono text-xs uppercase tracking-widest text-muted">
+            {footer.kicker}
+          </span>
+        )}
 
         <a
           href={`mailto:${footer.email}`}
@@ -62,7 +64,7 @@ export default function Contact() {
           </span>
         </a>
 
-        <div className="mt-24 grid grid-cols-1 gap-6 pb-8 font-mono text-[11px] uppercase tracking-widest text-muted sm:grid-cols-3 sm:items-end">
+        <div className="mt-24 grid grid-cols-1 gap-6 pb-8 font-mono text-sm uppercase tracking-widest text-muted sm:grid-cols-3 sm:items-end">
           <div className="flex flex-col gap-1">
             <span>{footer.email}</span>
             <span>{footer.location}</span>
