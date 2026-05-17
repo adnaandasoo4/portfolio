@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { hero } from "../constants";
 
@@ -10,6 +10,61 @@ import { hero } from "../constants";
 const HeroBigText = lazy(() => import("./HeroBigText"));
 
 const ease = [0.65, 0, 0.35, 1];
+
+/**
+ * Live HH:MM:SS clock for the author's local time, shown in the hero's
+ * top-left corner to balance the top-right scroll indicator. The time is
+ * formatted via Intl.DateTimeFormat with an explicit IANA `timeZone`, so
+ * the displayed clock is always the author's local time regardless of
+ * where the visitor is viewing from. Ticks once per second.
+ */
+function LocalTime({ label, timeZone, ready }) {
+  const formatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+        timeZone,
+      }),
+    [timeZone],
+  );
+
+  const [time, setTime] = useState(() => formatter.format(new Date()));
+
+  useEffect(() => {
+    const tick = () => setTime(formatter.format(new Date()));
+    // Align the first tick to the next wall-clock second so the seconds
+    // digit doesn't lag a fractional moment behind real time.
+    const msUntilNextSecond = 1000 - (Date.now() % 1000);
+    let intervalId;
+    const timeoutId = setTimeout(() => {
+      tick();
+      intervalId = setInterval(tick, 1000);
+    }, msUntilNextSecond);
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [formatter]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={ready ? { opacity: 1 } : false}
+      transition={{ duration: 0.6, delay: 0.25, ease }}
+      className="flex flex-col gap-1.5"
+    >
+      <span className="font-mono text-[10px] uppercase tracking-widest text-muted">
+        {label}
+      </span>
+      <span className="font-mono text-sm tracking-wider text-ink tabular-nums">
+        {time}
+      </span>
+    </motion.div>
+  );
+}
 
 /**
  * Hero section.
@@ -42,7 +97,13 @@ export default function Hero({ ready = true }) {
           edge sits flush with the section's content edge, which is 64px
           to the right of the navbar's right-aligned items.) */}
       <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-6 sm:px-16">
-        <div className="flex justify-end">
+        <div className="flex items-start justify-between">
+          <LocalTime
+            label={hero.locale.label}
+            timeZone={hero.locale.timeZone}
+            ready={ready}
+          />
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={ready ? { opacity: 1 } : false}

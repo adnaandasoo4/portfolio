@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { tech, technologies } from "../constants";
+import { HIDE_SECTION_LABELS, tech, technologies } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { revealVariant as reveal } from "../utils/motion";
 
@@ -95,13 +95,29 @@ function Tech() {
 
   return (
     <div className="flex flex-col gap-10 py-24">
-      <motion.span
+      {!HIDE_SECTION_LABELS && (
+        <motion.span
+          variants={reveal}
+          custom={0}
+          className="font-mono text-xs uppercase tracking-widest text-muted"
+        >
+          {tech.label}
+        </motion.span>
+      )}
+
+      <motion.h2
         variants={reveal}
-        custom={0}
-        className="font-mono text-xs uppercase tracking-widest text-muted"
+        custom={0.05}
+        className="font-display uppercase text-ink"
+        style={{
+          fontWeight: 700,
+          fontSize: "clamp(40px, 6vw, 96px)",
+          lineHeight: 1,
+          letterSpacing: "-0.01em",
+        }}
       >
-        {tech.label}
-      </motion.span>
+        {tech.heading}
+      </motion.h2>
 
       {/* Mobile: simple 2-column icon grid. Drops the bento layout's
           primary/supporting distinction and the morphing-highlight

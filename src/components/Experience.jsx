@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { experience, experiences } from "../constants";
+import { HIDE_SECTION_LABELS, experience, experiences } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { revealVariant as reveal } from "../utils/motion";
 import ExperienceRow from "./ExperienceRow";
@@ -21,13 +21,29 @@ function Experience() {
 
   return (
     <div data-cursor="check me out" className="flex flex-col gap-10 py-24">
-      <motion.span
+      {!HIDE_SECTION_LABELS && (
+        <motion.span
+          variants={reveal}
+          custom={0}
+          className="font-mono text-xs uppercase tracking-widest text-muted"
+        >
+          {experience.label}
+        </motion.span>
+      )}
+
+      <motion.h2
         variants={reveal}
-        custom={0}
-        className="font-mono text-xs uppercase tracking-widest text-muted"
+        custom={0.05}
+        className="font-display uppercase text-ink"
+        style={{
+          fontWeight: 700,
+          fontSize: "clamp(40px, 6vw, 96px)",
+          lineHeight: 1,
+          letterSpacing: "-0.01em",
+        }}
       >
-        {experience.label}
-      </motion.span>
+        {experience.heading}
+      </motion.h2>
 
       <motion.ul
         variants={reveal}
@@ -54,7 +70,7 @@ function Experience() {
       <motion.div
         variants={reveal}
         custom={0.15 + experiences.length * 0.06 + 0.15}
-        className="pt-10"
+        className="flex justify-end pt-10"
       >
         <a
           href="/resume.pdf"
@@ -77,7 +93,7 @@ function Experience() {
             aria-hidden="true"
             className="block whitespace-nowrap text-xl sm:text-2xl leading-[1.25] text-ink"
           >
-            {Array.from("Read the Resume ↗").map((char, i) => (
+            {Array.from("Read the resume ↗").map((char, i) => (
               <span
                 key={i}
                 className="relative inline-block h-[1.25em] overflow-hidden align-bottom"
@@ -113,7 +129,7 @@ function Experience() {
   );
 }
 
-const ExperienceSection = SectionWrapper(Experience, "work", {
+const ExperienceSection = SectionWrapper(Experience, "experience", {
   dataCursor: "check me out",
 });
 export default ExperienceSection;

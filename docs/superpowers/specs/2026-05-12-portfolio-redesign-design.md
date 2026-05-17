@@ -1,4 +1,4 @@
-M# Portfolio v2 — Design Spec
+# Portfolio v2 — Design Spec
 
 **Date:** 2026-05-12
 **Status:** Approved, ready for implementation planning
