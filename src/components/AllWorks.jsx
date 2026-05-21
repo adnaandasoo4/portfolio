@@ -129,6 +129,7 @@ export default function AllWorks() {
       <section className="mx-auto w-full max-w-screen-2xl px-6 pb-24 sm:px-16">
         <ul
           role="list"
+          className="space-y-8 sm:space-y-0"
           onMouseLeave={() => setHoveredIdx(null)}
         >
           {projects.map((project, i) => {
@@ -154,7 +155,7 @@ export default function AllWorks() {
                   data-cursor="open project"
                   aria-label={`Open ${project.name}, ${project.year}`}
                   onMouseEnter={() => setHoveredIdx(i)}
-                  className="group flex items-baseline justify-between gap-8 py-5 sm:py-7"
+                  className="group flex flex-col gap-4 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:py-7"
                 >
                   <motion.div
                     className="flex items-baseline gap-6"
@@ -176,7 +177,7 @@ export default function AllWorks() {
                       className="font-display uppercase"
                       style={{
                         fontWeight: 700,
-                        fontSize: "clamp(48px, 7vw, 112px)",
+                        fontSize: "clamp(32px, 9vw, 112px)",
                         lineHeight: 1,
                         letterSpacing: "-0.02em",
                       }}
@@ -184,8 +185,35 @@ export default function AllWorks() {
                       {project.name}
                     </h2>
                   </motion.div>
+                  {/* Mobile-only inline thumbnail. Hidden on sm+ — desktop uses the
+                      cursor-follow preview instead. */}
+                  <motion.div
+                    className="block w-full sm:hidden"
+                    style={{ aspectRatio: "16 / 10" }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: delay + 0.15,
+                      duration: 0.5,
+                      ease: [0.65, 0, 0.35, 1],
+                    }}
+                  >
+                    {project.coverImage ? (
+                      <img
+                        src={project.coverImage}
+                        alt={project.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                        {project.name}
+                      </div>
+                    )}
+                  </motion.div>
                   <motion.span
-                    className="hidden sm:inline whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted"
+                    className="whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
