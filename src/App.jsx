@@ -67,13 +67,21 @@ function Home({ ready }) {
   useEffect(() => {
     const target = location.state?.scrollTo;
     if (!target) return;
+    // Consume the scrollTo before the scroll fires. `history.replaceState`
+    // clears it from the browser-level history entry without touching React
+    // Router's in-memory location (so ScrollOnRouteChange doesn't see a
+    // state change and race us back to 0). On the next reload, useLocation
+    // hydrates state from the now-null history.state and this effect skips.
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", location.pathname + location.search);
+    }
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const el = document.getElementById(target);
         if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
-  }, [location.state]);
+  }, [location.pathname, location.search, location.state]);
 
   return (
     <>
