@@ -17,7 +17,7 @@ export default function Contact() {
       id="contact"
       className="relative flex w-full flex-col px-6 pt-32 sm:px-16"
     >
-      <div className="mx-auto flex w-full max-w-screen-2xl flex-col">
+      <div className="mx-auto flex w-full max-w-[1800px] flex-col">
         {!HIDE_SECTION_LABELS && (
           <span className="font-mono text-xs uppercase tracking-widest text-muted">
             {footer.kicker}

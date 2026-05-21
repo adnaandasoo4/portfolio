@@ -96,7 +96,7 @@ export default function Hero({ ready = true }) {
           toggle on wide displays. (Without the padding, the inner rail's
           edge sits flush with the section's content edge, which is 64px
           to the right of the navbar's right-aligned items.) */}
-      <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 flex-col px-6 sm:px-16">
+      <div className="relative mx-auto flex w-full max-w-[1800px] flex-1 flex-col px-6 sm:px-16">
         <div className="flex items-start justify-between">
           <LocalTime
             label={hero.locale.label}
@@ -135,7 +135,7 @@ export default function Hero({ ready = true }) {
 
       {/* Kicker — Software Engineer / Creative Developer. Anchored just
           above the wordmark and right-aligned with the inner rail. */}
-      <div className="pointer-events-none absolute bottom-[24vw] left-0 right-0 z-10 mx-auto w-full max-w-screen-2xl px-6 sm:px-16">
+      <div className="pointer-events-none absolute bottom-[24vw] left-0 right-0 z-10 mx-auto w-full max-w-[1800px] px-6 sm:px-16">
         <div className="flex justify-end">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
