@@ -32,7 +32,7 @@ export default function AllWorks() {
           onMouseLeave={() => setHoveredIdx(null)}
         >
           {projects.map((project, i) => {
-            const delay = 0.6 + i * 0.08;
+            const delay = i * 0.08;
             return (
               <li key={project.slug}>
                 <Link
@@ -49,7 +49,7 @@ export default function AllWorks() {
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
-                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      delay: prefersReducedMotion ? 0 : delay,
                       duration: prefersReducedMotion ? 0.2 : 0.5,
                       ease: [0.65, 0, 0.35, 1],
                     }}
@@ -94,7 +94,7 @@ export default function AllWorks() {
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
-                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      delay: prefersReducedMotion ? 0 : delay,
                       duration: prefersReducedMotion ? 0.2 : 0.5,
                       ease: [0.65, 0, 0.35, 1],
                     }}
