@@ -138,6 +138,7 @@ export default function AllWorks() {
             return (
               <li
                 key={project.slug}
+                className="group"
                 style={{
                   opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.35 : 1,
                   transition: "opacity 200ms",
@@ -146,7 +147,7 @@ export default function AllWorks() {
                 {/* Hairline above the row — animates from scaleX 0 to 1 on mount,
                     transform-origin: left so it grows left-to-right. */}
                 <motion.div
-                  className="h-px w-full origin-left bg-edge"
+                  className="h-px w-full origin-left bg-edge transition-all duration-200 group-focus-within:h-0.5 group-focus-within:bg-ink"
                   initial={prefersReducedMotion ? { opacity: 0 } : { scaleX: 0 }}
                   animate={prefersReducedMotion ? { opacity: 1 } : { scaleX: 1 }}
                   transition={{
@@ -160,7 +161,7 @@ export default function AllWorks() {
                   data-cursor="open project"
                   aria-label={`Open ${project.name}, ${project.year}`}
                   onMouseEnter={() => setHoveredIdx(i)}
-                  className="group flex flex-col gap-4 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:py-7"
+                  className="group flex flex-col gap-4 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:py-7 focus:outline-none"
                 >
                   <motion.div
                     className="flex items-baseline gap-6"
