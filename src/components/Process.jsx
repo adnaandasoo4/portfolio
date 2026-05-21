@@ -79,7 +79,7 @@ function Process() {
     displayedIndex !== null ? designProcess.stages[displayedIndex] : null;
 
   return (
-    <div className="flex flex-col gap-12 py-24">
+    <div className="flex flex-col gap-12 py-6 sm:py-24">
       {!HIDE_SECTION_LABELS && (
         <motion.span
           variants={reveal}
@@ -216,7 +216,12 @@ function Process() {
               className="block font-display uppercase text-ink"
               style={{
                 fontWeight: 700,
-                fontSize: "clamp(56px, 14vw, 128px)",
+                // Aggressive shrink so "DEVELOPMENT" (the longest stage
+                // name) clears the section's px-6 padding on every phone
+                // including 320px Galaxy/iPhone SE widths. clamp min 28
+                // + vw factor 12 keeps the text readable on small phones
+                // while still scaling up nicely as the viewport grows.
+                fontSize: "clamp(28px, 12vw, 128px)",
                 lineHeight: 0.82,
                 letterSpacing: "-0.02em",
               }}

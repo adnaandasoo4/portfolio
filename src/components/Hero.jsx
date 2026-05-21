@@ -134,16 +134,18 @@ export default function Hero({ ready = true }) {
       </div>
 
       {/* Mobile-only sideways wordmark — replaces the WebGL ADNAAN on
-          phones. Vertically centered along the left edge and scaled up
-          to dominate the column. `writing-mode: vertical-rl` rotates
-          Latin glyphs 90° clockwise (top-to-bottom reading), matching
-          the technique used by the SCROLL label on the right. */}
+          phones. Bottom is anchored to the same `bottom-[24vw]` rail
+          the kicker uses, so the last "N" sits flush with the bottom
+          of "Creative Developer" — the two read as a connected
+          bottom band. `writing-mode: vertical-rl` rotates Latin glyphs
+          90° clockwise (top-to-bottom reading), matching the technique
+          used by the SCROLL label on the right. */}
       <motion.div
         aria-hidden="true"
         initial={{ opacity: 0 }}
         animate={ready ? { opacity: 1 } : false}
         transition={{ duration: 0.6, delay: 0.45, ease }}
-        className="pointer-events-none absolute left-6 top-1/2 z-0 -translate-y-1/2 select-none uppercase sm:hidden"
+        className="pointer-events-none absolute bottom-[24vw] left-6 z-0 select-none uppercase sm:hidden"
         style={{
           writingMode: "vertical-rl",
           fontFamily: '"Clash Display", "Geist", system-ui, sans-serif',

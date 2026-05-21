@@ -20,7 +20,7 @@ function Experience() {
   }, []);
 
   return (
-    <div data-cursor="check me out" className="flex flex-col gap-10 py-24">
+    <div data-cursor="check me out" className="flex flex-col gap-10 py-6 sm:py-24">
       {!HIDE_SECTION_LABELS && (
         <motion.span
           variants={reveal}

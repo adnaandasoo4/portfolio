@@ -1,10 +1,24 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 import { useLenis } from "../utils/lenis";
 import { gsap } from "../utils/gsap";
 import { HIDE_SECTION_LABELS, projects, selectedWork } from "../constants";
 import { SectionWrapper } from "../hoc";
+
+// Defined at module scope so the wrapped component reference is stable
+// across renders — declaring `motion(Link)` inside the body would create a
+// new component every render and remount every tile.
+const MotionLink = motion(Link);
+
+// Standard viewport trigger used for the reveal animations on this section.
+// once:true matches the home page's pattern across other sections.
+const inViewProps = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+};
 
 /**
  * Selected Work — compact horizontal pinned scroll, modeled on the itsjay.us
@@ -106,18 +120,24 @@ function SelectedWork() {
           "04 — Featured Work" label aligns vertically with the labels on
           Manifesto / Experience / Tech. */}
       {!HIDE_SECTION_LABELS && (
-        <div className="mx-auto flex max-w-[1800px] items-baseline justify-between px-6 pt-24 sm:px-16">
-          <span className="font-mono text-xs uppercase tracking-widest text-muted">
+        <div className="mx-auto flex max-w-[1800px] items-baseline justify-between px-6 pt-6 sm:px-16 sm:pt-24">
+          <motion.span
+            {...inViewProps}
+            transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
+            className="font-mono text-xs uppercase tracking-widest text-muted"
+          >
             {selectedWork.label}
-          </span>
+          </motion.span>
         </div>
       )}
 
       {/* Big display heading — matches the Tech section's heading treatment.
           Sits in the same max-w-[1800px] rail as the rest of the page so
           its left edge lines up with section content above. */}
-      <div className="mx-auto w-full max-w-[1800px] px-6 pt-24 sm:px-16">
-        <h2
+      <div className="mx-auto w-full max-w-[1800px] px-6 pt-6 sm:px-16 sm:pt-24">
+        <motion.h2
+          {...inViewProps}
+          transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1], delay: 0.05 }}
           className="font-display uppercase text-ink"
           style={{
             fontWeight: 700,
@@ -127,7 +147,7 @@ function SelectedWork() {
           }}
         >
           {selectedWork.heading}
-        </h2>
+        </motion.h2>
       </div>
 
       {/* Tile row. Track translates horizontally; each tile owns its own
@@ -164,12 +184,18 @@ function SelectedWork() {
           {projects.map((project, i) => {
             const isHovered = hoveredIdx === i;
             return (
-              <Link
+              <MotionLink
                 key={project.slug}
                 to={`/works/${project.slug}`}
                 data-cursor="open project"
                 aria-label={project.name}
                 onMouseEnter={() => setHoveredIdx(i)}
+                {...inViewProps}
+                transition={{
+                  duration: 0.6,
+                  ease: [0.65, 0, 0.35, 1],
+                  delay: i * 0.06,
+                }}
                 // Mobile / reduced-motion: full-width tile in the vertical
                 // stack. Desktop + motion-safe: clamp width on the
                 // horizontal track. Gated on motion-safe so reduced-motion
@@ -304,7 +330,7 @@ function SelectedWork() {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </MotionLink>
             );
           })}
         </div>
@@ -328,7 +354,7 @@ function SelectedWork() {
       {/* View all works — letter-wave link matching the Read the resume
           treatment in the Experience section. Right-aligned within the
           inner rail, mirroring the Read the resume alignment. */}
-      <div className="mx-auto mt-12 flex max-w-[1800px] justify-end px-6 pb-24 sm:px-16">
+      <div className="mx-auto mt-12 flex max-w-[1800px] justify-end px-6 pb-6 sm:px-16 sm:pb-24">
         <Link
           to="/works"
           aria-label="View all works"
