@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { projects } from "../constants";
@@ -11,6 +12,8 @@ import Contact from "./Contact";
  * Cursor-follow preview and reveal animations are layered on by later tasks.
  */
 export default function AllWorks() {
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+
   return (
     <main className="relative w-full bg-paper text-ink">
       {/* Display title — same Cabinet Grotesk treatment as the home Hero and
@@ -32,13 +35,24 @@ export default function AllWorks() {
       {/* Typographic index — 5 rows, hairline above each + closer hairline
           below the list. Each row is a single Link. */}
       <section className="mx-auto w-full max-w-screen-2xl px-6 pb-24 sm:px-16">
-        <ul role="list" className="border-b border-edge">
+        <ul
+          role="list"
+          className="border-b border-edge"
+          onMouseLeave={() => setHoveredIdx(null)}
+        >
           {projects.map((project, i) => (
-            <li key={project.slug}>
+            <li
+              key={project.slug}
+              style={{
+                opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.35 : 1,
+                transition: "opacity 200ms",
+              }}
+            >
               <Link
                 to={`/works/${project.slug}`}
                 data-cursor="open project"
                 aria-label={`Open ${project.name}, ${project.year}`}
+                onMouseEnter={() => setHoveredIdx(i)}
                 className="group flex items-baseline justify-between gap-8 border-t border-edge py-5 sm:py-7"
               >
                 <div className="flex items-baseline gap-6">
