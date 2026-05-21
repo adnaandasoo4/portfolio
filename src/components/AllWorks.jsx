@@ -39,12 +39,12 @@ export default function AllWorks() {
                 to={`/works/${project.slug}`}
                 data-cursor="open project"
                 aria-label={`Open ${project.name}, ${project.year}`}
-                className="group flex items-baseline justify-between gap-8 border-t border-edge py-5 sm:py-7 focus:outline-none"
+                className="group flex items-baseline justify-between gap-8 border-t border-edge py-5 sm:py-7"
               >
                 <div className="flex items-baseline gap-6">
                   <span
                     aria-hidden="true"
-                    className="font-mono text-xs uppercase tracking-widest text-muted"
+                    className="font-mono text-xs uppercase tracking-widest tabular-nums text-muted"
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -60,7 +60,7 @@ export default function AllWorks() {
                     {project.name}
                   </h2>
                 </div>
-                <span className="whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted">
+                <span className="hidden sm:inline whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted">
                   {project.year} · {project.services.join(", ")}
                 </span>
               </Link>
