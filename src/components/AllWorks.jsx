@@ -41,7 +41,7 @@ export default function AllWorks() {
       mouseTarget.current.x = e.clientX;
       mouseTarget.current.y = e.clientY;
     };
-    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mousemove", handleMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMove);
   }, []);
 
@@ -53,14 +53,19 @@ export default function AllWorks() {
     current.current.x = mouseTarget.current.x;
     current.current.y = mouseTarget.current.y;
 
+    // Cache preview dimensions once per hover engagement. The preview's
+    // width is fixed via clamp() and aspect ratio is fixed, so reading
+    // offsetWidth/Height inside the rAF tick would force layout each
+    // frame for no benefit.
+    const el = previewRef.current;
+    const w = el ? el.offsetWidth : 0;
+    const h = el ? el.offsetHeight : 0;
+
     const tick = () => {
       current.current.x += (mouseTarget.current.x - current.current.x) * LERP;
       current.current.y += (mouseTarget.current.y - current.current.y) * LERP;
 
-      const el = previewRef.current;
       if (el) {
-        const w = el.offsetWidth;
-        const h = el.offsetHeight;
         const x = Math.max(
           0,
           Math.min(window.innerWidth - w, current.current.x + OFFSET_X)
