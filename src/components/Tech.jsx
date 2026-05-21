@@ -119,11 +119,11 @@ function Tech() {
         {tech.heading}
       </motion.h2>
 
-      {/* Mobile: simple 2-column icon grid. Drops the bento layout's
+      {/* Mobile: 2-column grid of 4:3 cells. Drops the bento layout's
           primary/supporting distinction and the morphing-highlight
-          interaction because they don't translate to a touch interface.
-          Cells are square, bordered, and tappable straight through to
-          the brand's site. */}
+          interaction (they don't translate to a touch interface) while
+          keeping the brand logos at a generous size in wider rectangles
+          to halve the section's vertical footprint. */}
       <motion.div
         variants={reveal}
         custom={0.1}
@@ -137,11 +137,11 @@ function Tech() {
             rel="noopener noreferrer"
             aria-label={`${entry.name} (opens in new tab)`}
             data-cursor="tech break?"
-            className="flex aspect-square items-center justify-center border border-edge text-ink"
+            className="flex aspect-[4/3] items-center justify-center border border-edge text-ink"
           >
             <entry.Icon
               className={`max-w-full text-ink ${
-                entry.wordmark ? "h-7 w-auto" : "h-12 w-12"
+                entry.wordmark ? "h-6 w-auto" : "h-10 w-10"
               }`}
               aria-hidden="true"
             />
