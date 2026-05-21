@@ -5,7 +5,7 @@ import { revealVariant as reveal } from "../utils/motion";
 
 function Manifesto() {
   return (
-    <div className="flex flex-col gap-10 py-24">
+    <div className="flex flex-col gap-10 py-6 sm:py-24">
       {!HIDE_SECTION_LABELS && (
         <motion.span
           variants={reveal}

@@ -15,7 +15,7 @@ export default function Contact() {
   return (
     <footer
       id="contact"
-      className="relative flex w-full flex-col px-6 pt-32 sm:px-16"
+      className="relative flex w-full flex-col px-6 pt-10 sm:px-16 sm:pt-32"
     >
       <div className="mx-auto flex w-full max-w-[1800px] flex-col">
         {!HIDE_SECTION_LABELS && (
@@ -30,7 +30,10 @@ export default function Contact() {
           className="group mt-10 inline-block font-display text-ink"
           style={{
             fontWeight: 700,
-            fontSize: "clamp(56px, 11vw, 180px)",
+            // Min lowered from 56 → 36 and vw factor from 11 → 10 so
+            // "Let's build it ↗" fits on a single line at mobile widths
+            // without wrapping the arrow off the rest of the phrase.
+            fontSize: "clamp(36px, 10vw, 180px)",
             lineHeight: "0.95",
             letterSpacing: "-0.01em",
           }}
