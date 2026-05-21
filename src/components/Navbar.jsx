@@ -104,7 +104,11 @@ export default function Navbar({ onReplayPreloader }) {
 
   // Single click dispatcher used by both the desktop nav list and the
   // mobile overlay list so behavior stays in lockstep across the two.
+  // The "home" kind reuses the AD. logo's smart back-to-top handler
+  // since the behavior is intentionally identical — the link is just
+  // a more obvious entry point for the same action.
   function handleLinkClick(e, link) {
+    if (link.kind === "home") return handleLogoClick(e);
     if (link.kind === "navAnchor") return handleNavAnchorClick(e, link);
     if (link.kind === "hybrid") return handleHybridClick(e, link);
     if (link.kind === "route") return handleRouteClick(e, link);
@@ -115,6 +119,7 @@ export default function Navbar({ onReplayPreloader }) {
   // tab" land somewhere sensible (and the URL preview the browser shows
   // on hover reads correctly).
   function linkHref(link) {
+    if (link.kind === "home") return "/";
     if (link.kind === "hybrid") return isHome ? `#${link.id}` : link.to;
     if (link.kind === "navAnchor") return isHome ? `#${link.id}` : `/`;
     if (link.kind === "route") return link.to;
@@ -167,7 +172,7 @@ export default function Navbar({ onReplayPreloader }) {
           {/* Desktop nav */}
           <ul className="hidden gap-8 font-mono text-sm uppercase tracking-widest md:flex">
             {navLinks.map((link) => (
-              <li key={link.id ?? link.to}>
+              <li key={link.id ?? link.to ?? link.title}>
                 <a
                   href={linkHref(link)}
                   onClick={(e) => handleLinkClick(e, link)}
@@ -226,7 +231,7 @@ export default function Navbar({ onReplayPreloader }) {
                   };
                   return (
                     <motion.li
-                      key={link.id ?? link.to}
+                      key={link.id ?? link.to ?? link.title}
                       initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.35 + i * 0.08, duration: 0.5, ease }}

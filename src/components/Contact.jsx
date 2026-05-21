@@ -35,7 +35,9 @@ export default function Contact() {
             letterSpacing: "-0.01em",
           }}
         >
-          <span className="block">{footer.headlineLead}</span>
+          <span className="block" style={{ fontSize: "0.78em" }}>
+            {footer.headlineLead}
+          </span>
           <span className="block whitespace-nowrap transition-colors duration-300 group-hover:text-flag">
             {footer.headlineHighlight}{" "}
             <span
