@@ -10,7 +10,7 @@ import {
 } from "react-icons/si";
 import { NextjsWordmark, GsapWordmark } from "../components/icons/TechLogos";
 
-// Nav links. Three kinds the navbar knows how to handle:
+// Nav links. Four kinds the navbar knows how to handle:
 //
 //   "anchor"     — always smooth-scroll to `#id` on the CURRENT page.
 //                  Used by `contact` because the Contact component is
@@ -28,13 +28,14 @@ import { NextjsWordmark, GsapWordmark } from "../components/icons/TechLogos";
 //                  section into view. If `triggersPreloader: true`, the
 //                  navbar also asks App to replay the preloader so the
 //                  navigation feels like a fresh page load.
+//
+//   "home"       — duplicates the AD. logo's smart back-to-top behavior
+//                  as a labeled link. On home, smooth-scrolls to top.
+//                  Off-home, replays the preloader and navigates to "/".
+//                  Exists to make the way back to the landing page
+//                  obvious for visitors who don't recognize the wordmark.
 export const navLinks = [
-  {
-    kind: "navAnchor",
-    id: "experience",
-    title: "experience",
-    triggersPreloader: true,
-  },
+  { kind: "home", title: "home" },
   { kind: "route", to: "/works", title: "works" },
   { kind: "anchor", id: "contact", title: "contact" },
 ];
