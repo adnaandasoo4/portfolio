@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 import { projects } from "../constants";
@@ -163,23 +164,33 @@ export default function AllWorks() {
         style={{
           width: PREVIEW_WIDTH,
           aspectRatio: "16 / 10",
-          opacity: hoveredIdx !== null ? 1 : 0,
-          transition: "opacity 240ms",
-          willChange: "transform, opacity",
+          willChange: "transform",
         }}
       >
-        {hoveredIdx !== null &&
-          (projects[hoveredIdx].coverImage ? (
-            <img
-              src={projects[hoveredIdx].coverImage}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
-              {projects[hoveredIdx].name}
-            </div>
-          ))}
+        <AnimatePresence>
+          {hoveredIdx !== null && (
+            <motion.div
+              key={hoveredIdx}
+              className="absolute inset-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              {projects[hoveredIdx].coverImage ? (
+                <img
+                  src={projects[hoveredIdx].coverImage}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                  {projects[hoveredIdx].name}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <Contact />
