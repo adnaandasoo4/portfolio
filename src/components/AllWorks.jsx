@@ -55,46 +55,31 @@ export default function AllWorks() {
         </h1>
       </section>
 
-      {/* Typographic index — 5 rows, hairline above each + closer hairline
-          below the list. Each row is a single Link. */}
+      {/* Typographic index — 5 rows of stacked display-weight names. On
+          desktop the names render in --display-subtle by default and snap
+          to --ink on hover (mirrors the Process section pattern). On mobile
+          they render in --ink full-strength since there's no hover. */}
       <section className="mx-auto w-full max-w-screen-2xl px-6 pb-24 sm:px-16">
         <ul
           role="list"
-          className="space-y-8 sm:space-y-0"
+          className="flex flex-col gap-8 sm:gap-2"
           onMouseLeave={() => setHoveredIdx(null)}
         >
           {projects.map((project, i) => {
             const delay = 0.6 + i * 0.08;
             return (
-              <li
-                key={project.slug}
-                className="group"
-                style={{
-                  opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.35 : 1,
-                  transition: "opacity 200ms",
-                }}
-              >
-                {/* Hairline above the row — animates from scaleX 0 to 1 on mount,
-                    transform-origin: left so it grows left-to-right. */}
-                <motion.div
-                  className="h-px w-full origin-left bg-edge transition-all duration-200 group-focus-within:h-0.5 group-focus-within:bg-ink"
-                  initial={prefersReducedMotion ? { opacity: 0 } : { scaleX: 0 }}
-                  animate={prefersReducedMotion ? { opacity: 1 } : { scaleX: 1 }}
-                  transition={{
-                    delay: prefersReducedMotion ? 0 : delay,
-                    duration: prefersReducedMotion ? 0.2 : 0.4,
-                    ease: [0.65, 0, 0.35, 1],
-                  }}
-                />
+              <li key={project.slug}>
                 <Link
                   to={`/works/${project.slug}`}
                   data-cursor="open project"
                   aria-label={`Open ${project.name}, ${project.year}`}
                   onMouseEnter={() => setHoveredIdx(i)}
-                  className="group flex flex-col gap-4 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:py-7 focus:outline-none"
+                  onFocus={() => setHoveredIdx(i)}
+                  onBlur={() => setHoveredIdx(null)}
+                  className="group flex flex-col gap-4 py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:py-3 focus:outline-none"
                 >
-                  <motion.div
-                    className="flex items-baseline gap-6"
+                  <motion.h2
+                    className="font-display uppercase transition-colors duration-200 [color:var(--ink)] sm:[color:var(--display-subtle)] sm:group-hover:[color:var(--ink)] sm:group-focus-visible:[color:var(--ink)]"
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
@@ -102,25 +87,15 @@ export default function AllWorks() {
                       duration: prefersReducedMotion ? 0.2 : 0.5,
                       ease: [0.65, 0, 0.35, 1],
                     }}
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "clamp(56px, 7vw, 128px)",
+                      lineHeight: 0.88,
+                      letterSpacing: "-0.02em",
+                    }}
                   >
-                    <span
-                      aria-hidden="true"
-                      className="font-mono text-xs uppercase tracking-widest tabular-nums text-muted"
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h2
-                      className="font-display uppercase"
-                      style={{
-                        fontWeight: 700,
-                        fontSize: "clamp(32px, 9vw, 112px)",
-                        lineHeight: 1,
-                        letterSpacing: "-0.02em",
-                      }}
-                    >
-                      {project.name}
-                    </h2>
-                  </motion.div>
+                    {project.name}
+                  </motion.h2>
                   {/* Desktop reduced-motion inline thumb. Replaces the cursor-follow
                       preview when the user has prefers-reduced-motion: reduce. Sized
                       smaller than the cursor preview; opacity follows row hover state. */}
@@ -188,17 +163,6 @@ export default function AllWorks() {
               </li>
             );
           })}
-          {/* Closing hairline below the last row */}
-          <motion.div
-            className="h-px w-full origin-left bg-edge"
-            initial={prefersReducedMotion ? { opacity: 0 } : { scaleX: 0 }}
-            animate={prefersReducedMotion ? { opacity: 1 } : { scaleX: 1 }}
-            transition={{
-              delay: prefersReducedMotion ? 0 : 0.6 + projects.length * 0.08,
-              duration: prefersReducedMotion ? 0.2 : 0.4,
-              ease: [0.65, 0, 0.35, 1],
-            }}
-          />
         </ul>
       </section>
 
