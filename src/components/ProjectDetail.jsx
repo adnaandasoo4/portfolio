@@ -48,7 +48,7 @@ export default function ProjectDetail() {
   if (!project) {
     return (
       <main className="min-h-screen w-full bg-paper text-ink">
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-6 px-6 pt-40 sm:px-16">
+        <div className="mx-auto flex max-w-[1800px] flex-col gap-6 px-6 pt-40 sm:px-16">
           <span className="font-mono text-xs uppercase tracking-widest text-muted">
             404 — Project not found
           </span>
@@ -95,7 +95,7 @@ export default function ProjectDetail() {
         initial="hidden"
         whileInView="show"
         viewport={viewport}
-        className="mx-auto flex max-w-screen-2xl flex-col gap-12 px-6 pb-16 pt-32 sm:px-16 sm:pt-40"
+        className="mx-auto flex max-w-[1800px] flex-col gap-12 px-6 pb-16 pt-32 sm:px-16 sm:pt-40"
       >
         <motion.div variants={reveal} custom={0}>
           <Link
@@ -208,7 +208,7 @@ export default function ProjectDetail() {
         initial="hidden"
         whileInView="show"
         viewport={viewport}
-        className="mx-auto w-full max-w-screen-2xl px-6 py-16 sm:px-16"
+        className="mx-auto w-full max-w-[1800px] px-6 py-16 sm:px-16"
       >
         {project.coverImage ? (
           <img
@@ -240,7 +240,7 @@ export default function ProjectDetail() {
         initial="hidden"
         whileInView="show"
         viewport={viewport}
-        className="mx-auto w-full max-w-screen-2xl px-6 py-16 sm:px-16"
+        className="mx-auto w-full max-w-[1800px] px-6 py-16 sm:px-16"
       >
         <motion.h2
           variants={reveal}

@@ -101,12 +101,12 @@ function SelectedWork() {
     <div ref={sectionRef} className="relative">
       {/* Header — just the small label on the left for section numbering.
           The carousel below is still fullBleed (edge-to-edge), but the header
-          is constrained to `max-w-screen-2xl mx-auto` with the same px-6
+          is constrained to `max-w-[1800px] mx-auto` with the same px-6
           sm:px-16 padding the other sections use via SectionWrapper, so the
           "04 — Featured Work" label aligns vertically with the labels on
           Manifesto / Experience / Tech. */}
       {!HIDE_SECTION_LABELS && (
-        <div className="mx-auto flex max-w-screen-2xl items-baseline justify-between px-6 pt-24 sm:px-16">
+        <div className="mx-auto flex max-w-[1800px] items-baseline justify-between px-6 pt-24 sm:px-16">
           <span className="font-mono text-xs uppercase tracking-widest text-muted">
             {selectedWork.label}
           </span>
@@ -114,9 +114,9 @@ function SelectedWork() {
       )}
 
       {/* Big display heading — matches the Tech section's heading treatment.
-          Sits in the same max-w-screen-2xl rail as the rest of the page so
+          Sits in the same max-w-[1800px] rail as the rest of the page so
           its left edge lines up with section content above. */}
-      <div className="mx-auto w-full max-w-screen-2xl px-6 pt-24 sm:px-16">
+      <div className="mx-auto w-full max-w-[1800px] px-6 pt-24 sm:px-16">
         <h2
           className="font-display uppercase text-ink"
           style={{
@@ -167,7 +167,7 @@ function SelectedWork() {
               <Link
                 key={project.slug}
                 to={`/works/${project.slug}`}
-                data-cursor="check out my work"
+                data-cursor="open project"
                 aria-label={project.name}
                 onMouseEnter={() => setHoveredIdx(i)}
                 // Mobile / reduced-motion: full-width tile in the vertical
@@ -328,10 +328,11 @@ function SelectedWork() {
       {/* View all works — letter-wave link matching the Read the resume
           treatment in the Experience section. Right-aligned within the
           inner rail, mirroring the Read the resume alignment. */}
-      <div className="mx-auto mt-12 flex max-w-screen-2xl justify-end px-6 pb-24 sm:px-16">
+      <div className="mx-auto mt-12 flex max-w-[1800px] justify-end px-6 pb-24 sm:px-16">
         <Link
           to="/works"
           aria-label="View all works"
+          data-cursor="open the index"
           className="group inline-block focus:outline-none"
         >
           <span

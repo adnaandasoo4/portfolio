@@ -150,10 +150,10 @@ export default function Navbar({ onReplayPreloader }) {
         className="fixed left-0 right-0 top-0 z-50 backdrop-blur-md"
         style={{ background: "rgb(from var(--bg) r g b / 0.8)" }}
       >
-        {/* Inner rail matches every other section (max-w-screen-2xl + same
+        {/* Inner rail matches every other section (max-w-[1800px] + same
             px-6 sm:px-16) so the logo and theme toggle align with Hero,
             Manifesto, Experience, Tech, and Contact on wide displays. */}
-        <div className="mx-auto flex w-full max-w-screen-2xl items-center justify-between px-6 py-5 text-ink sm:px-16">
+        <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between px-6 py-5 text-ink sm:px-16">
           <a
             href="/"
             aria-label="Home"

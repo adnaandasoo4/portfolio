@@ -1,99 +1,103 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 import { projects } from "../constants";
-import {
-  revealVariant as reveal,
-  staggerContainer,
-} from "../utils/motion";
 import Contact from "./Contact";
-
-// Standard viewport trigger: section reveals once when at least 20% of
-// it is in view. `once: true` means the animation doesn't replay on
-// scroll-out/in — matches the home page's section reveals.
-const viewport = { once: true, amount: 0.2 };
+import WorksCursorPreview from "./WorksCursorPreview";
 
 /**
- * AllWorks — full project index, mounted at /works.
+ * AllWorks — typographic index at /works.
  *
- * Layout:
- *   - Big "Work" title at the top, in the same display weight as the
- *     other section headings on the home page
- *   - One row per project, alternating image-left / image-right on every
- *     other row for visual rhythm (the "zebra" pattern common in
- *     editorial portfolios)
- *   - Each row is wrapped in a <Link> to /works/:slug — entire row is
- *     clickable
- *   - Cover image takes ~55% of the row width; the remaining ~45% holds
- *     the project name (display), year, services (mono), and a one-line
- *     description, with a "View project ↗" affordance at the bottom that
- *     subtly grows/translates on hover
- *   - Footer reuses the Contact component verbatim
- *
- * Scrolls to top on mount so navigating from a detail page or from the
- * "View all works" link on home lands the visitor at the title, not at
- * whatever scroll offset the SPA was at.
+ * 5 stacked rows, each is a single <Link>. Display-size project name carries
+ * the row; index (mono) on the left, year + services (mono) on the right.
+ * Cursor-follow preview and reveal animations are layered on by later tasks.
  */
 export default function AllWorks() {
-  // Scroll-to-top on navigation handled by ScrollOnRouteChange at the
-  // App level — see App.jsx.
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <main className="relative w-full bg-paper text-ink">
-      {/* Page header — big display title. Padding-top accounts for the
-          fixed navbar so the title has breathing room. */}
-      <motion.section
-        variants={staggerContainer()}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewport}
-        className="mx-auto flex max-w-screen-2xl flex-col gap-8 px-6 pb-16 pt-32 sm:px-16 sm:pt-40"
-      >
-        <motion.h1
-          variants={reveal}
-          custom={0}
-          className="font-display uppercase"
-          style={{
-            fontWeight: 700,
-            fontSize: "clamp(40px, 6vw, 96px)",
-            lineHeight: 0.95,
-            letterSpacing: "-0.02em",
-          }}
+      {/* Typographic index — centered list of project names. The ul is
+          `mx-auto w-fit` so it auto-sizes to the widest project name and
+          centers horizontally; every row's left edge therefore aligns at
+          the same vertical line through the page (Process-style block
+          centering). Display-subtle by default on desktop, snaps to ink
+          on hover. Top padding clears the fixed navbar. */}
+      <section className="mx-auto w-full max-w-[1800px] px-6 pb-24 pt-32 sm:px-16 sm:pt-40">
+        <ul
+          role="list"
+          className="mx-auto flex w-fit flex-col gap-8 sm:gap-0"
+          onMouseLeave={() => setHoveredIdx(null)}
         >
-          Works
-        </motion.h1>
-      </motion.section>
-
-      {/* Project list — alternating image-left / image-right rows. Each
-          row is its own viewport-triggered reveal so the list cascades
-          in as the visitor scrolls through it (rather than firing all
-          at once at the top of the section). */}
-      <section className="mx-auto w-full max-w-screen-2xl px-6 pb-24 sm:px-16">
-        <ul className="flex flex-col gap-20 sm:gap-32">
           {projects.map((project, i) => {
-            const imageOnLeft = i % 2 === 0;
+            const delay = 0.6 + i * 0.08;
             return (
-              <motion.li
-                key={project.slug}
-                variants={reveal}
-                custom={0}
-                initial="hidden"
-                whileInView="show"
-                viewport={viewport}
-              >
+              <li key={project.slug}>
                 <Link
                   to={`/works/${project.slug}`}
                   data-cursor="open project"
-                  aria-label={`Open ${project.name}`}
-                  className="group grid grid-cols-1 items-center gap-8 sm:grid-cols-12 sm:gap-12"
+                  aria-label={`Open ${project.name}, ${project.year}`}
+                  onMouseEnter={() => setHoveredIdx(i)}
+                  onFocus={() => setHoveredIdx(i)}
+                  onBlur={() => setHoveredIdx(null)}
+                  className="group flex flex-col gap-4 py-2 sm:py-3 focus:outline-none"
                 >
-                  {/* Cover image — sm:col-span-7 on the side dictated by
-                      row index. order utilities flip the visual order on
-                      odd rows without changing DOM order. */}
+                  <motion.h2
+                    className="font-display uppercase whitespace-normal transition-colors duration-200 [color:var(--ink)] sm:whitespace-nowrap sm:[color:var(--display-subtle)] sm:group-hover:[color:var(--ink)] sm:group-focus-visible:[color:var(--ink)]"
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                    transition={{
+                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      duration: prefersReducedMotion ? 0.2 : 0.5,
+                      ease: [0.65, 0, 0.35, 1],
+                    }}
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "clamp(56px, 9vw, 180px)",
+                      lineHeight: 0.82,
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {project.name}
+                  </motion.h2>
+                  {/* Desktop reduced-motion inline thumb. Replaces the cursor-follow
+                      preview when the user has prefers-reduced-motion: reduce. Sized
+                      smaller than the cursor preview; opacity follows row hover state. */}
                   <div
-                    className={`relative overflow-hidden bg-edge sm:col-span-7 ${
-                      imageOnLeft ? "sm:order-1" : "sm:order-2"
-                    }`}
+                    className="hidden sm:motion-reduce:block"
+                    style={{
+                      width: "clamp(200px, 18vw, 280px)",
+                      aspectRatio: "16 / 10",
+                      opacity: hoveredIdx === i ? 1 : 0,
+                      transition: "opacity 180ms",
+                    }}
+                  >
+                    {project.coverImage ? (
+                      <img
+                        src={project.coverImage}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                        {project.name}
+                      </div>
+                    )}
+                  </div>
+                  {/* Mobile-only inline thumbnail. Hidden on sm+ — desktop uses the
+                      cursor-follow preview instead. */}
+                  <motion.div
+                    className="block w-full sm:hidden"
                     style={{ aspectRatio: "16 / 10" }}
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                    transition={{
+                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      duration: prefersReducedMotion ? 0.2 : 0.5,
+                      ease: [0.65, 0, 0.35, 1],
+                    }}
                   >
                     {project.coverImage ? (
                       <img
@@ -104,75 +108,20 @@ export default function AllWorks() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center font-mono text-xs uppercase tracking-widest text-muted">
-                        {project.name} · placeholder
+                      <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                        {project.name}
                       </div>
                     )}
-                  </div>
-
-                  {/* Detail column — index + name + meta + description +
-                      view CTA. Index/name sit at the top, view CTA at
-                      the bottom for a clear top-to-bottom read. */}
-                  <div
-                    className={`flex flex-col gap-6 sm:col-span-5 ${
-                      imageOnLeft ? "sm:order-2" : "sm:order-1"
-                    }`}
-                  >
-                    <div className="flex items-baseline gap-4">
-                      <span className="font-mono text-xs uppercase tracking-widest text-muted">
-                        {String(i + 1).padStart(2, "0")} /{" "}
-                        {String(projects.length).padStart(2, "0")}
-                      </span>
-                      <span className="font-mono text-xs uppercase tracking-widest text-muted">
-                        {project.year}
-                      </span>
-                    </div>
-
-                    <h2
-                      className="font-display uppercase"
-                      style={{
-                        fontWeight: 700,
-                        fontSize: "clamp(32px, 4vw, 64px)",
-                        lineHeight: 1,
-                        letterSpacing: "-0.015em",
-                      }}
-                    >
-                      {project.name}
-                    </h2>
-
-                    <p className="font-mono text-xs uppercase tracking-widest text-muted">
-                      {project.services.join(" · ")}
-                    </p>
-
-                    <p
-                      className="opacity-80"
-                      style={{
-                        fontSize: "15px",
-                        lineHeight: 1.55,
-                        maxWidth: "48ch",
-                      }}
-                    >
-                      {project.description}
-                    </p>
-
-                    <span className="mt-2 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink">
-                      View project
-                      <span
-                        aria-hidden="true"
-                        className="inline-block transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5"
-                      >
-                        ↗
-                      </span>
-                    </span>
-                  </div>
+                  </motion.div>
                 </Link>
-              </motion.li>
+              </li>
             );
           })}
         </ul>
       </section>
 
-      {/* Footer — same Contact set-piece as the home page. */}
+      <WorksCursorPreview hoveredIdx={hoveredIdx} projects={projects} />
+
       <Contact />
     </main>
   );
