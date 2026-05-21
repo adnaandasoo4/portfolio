@@ -200,67 +200,32 @@ function Process() {
         <div />
       </div>
 
-      {/* Mobile layout — stacked. Hover is meaningless here, so every stage
-          prints its name, description, and framed card inline with a
-          hairline divider between adjacent stages. */}
-      <ul className="flex flex-col gap-12 md:hidden">
-        {designProcess.stages.map((stage, i) => (
-          <motion.li
-            key={stage.number}
-            variants={reveal}
-            custom={0.05 * i}
-            className="flex flex-col gap-5"
-          >
-            <h3
-              className="font-display uppercase text-ink"
+      {/* Mobile layout — typographic stack mirroring the desktop row block.
+          Hover is meaningless here, so we drop the description + identity
+          card and just print the five stage names in big letters. Block
+          is centered (mx-auto w-fit) so every row's left edge aligns on
+          the same vertical column, matching the /works pattern. */}
+      <motion.ul
+        variants={reveal}
+        custom={0.1}
+        className="mx-auto flex w-fit flex-col md:hidden"
+      >
+        {designProcess.stages.map((stage) => (
+          <li key={stage.number}>
+            <span
+              className="block font-display uppercase text-ink"
               style={{
                 fontWeight: 700,
-                fontSize: "clamp(44px, 13vw, 88px)",
-                lineHeight: 1,
+                fontSize: "clamp(56px, 14vw, 128px)",
+                lineHeight: 0.82,
                 letterSpacing: "-0.02em",
               }}
             >
               {stage.name}
-            </h3>
-            <p
-              className="text-ink/85"
-              style={{
-                fontSize: "15px",
-                lineHeight: 1.55,
-                maxWidth: "52ch",
-              }}
-            >
-              {stage.description}
-            </p>
-            <div className="flex aspect-[4/3] w-full max-w-xs flex-col border border-edge p-5">
-              <div className="flex flex-1 items-center justify-center">
-                <span
-                  className="font-display text-ink"
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "clamp(64px, 18vw, 112px)",
-                    lineHeight: 1,
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  {stage.number}
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <span className="font-mono text-xs uppercase tracking-widest text-ink">
-                  {stage.name}
-                </span>
-                <span className="text-center font-mono text-[10px] uppercase tracking-widest text-muted">
-                  {stage.tools.join(" · ")}
-                </span>
-              </div>
-            </div>
-            {i < designProcess.stages.length - 1 && (
-              <div className="mt-2 border-t border-edge" />
-            )}
-          </motion.li>
+            </span>
+          </li>
         ))}
-      </ul>
+      </motion.ul>
     </div>
   );
 }
