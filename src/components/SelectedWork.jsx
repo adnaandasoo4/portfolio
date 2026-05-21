@@ -167,7 +167,7 @@ function SelectedWork() {
               <Link
                 key={project.slug}
                 to={`/works/${project.slug}`}
-                data-cursor="check out my work"
+                data-cursor="open project"
                 aria-label={project.name}
                 onMouseEnter={() => setHoveredIdx(i)}
                 // Mobile / reduced-motion: full-width tile in the vertical
@@ -332,6 +332,7 @@ function SelectedWork() {
         <Link
           to="/works"
           aria-label="View all works"
+          data-cursor="open the index"
           className="group inline-block focus:outline-none"
         >
           <span
