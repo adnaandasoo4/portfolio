@@ -99,8 +99,28 @@ export default function AllWorks() {
             lineHeight: 0.95,
             letterSpacing: "-0.02em",
           }}
+          aria-label="Works"
         >
-          Works
+          {Array.from("Works").map((char, i) => (
+            <span
+              key={i}
+              className="inline-block overflow-hidden align-bottom"
+              aria-hidden="true"
+            >
+              <motion.span
+                className="inline-block"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                transition={{
+                  delay: i * 0.03,
+                  duration: 0.6,
+                  ease: [0.65, 0, 0.35, 1],
+                }}
+              >
+                {char}
+              </motion.span>
+            </span>
+          ))}
         </h1>
       </section>
 
