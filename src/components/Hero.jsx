@@ -89,7 +89,7 @@ function LocalTime({ label, timeZone, ready }) {
  */
 export default function Hero({ ready = true }) {
   return (
-    <section className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-12 pt-32 sm:px-16 sm:pt-40">
+    <section className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-0 pt-32 sm:px-16 sm:pb-12 sm:pt-40">
       {/* Inner content container — same 1536px rail as every other section,
           and same internal px-6 sm:px-16 padding the navbar uses, so the
           scroll indicator's right edge lines up with the navbar's theme
@@ -133,6 +133,30 @@ export default function Hero({ ready = true }) {
         </div>
       </div>
 
+      {/* Mobile-only sideways wordmark — replaces the WebGL ADNAAN on
+          phones. Vertically centered along the left edge and scaled up
+          to dominate the column. `writing-mode: vertical-rl` rotates
+          Latin glyphs 90° clockwise (top-to-bottom reading), matching
+          the technique used by the SCROLL label on the right. */}
+      <motion.div
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={ready ? { opacity: 1 } : false}
+        transition={{ duration: 0.6, delay: 0.45, ease }}
+        className="pointer-events-none absolute left-6 top-1/2 z-0 -translate-y-1/2 select-none uppercase sm:hidden"
+        style={{
+          writingMode: "vertical-rl",
+          fontFamily: '"Clash Display", "Geist", system-ui, sans-serif',
+          fontWeight: 700,
+          fontSize: "clamp(80px, 24vw, 160px)",
+          lineHeight: 0.85,
+          letterSpacing: "-0.02em",
+          color: "var(--display-subtle)",
+        }}
+      >
+        {hero.name}
+      </motion.div>
+
       {/* Kicker — Software Engineer / Creative Developer. Anchored just
           above the wordmark and right-aligned with the inner rail. */}
       <div className="pointer-events-none absolute bottom-[24vw] left-0 right-0 z-10 mx-auto w-full max-w-[1800px] px-6 sm:px-16">
@@ -151,10 +175,14 @@ export default function Hero({ ready = true }) {
       </div>
 
       {/* WebGL display word, full-bleed at the bottom. Lazy-loaded so
-          Three.js doesn't block the rest of the page's initial paint. */}
-      <Suspense fallback={null}>
-        <HeroBigText text={hero.name} />
-      </Suspense>
+          Three.js doesn't block the rest of the page's initial paint.
+          Desktop/tablet only — on mobile, the sideways wordmark above
+          carries the name. */}
+      <div className="hidden sm:contents">
+        <Suspense fallback={null}>
+          <HeroBigText text={hero.name} />
+        </Suspense>
+      </div>
     </section>
   );
 }

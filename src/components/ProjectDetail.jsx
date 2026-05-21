@@ -134,7 +134,7 @@ export default function ProjectDetail() {
         <motion.div
           variants={reveal}
           custom={0.15}
-          className="grid grid-cols-1 gap-10 border-t border-edge pt-10 sm:grid-cols-2"
+          className="grid grid-cols-2 gap-6 border-t border-edge pt-10 sm:gap-10"
         >
           <div className="flex flex-col gap-4">
             <span className="font-mono text-xs uppercase tracking-widest text-muted">
