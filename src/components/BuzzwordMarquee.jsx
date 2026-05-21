@@ -44,6 +44,16 @@ export default function BuzzwordMarquee() {
         .buzzword-marquee-track {
           animation: buzzword-marquee 40s linear infinite;
         }
+        /* The track travels a fixed 50% regardless of viewport, so the
+           perceived pixels-per-second drops as the viewport narrows —
+           mobile users see fewer words traverse the strip in the same
+           wall-clock time. Halve the duration on mobile to keep the
+           cadence feeling lively. */
+        @media (max-width: 640px) {
+          .buzzword-marquee-track {
+            animation-duration: 18s;
+          }
+        }
         .buzzword-marquee-wrap:hover .buzzword-marquee-track,
         .buzzword-marquee-wrap:focus-within .buzzword-marquee-track {
           animation-play-state: paused;
