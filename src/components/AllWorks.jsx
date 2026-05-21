@@ -129,49 +129,88 @@ export default function AllWorks() {
       <section className="mx-auto w-full max-w-screen-2xl px-6 pb-24 sm:px-16">
         <ul
           role="list"
-          className="border-b border-edge"
           onMouseLeave={() => setHoveredIdx(null)}
         >
-          {projects.map((project, i) => (
-            <li
-              key={project.slug}
-              style={{
-                opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.35 : 1,
-                transition: "opacity 200ms",
-              }}
-            >
-              <Link
-                to={`/works/${project.slug}`}
-                data-cursor="open project"
-                aria-label={`Open ${project.name}, ${project.year}`}
-                onMouseEnter={() => setHoveredIdx(i)}
-                className="group flex items-baseline justify-between gap-8 border-t border-edge py-5 sm:py-7"
+          {projects.map((project, i) => {
+            const delay = 0.6 + i * 0.08;
+            return (
+              <li
+                key={project.slug}
+                style={{
+                  opacity: hoveredIdx !== null && hoveredIdx !== i ? 0.35 : 1,
+                  transition: "opacity 200ms",
+                }}
               >
-                <div className="flex items-baseline gap-6">
-                  <span
-                    aria-hidden="true"
-                    className="font-mono text-xs uppercase tracking-widest tabular-nums text-muted"
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <h2
-                    className="font-display uppercase"
-                    style={{
-                      fontWeight: 700,
-                      fontSize: "clamp(48px, 7vw, 112px)",
-                      lineHeight: 1,
-                      letterSpacing: "-0.02em",
+                {/* Hairline above the row — animates from scaleX 0 to 1 on mount,
+                    transform-origin: left so it grows left-to-right. */}
+                <motion.div
+                  className="h-px w-full origin-left bg-edge"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ delay, duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
+                />
+                <Link
+                  to={`/works/${project.slug}`}
+                  data-cursor="open project"
+                  aria-label={`Open ${project.name}, ${project.year}`}
+                  onMouseEnter={() => setHoveredIdx(i)}
+                  className="group flex items-baseline justify-between gap-8 py-5 sm:py-7"
+                >
+                  <motion.div
+                    className="flex items-baseline gap-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: delay + 0.15,
+                      duration: 0.5,
+                      ease: [0.65, 0, 0.35, 1],
                     }}
                   >
-                    {project.name}
-                  </h2>
-                </div>
-                <span className="hidden sm:inline whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted">
-                  {project.year} · {project.services.join(", ")}
-                </span>
-              </Link>
-            </li>
-          ))}
+                    <span
+                      aria-hidden="true"
+                      className="font-mono text-xs uppercase tracking-widest tabular-nums text-muted"
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <h2
+                      className="font-display uppercase"
+                      style={{
+                        fontWeight: 700,
+                        fontSize: "clamp(48px, 7vw, 112px)",
+                        lineHeight: 1,
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {project.name}
+                    </h2>
+                  </motion.div>
+                  <motion.span
+                    className="hidden sm:inline whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: delay + 0.15,
+                      duration: 0.5,
+                      ease: [0.65, 0, 0.35, 1],
+                    }}
+                  >
+                    {project.year} · {project.services.join(", ")}
+                  </motion.span>
+                </Link>
+              </li>
+            );
+          })}
+          {/* Closing hairline below the last row */}
+          <motion.div
+            className="h-px w-full origin-left bg-edge"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{
+              delay: 0.6 + projects.length * 0.08,
+              duration: 0.4,
+              ease: [0.65, 0, 0.35, 1],
+            }}
+          />
         </ul>
       </section>
 
