@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { projects } from "../constants";
 import Contact from "./Contact";
+
+const PREVIEW_WIDTH = "clamp(240px, 22vw, 360px)";
+const LERP = 0.18;
+const OFFSET_X = 24;
+const OFFSET_Y = 24;
 
 /**
  * AllWorks — typographic index at /works.
@@ -13,6 +18,67 @@ import Contact from "./Contact";
  */
 export default function AllWorks() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+
+  const previewRef = useRef(null);
+  const mouseTarget = useRef({ x: 0, y: 0 });
+  const current = useRef({ x: 0, y: 0 });
+  const rafId = useRef(null);
+
+  // Preload all cover images on mount so the swap is instant on first hover.
+  useEffect(() => {
+    projects.forEach((p) => {
+      if (p.coverImage) {
+        const img = new Image();
+        img.src = p.coverImage;
+      }
+    });
+  }, []);
+
+  // Track mouse position at window level. Single passive listener for the
+  // lifetime of the page.
+  useEffect(() => {
+    const handleMove = (e) => {
+      mouseTarget.current.x = e.clientX;
+      mouseTarget.current.y = e.clientY;
+    };
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, []);
+
+  // rAF lerp loop. Only runs while a row is hovered. Seeds current at the
+  // mouse position on engage so the preview doesn't glide in from (0,0).
+  useEffect(() => {
+    if (hoveredIdx === null) return;
+
+    current.current.x = mouseTarget.current.x;
+    current.current.y = mouseTarget.current.y;
+
+    const tick = () => {
+      current.current.x += (mouseTarget.current.x - current.current.x) * LERP;
+      current.current.y += (mouseTarget.current.y - current.current.y) * LERP;
+
+      const el = previewRef.current;
+      if (el) {
+        const w = el.offsetWidth;
+        const h = el.offsetHeight;
+        const x = Math.max(
+          0,
+          Math.min(window.innerWidth - w, current.current.x + OFFSET_X)
+        );
+        const y = Math.max(
+          0,
+          Math.min(window.innerHeight - h, current.current.y + OFFSET_Y)
+        );
+        el.style.transform = `translate(${x}px, ${y}px)`;
+      }
+      rafId.current = requestAnimationFrame(tick);
+    };
+    rafId.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, [hoveredIdx]);
 
   return (
     <main className="relative w-full bg-paper text-ink">
@@ -82,6 +148,34 @@ export default function AllWorks() {
           ))}
         </ul>
       </section>
+
+      {/* Cursor-follow preview. position: fixed; translated by rAF loop above.
+          Hidden on mobile (no hover) and under prefers-reduced-motion (Task 8
+          swaps in the inline thumb behavior for that case). */}
+      <div
+        ref={previewRef}
+        className="pointer-events-none fixed left-0 top-0 z-40 hidden sm:block motion-reduce:hidden"
+        style={{
+          width: PREVIEW_WIDTH,
+          aspectRatio: "16 / 10",
+          opacity: hoveredIdx !== null ? 1 : 0,
+          transition: "opacity 240ms",
+          willChange: "transform, opacity",
+        }}
+      >
+        {hoveredIdx !== null &&
+          (projects[hoveredIdx].coverImage ? (
+            <img
+              src={projects[hoveredIdx].coverImage}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+              {projects[hoveredIdx].name}
+            </div>
+          ))}
+      </div>
 
       <Contact />
     </main>
