@@ -114,7 +114,7 @@ const experiences = [
 const projects = [
   {
     slug: "compliance-dashboard",
-    name: "Compliance Dashboard",
+    name: "Compliance",
     year: "2024",
     services: ["Web Development", "Data Visualization"],
     description:
@@ -140,7 +140,7 @@ const projects = [
   },
   {
     slug: "design-system-explorer",
-    name: "Design System Explorer",
+    name: "Design System",
     year: "2025",
     services: ["Web Development", "Tooling"],
     description:

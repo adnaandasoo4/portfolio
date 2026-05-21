@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const PREVIEW_WIDTH = "clamp(240px, 22vw, 360px)";
+const PREVIEW_WIDTH = "clamp(360px, 32vw, 560px)";
 const LERP = 0.18;
 const OFFSET_X = 24;
 const OFFSET_Y = 24;

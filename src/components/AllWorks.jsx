@@ -19,50 +19,16 @@ export default function AllWorks() {
 
   return (
     <main className="relative w-full bg-paper text-ink">
-      {/* Display title — same Cabinet Grotesk treatment as the home Hero and
-          per-project titles. Top padding clears the fixed navbar. */}
-      <section className="mx-auto flex max-w-screen-2xl flex-col gap-8 px-6 pb-16 pt-32 sm:px-16 sm:pt-40">
-        <h1
-          className="font-display uppercase"
-          style={{
-            fontWeight: 700,
-            fontSize: "clamp(40px, 6vw, 96px)",
-            lineHeight: 0.95,
-            letterSpacing: "-0.02em",
-          }}
-          aria-label="Works"
-        >
-          {Array.from("Works").map((char, i) => (
-            <span
-              key={i}
-              className="inline-block overflow-hidden align-bottom"
-              aria-hidden="true"
-            >
-              <motion.span
-                className="inline-block"
-                initial={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
-                animate={prefersReducedMotion ? { opacity: 1 } : { y: 0 }}
-                transition={{
-                  delay: prefersReducedMotion ? 0 : i * 0.03,
-                  duration: prefersReducedMotion ? 0.2 : 0.6,
-                  ease: [0.65, 0, 0.35, 1],
-                }}
-              >
-                {char}
-              </motion.span>
-            </span>
-          ))}
-        </h1>
-      </section>
-
-      {/* Typographic index — 5 rows of stacked display-weight names. On
-          desktop the names render in --display-subtle by default and snap
-          to --ink on hover (mirrors the Process section pattern). On mobile
-          they render in --ink full-strength since there's no hover. */}
-      <section className="mx-auto w-full max-w-screen-2xl px-6 pb-24 sm:px-16">
+      {/* Typographic index — centered list of project names. The ul is
+          `mx-auto w-fit` so it auto-sizes to the widest project name and
+          centers horizontally; every row's left edge therefore aligns at
+          the same vertical line through the page (Process-style block
+          centering). Display-subtle by default on desktop, snaps to ink
+          on hover. Top padding clears the fixed navbar. */}
+      <section className="mx-auto w-full max-w-[1800px] px-6 pb-24 pt-32 sm:px-16 sm:pt-40">
         <ul
           role="list"
-          className="flex flex-col gap-8 sm:gap-2"
+          className="mx-auto flex w-fit flex-col gap-8 sm:gap-0"
           onMouseLeave={() => setHoveredIdx(null)}
         >
           {projects.map((project, i) => {
@@ -76,10 +42,10 @@ export default function AllWorks() {
                   onMouseEnter={() => setHoveredIdx(i)}
                   onFocus={() => setHoveredIdx(i)}
                   onBlur={() => setHoveredIdx(null)}
-                  className="group flex flex-col gap-4 py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:py-3 focus:outline-none"
+                  className="group flex flex-col gap-4 py-2 sm:py-3 focus:outline-none"
                 >
                   <motion.h2
-                    className="font-display uppercase transition-colors duration-200 [color:var(--ink)] sm:[color:var(--display-subtle)] sm:group-hover:[color:var(--ink)] sm:group-focus-visible:[color:var(--ink)]"
+                    className="font-display uppercase whitespace-normal transition-colors duration-200 [color:var(--ink)] sm:whitespace-nowrap sm:[color:var(--display-subtle)] sm:group-hover:[color:var(--ink)] sm:group-focus-visible:[color:var(--ink)]"
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
@@ -89,8 +55,8 @@ export default function AllWorks() {
                     }}
                     style={{
                       fontWeight: 700,
-                      fontSize: "clamp(56px, 7vw, 128px)",
-                      lineHeight: 0.88,
+                      fontSize: "clamp(56px, 9vw, 180px)",
+                      lineHeight: 0.82,
                       letterSpacing: "-0.02em",
                     }}
                   >
@@ -147,18 +113,6 @@ export default function AllWorks() {
                       </div>
                     )}
                   </motion.div>
-                  <motion.span
-                    className="whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted"
-                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
-                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                    transition={{
-                      delay: prefersReducedMotion ? 0 : delay + 0.15,
-                      duration: prefersReducedMotion ? 0.2 : 0.5,
-                      ease: [0.65, 0, 0.35, 1],
-                    }}
-                  >
-                    {project.year} · {project.services.join(", ")}
-                  </motion.span>
                 </Link>
               </li>
             );
