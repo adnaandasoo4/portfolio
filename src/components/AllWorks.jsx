@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 import { projects } from "../constants";
@@ -19,6 +19,7 @@ const OFFSET_Y = 24;
  */
 export default function AllWorks() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const previewRef = useRef(null);
   const mouseTarget = useRef({ x: 0, y: 0 });
@@ -109,11 +110,11 @@ export default function AllWorks() {
             >
               <motion.span
                 className="inline-block"
-                initial={{ y: "100%" }}
-                animate={{ y: 0 }}
+                initial={prefersReducedMotion ? { opacity: 0 } : { y: "100%" }}
+                animate={prefersReducedMotion ? { opacity: 1 } : { y: 0 }}
                 transition={{
-                  delay: i * 0.03,
-                  duration: 0.6,
+                  delay: prefersReducedMotion ? 0 : i * 0.03,
+                  duration: prefersReducedMotion ? 0.2 : 0.6,
                   ease: [0.65, 0, 0.35, 1],
                 }}
               >
@@ -146,9 +147,13 @@ export default function AllWorks() {
                     transform-origin: left so it grows left-to-right. */}
                 <motion.div
                   className="h-px w-full origin-left bg-edge"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay, duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
+                  initial={prefersReducedMotion ? { opacity: 0 } : { scaleX: 0 }}
+                  animate={prefersReducedMotion ? { opacity: 1 } : { scaleX: 1 }}
+                  transition={{
+                    delay: prefersReducedMotion ? 0 : delay,
+                    duration: prefersReducedMotion ? 0.2 : 0.4,
+                    ease: [0.65, 0, 0.35, 1],
+                  }}
                 />
                 <Link
                   to={`/works/${project.slug}`}
@@ -159,11 +164,11 @@ export default function AllWorks() {
                 >
                   <motion.div
                     className="flex items-baseline gap-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
-                      delay: delay + 0.15,
-                      duration: 0.5,
+                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      duration: prefersReducedMotion ? 0.2 : 0.5,
                       ease: [0.65, 0, 0.35, 1],
                     }}
                   >
@@ -185,16 +190,40 @@ export default function AllWorks() {
                       {project.name}
                     </h2>
                   </motion.div>
+                  {/* Desktop reduced-motion inline thumb. Replaces the cursor-follow
+                      preview when the user has prefers-reduced-motion: reduce. Sized
+                      smaller than the cursor preview; opacity follows row hover state. */}
+                  <div
+                    className="hidden sm:motion-reduce:block"
+                    style={{
+                      width: "clamp(200px, 18vw, 280px)",
+                      aspectRatio: "16 / 10",
+                      opacity: hoveredIdx === i ? 1 : 0,
+                      transition: "opacity 180ms",
+                    }}
+                  >
+                    {project.coverImage ? (
+                      <img
+                        src={project.coverImage}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                        {project.name}
+                      </div>
+                    )}
+                  </div>
                   {/* Mobile-only inline thumbnail. Hidden on sm+ — desktop uses the
                       cursor-follow preview instead. */}
                   <motion.div
                     className="block w-full sm:hidden"
                     style={{ aspectRatio: "16 / 10" }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
-                      delay: delay + 0.15,
-                      duration: 0.5,
+                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      duration: prefersReducedMotion ? 0.2 : 0.5,
                       ease: [0.65, 0, 0.35, 1],
                     }}
                   >
@@ -214,11 +243,11 @@ export default function AllWorks() {
                   </motion.div>
                   <motion.span
                     className="whitespace-nowrap font-mono text-xs uppercase tracking-widest text-muted"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+                    animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                     transition={{
-                      delay: delay + 0.15,
-                      duration: 0.5,
+                      delay: prefersReducedMotion ? 0 : delay + 0.15,
+                      duration: prefersReducedMotion ? 0.2 : 0.5,
                       ease: [0.65, 0, 0.35, 1],
                     }}
                   >
@@ -231,11 +260,11 @@ export default function AllWorks() {
           {/* Closing hairline below the last row */}
           <motion.div
             className="h-px w-full origin-left bg-edge"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { scaleX: 0 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { scaleX: 1 }}
             transition={{
-              delay: 0.6 + projects.length * 0.08,
-              duration: 0.4,
+              delay: prefersReducedMotion ? 0 : 0.6 + projects.length * 0.08,
+              duration: prefersReducedMotion ? 0.2 : 0.4,
               ease: [0.65, 0, 0.35, 1],
             }}
           />
