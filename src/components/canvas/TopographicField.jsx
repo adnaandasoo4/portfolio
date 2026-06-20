@@ -42,17 +42,19 @@ export default function TopographicField() {
       return s;
     };
 
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(
-      prog,
-      compile(
-        gl.FRAGMENT_SHADER,
-        "#extension GL_OES_standard_derivatives : enable\n" + FRAG,
-      ),
+    const vsh = compile(gl.VERTEX_SHADER, VERT);
+    const fsh = compile(
+      gl.FRAGMENT_SHADER,
+      "#extension GL_OES_standard_derivatives : enable\n" + FRAG,
     );
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vsh);
+    gl.attachShader(prog, fsh);
     gl.linkProgram(prog);
     gl.useProgram(prog);
+    // Shaders are retained by the linked program; free our handles now.
+    gl.deleteShader(vsh);
+    gl.deleteShader(fsh);
 
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -79,10 +81,8 @@ export default function TopographicField() {
       coverage: U("uCoverage"),
     };
 
-    const cur = {
-      bg: [...BACKDROP_COLORS[backdropRef.current].bg],
-      line: [...BACKDROP_COLORS[backdropRef.current].line],
-    };
+    const init = BACKDROP_COLORS[backdropRef.current] || BACKDROP_COLORS.dark;
+    const cur = { bg: [...init.bg], line: [...init.line] };
 
     const reduce =
       typeof window.matchMedia === "function" &&
@@ -99,6 +99,8 @@ export default function TopographicField() {
 
     let raf = 0;
     let running = true;
+    // Single clock origin. After a hidden-tab pause `t` jumps forward by the
+    // hidden duration; harmless here because the field morphs very slowly.
     const start = performance.now();
 
     const draw = (t) => {
