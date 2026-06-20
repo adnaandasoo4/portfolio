@@ -7,6 +7,8 @@ import ProjectDetail from './components/ProjectDetail';
 import { ThemeProvider } from './utils/theme';
 import { LenisProvider, useLenis } from './utils/lenis';
 import { setupGsap } from './utils/gsap';
+import { BackdropProvider } from './utils/backdrop';
+import TopographicField from './components/canvas/TopographicField';
 
 function GsapBootstrap() {
   const lenis = useLenis();
@@ -122,22 +124,25 @@ const App = () => {
   return (
     <ThemeProvider>
       <LenisProvider>
-        <GsapBootstrap />
-        {/* Navbar, ScrollToTop, CustomCursor, and Preloader sit OUTSIDE
-            Routes so they render on every page (Home, ProjectDetail, any
-            future routes) without remounting on navigation. */}
-        <div className='relative z-0'>
-          <Navbar onReplayPreloader={replayPreloader} />
-          <ScrollOnRouteChange />
-          <Routes>
-            <Route path='/' element={<Home ready={pageReady} />} />
-            <Route path='/works' element={<AllWorks />} />
-            <Route path='/works/:slug' element={<ProjectDetail />} />
-          </Routes>
-        </div>
-        <ScrollToTop />
-        <CustomCursor />
-        <Preloader key={preloaderRunId} onReady={handlePreloaderReady} />
+        <BackdropProvider>
+          <GsapBootstrap />
+          <TopographicField />
+          {/* Navbar, ScrollToTop, CustomCursor, and Preloader sit OUTSIDE
+              Routes so they render on every page without remounting. Content
+              is raised above the fixed field canvas (z-0) via z-10. */}
+          <div className='relative z-10'>
+            <Navbar onReplayPreloader={replayPreloader} />
+            <ScrollOnRouteChange />
+            <Routes>
+              <Route path='/' element={<Home ready={pageReady} />} />
+              <Route path='/works' element={<AllWorks />} />
+              <Route path='/works/:slug' element={<ProjectDetail />} />
+            </Routes>
+          </div>
+          <ScrollToTop />
+          <CustomCursor />
+          <Preloader key={preloaderRunId} onReady={handlePreloaderReady} />
+        </BackdropProvider>
       </LenisProvider>
     </ThemeProvider>
   )
