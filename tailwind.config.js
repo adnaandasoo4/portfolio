@@ -19,6 +19,7 @@ module.exports = {
         ink: "var(--ink)",
         paper: "var(--bg)",
         accent: "var(--accent)",
+        lime: "var(--lime)",
         edge: "var(--border)",
         muted: "var(--muted)",
         flag: "var(--flag)",
@@ -27,9 +28,9 @@ module.exports = {
         xs: "450px",
       },
       fontFamily: {
-        display: ["Clash Display", "Geist", "system-ui", "sans-serif"],
+        display: ["Moniqa", "Georgia", "serif"],
         sans: [
-          "Geist",
+          "Manrope",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
