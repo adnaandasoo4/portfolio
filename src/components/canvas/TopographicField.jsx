@@ -30,10 +30,13 @@ export default function TopographicField() {
     });
     if (!gl) return; // no-WebGL fallback: page background shows through
 
-    gl.getExtension("OES_standard_derivatives");
+    // The field's hairline contours need fwidth() (WebGL1 derivatives). If the
+    // extension is missing, bail cleanly — the solid page background shows.
+    if (!gl.getExtension("OES_standard_derivatives")) return;
 
     const compile = (type, src) => {
       const s = gl.createShader(type);
+      if (!s) return null;
       gl.shaderSource(s, src);
       gl.compileShader(s);
       if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
@@ -47,10 +50,15 @@ export default function TopographicField() {
       gl.FRAGMENT_SHADER,
       "#extension GL_OES_standard_derivatives : enable\n" + FRAG,
     );
+    if (!vsh || !fsh) return;
     const prog = gl.createProgram();
     gl.attachShader(prog, vsh);
     gl.attachShader(prog, fsh);
     gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.error(gl.getProgramInfoLog(prog));
+      return;
+    }
     gl.useProgram(prog);
     // Shaders are retained by the linked program; free our handles now.
     gl.deleteShader(vsh);
@@ -124,6 +132,7 @@ export default function TopographicField() {
     };
 
     const frame = () => {
+      if (!running) return;
       const t =
         ((performance.now() - start) / 1000) * (TOPO_PARAMS.speedPct / 40);
       draw(t);

@@ -34,7 +34,7 @@
 
 /* V2 default context — dark green. data-theme is no longer read (the old
    theme toggle becomes a no-op until it is removed in the navbar piece). */
-:root{
+:root, .ctx-dark{
   --bg:#283021;
   --ink:#DEE1D3;
   --accent:#B6C652;            /* muted green — headline accents / accent text */
