@@ -1,6 +1,7 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { hero } from "../constants";
+import { useReportBackdrop } from "../utils/backdrop";
 
 // HeroBigText pulls in Three.js (~365 KB). Code-splitting it into its own
 // chunk lets the rest of the page (Manifesto, Experience, Tech, Selected
@@ -88,8 +89,10 @@ function LocalTime({ label, timeZone, ready }) {
  *   indicator animate in alongside the splitting overlay.
  */
 export default function Hero({ ready = true }) {
+  const sectionRef = useRef(null);
+  useReportBackdrop(sectionRef, "dark");
   return (
-    <section className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-0 pt-32 sm:px-16 sm:pb-12 sm:pt-40">
+    <section ref={sectionRef} className="ctx-dark relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-0 pt-32 sm:px-16 sm:pb-12 sm:pt-40">
       {/* Inner content container — same 1536px rail as every other section,
           and same internal px-6 sm:px-16 padding the navbar uses, so the
           scroll indicator's right edge lines up with the navbar's theme
