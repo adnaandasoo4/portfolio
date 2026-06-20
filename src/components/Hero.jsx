@@ -134,6 +134,18 @@ export default function Hero({ ready = true }) {
             </span>
           </motion.div>
         </div>
+
+        {/* V2 foundation proof — Moniqa headline treatment. Copy is
+            provisional; the full Hero composition is a later piece. */}
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={ready ? { opacity: 1, y: 0 } : false}
+          transition={{ duration: 0.7, delay: 0.35, ease }}
+          className="display-head mt-16 max-w-[18ch] text-ink"
+          style={{ fontSize: "clamp(40px, 6vw, 104px)", lineHeight: 0.98 }}
+        >
+          Designing <em>Systems</em>, Shipping <em>Experiences</em>.
+        </motion.h1>
       </div>
 
       {/* Mobile-only sideways wordmark — replaces the WebGL ADNAAN on
