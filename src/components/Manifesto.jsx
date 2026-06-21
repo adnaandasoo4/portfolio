@@ -3,13 +3,13 @@ import { motion } from "framer-motion";
 import { HIDE_SECTION_LABELS, manifesto } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { revealVariant as reveal } from "../utils/motion";
-import { useReportBackdrop } from "../utils/backdrop";
+import { useSectionBackdrop } from "../utils/backdrop";
 
 function Manifesto() {
   const ref = useRef(null);
-  useReportBackdrop(ref, "light");
+  useSectionBackdrop(ref, "light");
   return (
-    <div ref={ref} className="ctx-light flex flex-col gap-10 py-6 sm:py-24">
+    <div ref={ref} className="flex flex-col gap-10 py-6 sm:py-24">
       {!HIDE_SECTION_LABELS && (
         <motion.span
           variants={reveal}
