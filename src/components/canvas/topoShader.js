@@ -18,8 +18,8 @@ const rgb = (h) => [
 
 // Per-backdrop background + contour-line colors.
 export const BACKDROP_COLORS = {
-  dark: { bg: rgb("#283021"), line: rgb("#DCFE4F") }, // green bg, lime lines
-  light: { bg: rgb("#F1EFE8"), line: rgb("#292C21") }, // paper bg, dark-green lines
+  dark: { bg: rgb("#283021"), line: rgb("#DCFE4F"), ink: rgb("#DEE1D3") }, // green bg, lime lines, light ink
+  light: { bg: rgb("#F1EFE8"), line: rgb("#292C21"), ink: rgb("#292C21") }, // paper bg, dark-green lines, dark ink
 };
 
 export const VERT = `attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}`;
