@@ -195,14 +195,17 @@ export default function Hero({ ready = true }) {
         className="display-head pointer-events-none absolute bottom-[-1vw] left-0 right-0 z-0 hidden select-none text-center uppercase sm:block"
         style={{
           fontFamily: '"Moniqa", Georgia, serif',
-          fontWeight: 900,
+          fontWeight: 300,
+          fontStyle: "italic",
           fontSize: "clamp(96px, 26vw, 460px)",
           lineHeight: 0.8,
           letterSpacing: "0.01em",
           color: "var(--ink)",
         }}
       >
-        {hero.name}
+        {/* Two-tone wordmark — "AD" Light-italic in ink, "NAAN" Black-italic in
+            the green accent (via .display-head em). */}
+        AD<em>NAAN</em>
       </div>
     </section>
   );
