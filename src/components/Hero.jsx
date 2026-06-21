@@ -1,14 +1,8 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { hero } from "../constants";
-import { useReportBackdrop } from "../utils/backdrop";
+import { useSectionBackdrop } from "../utils/backdrop";
 
-// HeroBigText pulls in Three.js (~365 KB). Code-splitting it into its own
-// chunk lets the rest of the page (Manifesto, Experience, Tech, Selected
-// Work, Contact) finish downloading first; the wordmark fills in as Three
-// loads in parallel. Fallback is null so the wordmark area stays empty
-// during the swap — the page background already covers it.
-const HeroBigText = lazy(() => import("./HeroBigText"));
 
 const ease = [0.65, 0, 0.35, 1];
 
@@ -90,9 +84,9 @@ function LocalTime({ label, timeZone, ready }) {
  */
 export default function Hero({ ready = true }) {
   const sectionRef = useRef(null);
-  useReportBackdrop(sectionRef, "dark");
+  useSectionBackdrop(sectionRef, "dark");
   return (
-    <section ref={sectionRef} className="ctx-dark relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-0 pt-32 sm:px-16 sm:pb-12 sm:pt-40">
+    <section ref={sectionRef} className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pb-0 pt-32 sm:px-16 sm:pb-12 sm:pt-40">
       {/* Inner content container — same 1536px rail as every other section,
           and same internal px-6 sm:px-16 padding the navbar uses, so the
           scroll indicator's right edge lines up with the navbar's theme
@@ -163,8 +157,8 @@ export default function Hero({ ready = true }) {
         className="pointer-events-none absolute bottom-[24vw] left-6 z-0 select-none uppercase sm:hidden"
         style={{
           writingMode: "vertical-rl",
-          fontFamily: '"Clash Display", "Geist", system-ui, sans-serif',
-          fontWeight: 700,
+          fontFamily: '"Moniqa", Georgia, serif',
+          fontWeight: 900,
           fontSize: "clamp(80px, 24vw, 160px)",
           lineHeight: 0.85,
           letterSpacing: "-0.02em",
@@ -191,14 +185,23 @@ export default function Hero({ ready = true }) {
         </div>
       </div>
 
-      {/* WebGL display word, full-bleed at the bottom. Lazy-loaded so
-          Three.js doesn't block the rest of the page's initial paint.
-          Desktop/tablet only — on mobile, the sideways wordmark above
-          carries the name. */}
-      <div className="hidden sm:contents">
-        <Suspense fallback={null}>
-          <HeroBigText text={hero.name} />
-        </Suspense>
+      {/* Desktop wordmark — solid Moniqa ADNAAN. Transparent background so the
+          topographic field shows through the negative space; color follows the
+          live --ink token so it recolors with the scroll blend. Desktop/tablet
+          only; on mobile the sideways wordmark above carries the name. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-[-1vw] left-0 right-0 z-0 hidden select-none text-center uppercase sm:block"
+        style={{
+          fontFamily: '"Moniqa", Georgia, serif',
+          fontWeight: 900,
+          fontSize: "clamp(96px, 26vw, 460px)",
+          lineHeight: 0.8,
+          letterSpacing: "0.01em",
+          color: "var(--ink)",
+        }}
+      >
+        {hero.name}
       </div>
     </section>
   );
