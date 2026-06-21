@@ -1,21 +1,39 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
 const BackdropContext = createContext(null);
 
 /**
- * Holds which backdrop the in-view section is requesting: 'dark' (green) or
- * 'light' (off-white). The TopographicField reads this to cross-fade its
- * colors; sections set it via useReportBackdrop as they scroll into view.
+ * Holds an ordered registry of sections and the backdrop palette each one
+ * wants ('dark' green / 'light' off-white). The TopographicField reads the
+ * registry every frame to compute a continuous, scroll-driven color blend
+ * that drives both the field colors and the page text. Sections register
+ * themselves via useSectionBackdrop.
  */
-export function BackdropProvider({ children, initial = "dark" }) {
-  const [backdrop, setBackdrop] = useState(initial);
-  const value = useMemo(() => ({ backdrop, setBackdrop }), [backdrop]);
+export function BackdropProvider({ children }) {
+  const registryRef = useRef([]);
+  const [version, setVersion] = useState(0);
+
+  const register = useCallback((entry) => {
+    registryRef.current = [...registryRef.current, entry];
+    setVersion((v) => v + 1);
+    return () => {
+      registryRef.current = registryRef.current.filter((e) => e !== entry);
+      setVersion((v) => v + 1);
+    };
+  }, []);
+
+  const value = useMemo(
+    () => ({ registryRef, version, register }),
+    [version, register],
+  );
   return (
     <BackdropContext.Provider value={value}>
       {children}
@@ -23,37 +41,43 @@ export function BackdropProvider({ children, initial = "dark" }) {
   );
 }
 
+/**
+ * Register `ref`'s element with the given palette ('dark' | 'light') while it
+ * is mounted. The field measures each registered element's position to blend
+ * colors across sections as the user scrolls.
+ */
 // eslint-disable-next-line react-refresh/only-export-components
-export function useBackdrop() {
+export function useSectionBackdrop(ref, palette) {
   const ctx = useContext(BackdropContext);
-  return ctx ? ctx.backdrop : "dark";
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useSetBackdrop() {
-  const ctx = useContext(BackdropContext);
-  return ctx ? ctx.setBackdrop : () => {};
+  const register = ctx && ctx.register;
+  useEffect(() => {
+    if (!register || !ref.current) return;
+    const entry = { el: ref.current, palette };
+    return register(entry);
+  }, [ref, palette, register]);
 }
 
 /**
- * Report `value` ('dark' | 'light') as the active backdrop while the element
- * referenced by `ref` is at least half in view.
+ * Accessor for the field: the live registry ref plus a version counter that
+ * bumps whenever sections register/unregister (so cached offsets recompute).
+ */
+// eslint-disable-next-line react-refresh/only-export-components
+export function useBackdropRegistry() {
+  const ctx = useContext(BackdropContext);
+  if (ctx) return { registryRef: ctx.registryRef, version: ctx.version };
+  return { registryRef: { current: [] }, version: 0 };
+}
+
+/**
+ * TEMPORARY back-compat shims so existing imports keep building during the
+ * migration. Both are removed in the cleanup task once all callers move to
+ * useSectionBackdrop / useBackdropRegistry.
  */
 // eslint-disable-next-line react-refresh/only-export-components
 export function useReportBackdrop(ref, value) {
-  const setBackdrop = useSetBackdrop();
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting && e.intersectionRatio >= 0.5) setBackdrop(value);
-        });
-      },
-      { threshold: [0.5] },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, value, setBackdrop]);
+  useSectionBackdrop(ref, value);
+}
+// eslint-disable-next-line react-refresh/only-export-components
+export function useBackdrop() {
+  return "dark";
 }
