@@ -25,16 +25,12 @@ function blendedPalette(offsets, scrollY, vh) {
   if (offsets.length === 1) return BACKDROP_COLORS[offsets[0].palette] || BACKDROP_COLORS.dark;
   const refY = scrollY + vh * REF_POINT;
   const band = Math.max(1, vh * BLEND_BAND_FRAC);
-  // Boundary = top edge of each section after the first. Pick the nearest.
+  // Active pair straddles the reference line: B is the first section whose top
+  // is past refY; A is the one before it. Clamp so the page ends hold the
+  // first/last palette.
   let k = 1;
-  let best = Infinity;
-  for (let i = 1; i < offsets.length; i++) {
-    const d = Math.abs(offsets[i].top - refY);
-    if (d < best) {
-      best = d;
-      k = i;
-    }
-  }
+  while (k < offsets.length && offsets[k].top <= refY) k++;
+  k = Math.min(k, offsets.length - 1);
   const A = BACKDROP_COLORS[offsets[k - 1].palette] || BACKDROP_COLORS.dark;
   const B = BACKDROP_COLORS[offsets[k].palette] || BACKDROP_COLORS.dark;
   const progress = clamp((refY - offsets[k].top) / band + 0.5, 0, 1);
