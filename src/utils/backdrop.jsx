@@ -10,6 +10,10 @@ import {
 
 const BackdropContext = createContext(null);
 
+// Stable fallback so consumers used outside a provider don't see a new
+// registry object (and re-run effects) on every render.
+const EMPTY_REGISTRY = { current: [] };
+
 /**
  * Holds an ordered registry of sections and the backdrop palette each one
  * wants ('dark' green / 'light' off-white). The TopographicField reads the
@@ -65,6 +69,6 @@ export function useSectionBackdrop(ref, palette) {
 export function useBackdropRegistry() {
   const ctx = useContext(BackdropContext);
   if (ctx) return { registryRef: ctx.registryRef, version: ctx.version };
-  return { registryRef: { current: [] }, version: 0 };
+  return { registryRef: EMPTY_REGISTRY, version: 0 };
 }
 

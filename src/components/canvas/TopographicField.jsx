@@ -145,6 +145,8 @@ export default function TopographicField() {
           hasGL = true;
         } else {
           console.error(gl.getProgramInfoLog(prog));
+          gl.deleteShader(vsh);
+          gl.deleteShader(fsh);
         }
       }
     }
