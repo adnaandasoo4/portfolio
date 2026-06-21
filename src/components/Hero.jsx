@@ -71,8 +71,9 @@ function LocalTime({ label, timeZone, ready }) {
  *   right-side element a visitor sees.
  * - Bottom-right (above the wordmark): two-line kicker — Software
  *   Engineer / Creative Developer, in display-friendly mono at ink color.
- * - Bottom: HeroBigText — full-bleed WebGL wordmark with through-glass
- *   blur localized around the cursor on hover.
+ * - Bottom: ADNAAN wordmark — solid Moniqa display text, transparent so the
+ *   topographic field shows through; recolors with the scroll blend via the
+ *   --ink token. Desktop/tablet only; mobile uses the sideways wordmark above.
  *
  * @param {object} props
  * @param {boolean} [props.ready=true] - When false, the in-section

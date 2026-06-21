@@ -34,7 +34,7 @@
 
 /* V2 default context — dark green. data-theme is no longer read (the old
    theme toggle becomes a no-op until it is removed in the navbar piece). */
-:root, .ctx-dark{
+:root{
   --bg:#283021;
   --ink:#DEE1D3;
   --accent:#B6C652;            /* muted green — headline accents / accent text */
@@ -43,18 +43,6 @@
   --muted:rgba(222,225,211,0.62);
   --display-subtle:#20231A;    /* ghost wordmark on green */
   --flag:#DCFE4F;              /* wayfinding accent (was orange) → lime in V2 */
-}
-
-/* Off-white section context — opt in by adding `ctx-light` to a section. */
-.ctx-light{
-  --bg:#F1EFE8;
-  --ink:#292C21;
-  --accent:#B6C652;
-  --lime:#DCFE4F;
-  --border:rgba(41,44,33,0.18);
-  --muted:rgba(41,44,33,0.62);
-  --display-subtle:#E6E4DC;
-  --flag:#DCFE4F;
 }
 
 * {

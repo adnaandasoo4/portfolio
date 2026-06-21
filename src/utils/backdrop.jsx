@@ -68,16 +68,3 @@ export function useBackdropRegistry() {
   return { registryRef: { current: [] }, version: 0 };
 }
 
-/**
- * TEMPORARY back-compat shims so existing imports keep building during the
- * migration. Both are removed in the cleanup task once all callers move to
- * useSectionBackdrop / useBackdropRegistry.
- */
-// eslint-disable-next-line react-refresh/only-export-components
-export function useReportBackdrop(ref, value) {
-  useSectionBackdrop(ref, value);
-}
-// eslint-disable-next-line react-refresh/only-export-components
-export function useBackdrop() {
-  return "dark";
-}
