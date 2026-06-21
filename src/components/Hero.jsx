@@ -155,7 +155,7 @@ export default function Hero({ ready = true }) {
         initial={{ opacity: 0 }}
         animate={ready ? { opacity: 1 } : false}
         transition={{ duration: 0.6, delay: 0.45, ease }}
-        className="pointer-events-none absolute bottom-[24vw] left-6 z-0 select-none uppercase sm:hidden"
+        className="display-head pointer-events-none absolute bottom-[24vw] left-6 z-0 select-none uppercase sm:hidden"
         style={{
           writingMode: "vertical-rl",
           fontFamily: '"Moniqa", Georgia, serif',
@@ -192,7 +192,7 @@ export default function Hero({ ready = true }) {
           only; on mobile the sideways wordmark above carries the name. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-[-1vw] left-0 right-0 z-0 hidden select-none text-center uppercase sm:block"
+        className="display-head pointer-events-none absolute bottom-[-1vw] left-0 right-0 z-0 hidden select-none text-center uppercase sm:block"
         style={{
           fontFamily: '"Moniqa", Georgia, serif',
           fontWeight: 900,
