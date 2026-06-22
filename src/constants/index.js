@@ -218,8 +218,9 @@ export const socials = [
 ];
 
 export const hero = {
-  // Big WebGL display word at the bottom of the section.
-  name: "ADNAAN",
+  // Full-bleed Manrope wordmark across the bottom of the hero (rendered
+  // uppercase via CSS).
+  name: "Adnaan Dasoo",
   // Two-line mono kicker rendered top-right at the same scale as the
   // SUERO reference's "DIGITAL DESIGN STUDIO / WEBFLOW PREMIUM PARTNER".
   kicker: ["Software Engineer", "Creative Developer"],

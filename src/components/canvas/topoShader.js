@@ -16,11 +16,32 @@ const rgb = (h) => [
   parseInt(h.slice(5, 7), 16) / 255,
 ];
 
-// Per-backdrop background + contour-line colors.
+// Selectable identities for the dark backdrop. The light (paper) backdrop is
+// shared across all of them. Each `line` is the palette's bright accent (the
+// contour-line color), mirrored in CSS as --lime.
+export const DARK_PALETTES = {
+  green: { bg: rgb("#292E21"), line: rgb("#DCFE4F"), ink: rgb("#DEE1D3") }, // green bg, lime lines
+  oxblood: { bg: rgb("#200B10"), line: rgb("#8A8E94"), ink: rgb("#E6E3DD") }, // dark muted oxblood, darker silver-gray lines
+  blue: { bg: rgb("#0F1B30"), line: rgb("#8FC2F2"), ink: rgb("#D7E1EE") }, // midnight navy, light-blue lines
+  graphite: { bg: rgb("#24262B"), line: rgb("#E0A94A"), ink: rgb("#DEE1E6") }, // graphite charcoal, amber lines
+};
+
+// Per-backdrop background + contour-line colors. `dark` is mutated in place by
+// setDarkPalette so live readers (the field's per-frame loop, OverlayTopo) pick
+// up palette swaps without re-instantiating their GL contexts.
 export const BACKDROP_COLORS = {
-  dark: { bg: rgb("#283021"), line: rgb("#DCFE4F"), ink: rgb("#DEE1D3") }, // green bg, lime lines, light ink
+  dark: { ...DARK_PALETTES.green },
   light: { bg: rgb("#F1EFE8"), line: rgb("#292C21"), ink: rgb("#292C21") }, // paper bg, dark-green lines, dark ink
 };
+
+// Swap the active dark palette. Mutates the existing `dark` object's properties
+// (rather than reassigning it) so references captured at effect-setup stay valid.
+export function setDarkPalette(name) {
+  const p = DARK_PALETTES[name] || DARK_PALETTES.green;
+  BACKDROP_COLORS.dark.bg = p.bg;
+  BACKDROP_COLORS.dark.line = p.line;
+  BACKDROP_COLORS.dark.ink = p.ink;
+}
 
 export const VERT = `attribute vec2 p;void main(){gl_Position=vec4(p,0.0,1.0);}`;
 

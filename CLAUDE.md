@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands
-
+        Thi
 - `npm run dev` — start Vite dev server with HMR
 - `npm run build` — production build to `dist/`
 - `npm run preview` — serve the production build locally

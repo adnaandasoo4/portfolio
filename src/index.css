@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
 
 /* Moniqa Display — V2 headline face (self-hosted OTF; only the 3 weights we use). */
 @font-face{font-family:'Moniqa';font-weight:400;font-style:normal;src:url('/fonts/moniqa/Moniqa-Display.otf') format('opentype');font-display:swap;}
@@ -32,17 +32,65 @@
 @tailwind components;
 @tailwind utilities;
 
-/* V2 default context — dark green. data-theme is no longer read (the old
-   theme toggle becomes a no-op until it is removed in the navbar piece). */
+/* The `display` type token is now Manrope (see tailwind.config.js). Every
+   font-display heading renders heavy + all-caps, replacing the old Moniqa look. */
+.font-display{
+  font-weight:700;
+  text-transform:uppercase;
+}
+
+/* V2 default context — paper/off-white. The page now OPENS on the light
+   palette (matching the paper Preloader) and transitions into the green as
+   you scroll past the hero. The TopographicField overwrites --bg/--ink/--line
+   per-frame from the scroll-blended palette; these defaults only set the
+   first paint before JS runs, so they must match the hero's 'light' palette
+   to avoid a green flash. data-theme is no longer read (the old theme toggle
+   becomes a no-op until it is removed in the navbar piece). */
 :root{
-  --bg:#283021;
-  --ink:#DEE1D3;
+  --bg:#F1EFE8;
+  --ink:#292C21;
   --accent:#B6C652;            /* muted green — headline accents / accent text */
   --lime:#DCFE4F;              /* bright lime — UI chrome only */
-  --border:rgba(222,225,211,0.18);
-  --muted:rgba(222,225,211,0.62);
+  --dark-bg:#292E21;           /* solid dark backdrop (overlay, chrome) */
+  --dark-ink:#DEE1D3;          /* off-white text on the dark backdrop */
+  /* Derived from the live (scroll-blended) --ink so de-emphasized text and
+     hairlines auto-follow the white→green transition: dark-on-paper in the
+     hero, light-on-green in the body. (Previously hardcoded to light ink,
+     which was invisible on the now-white hero.) */
+  --border:color-mix(in srgb, var(--ink) 18%, transparent);
+  --muted:color-mix(in srgb, var(--ink) 62%, transparent);
   --display-subtle:#20231A;    /* ghost wordmark on green */
   --flag:#DCFE4F;              /* wayfinding accent (was orange) → lime in V2 */
+}
+
+/* Experimental palettes — selectable from the bottom-left ColorPicker (sets
+   data-palette on <html>). The WebGL field's dark colors switch separately via
+   setDarkPalette() in topoShader.js; keep the two in sync.
+   Each block: --accent (muted text accent), --lime (bright UI chrome),
+   --dark-bg (solid dark backdrop), --dark-ink (off-white on dark). */
+:root[data-palette="oxblood"]{        /* dark muted oxblood + darker silver-gray */
+  --accent:#70747A;
+  --lime:#8A8E94;
+  --flag:#8A8E94;
+  --dark-bg:#200B10;
+  --dark-ink:#E6E3DD;
+  --display-subtle:#140709;
+}
+:root[data-palette="blue"]{           /* midnight navy + light blue */
+  --accent:#7BA6D8;
+  --lime:#8FC2F2;
+  --flag:#8FC2F2;
+  --dark-bg:#0F1B30;
+  --dark-ink:#D7E1EE;
+  --display-subtle:#0A1424;
+}
+:root[data-palette="graphite"]{       /* graphite charcoal + warm amber */
+  --accent:#C3995A;
+  --lime:#E0A94A;
+  --flag:#E0A94A;
+  --dark-bg:#24262B;
+  --dark-ink:#DEE1E6;
+  --display-subtle:#16181C;
 }
 
 * {
@@ -56,7 +104,27 @@ html, body {
   color: var(--ink);
   font-family: "Manrope", system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  /* Native scrollbar hidden — replaced by the custom overlay scrollbar
+     (CustomScrollbar.jsx). Firefox / legacy Edge. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+/* WebKit / Blink. */
+html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* ── custom overlay scrollbar ── */
+/* Hidden by default; shown while scrolling (.is-active, toggled in JS) or on
+   hover, and widens slightly on hover. */
+.custom-scrollbar{position:fixed;top:10px;right:0;bottom:10px;width:8px;z-index:30;
+  border-radius:8px;opacity:0;pointer-events:auto;
+  transition:opacity .3s ease,width .2s ease}
+.custom-scrollbar.is-active,.custom-scrollbar:hover{opacity:1}
+.custom-scrollbar:hover{width:10px}
+.custom-scrollbar-thumb{position:absolute;left:0;top:0;width:100%;border-radius:8px;
+  background:var(--ink);opacity:.5;cursor:grab;
+  transition:opacity .2s ease,background-color .15s linear}
+.custom-scrollbar:hover .custom-scrollbar-thumb{opacity:.85}
+.custom-scrollbar-thumb:active{cursor:grabbing;opacity:.95}
 
 .hash-span {
   margin-top: -100px;
@@ -64,17 +132,137 @@ html, body {
   display: block;
 }
 
-/* V2 headline treatment — Moniqa all-caps with every OpenType feature on.
-   Accent words are authored as <em> and render Black-italic in muted green. */
+/* V2 headline treatment — Manrope 700, all-caps. Accent words are authored as
+   <em> and render in the muted accent color. */
 .display-head{
-  font-family:'Moniqa', Georgia, serif;
+  font-family:'Manrope', system-ui, sans-serif;
   text-transform:uppercase;
-  font-weight:400;
+  font-weight:700;
   letter-spacing:0.01em;
-  font-feature-settings:"salt" 1,"ss01" 1,"dlig" 1,"liga" 1,"calt" 1;
 }
 .display-head em{
-  font-style:italic;
-  font-weight:900;
+  font-style:normal;
+  font-weight:700;
   color:var(--accent);
 }
+
+/* ============================================================================
+   V2 NAVIGATION — boxed burger, "Say Hi" contact pill, full-page overlay.
+   Wired from the nav-1-fullpage prototype. Classes are namespaced `nv-`.
+   Colours: the closed burger uses the scroll-blended --ink so it reads on both
+   the white hero and green body; the open burger + overlay use fixed brand
+   colours since the overlay is its own dark-green context.
+   ============================================================================ */
+
+/* ── "Say Hi" contact pill ── */
+.nv-contact{height:68px;display:inline-flex;align-items:center;gap:11px;padding:0 30px;border-radius:16px;
+  border:3px solid var(--lime);background:var(--lime);color:var(--dark-bg);
+  font-family:'Manrope',system-ui,sans-serif;font-weight:800;font-size:20px;letter-spacing:.03em;
+  text-transform:uppercase;text-decoration:none;white-space:nowrap}
+.nv-cttext{display:inline-flex}
+.nv-ltr{position:relative;display:inline-block;overflow:hidden;height:1em;line-height:1;vertical-align:bottom}
+.nv-ltr.nv-space{width:.32em;overflow:visible}
+.nv-roll{display:block;transition:transform .5s cubic-bezier(.65,0,.35,1) calc(var(--i,0)*.035s)}
+.nv-roll span{display:block;line-height:1}
+.nv-contact:hover .nv-roll{transform:translateY(-50%)}
+.nv-wave{display:inline-block;transform-origin:70% 80%}
+.nv-contact:hover .nv-wave{animation:nvwave .8s ease-in-out 1}
+@keyframes nvwave{0%,100%{transform:rotate(0)}20%{transform:rotate(16deg)}40%{transform:rotate(-8deg)}
+  60%{transform:rotate(12deg)}80%{transform:rotate(-4deg)}}
+
+/* ── boxed burger ── */
+.nv-burger{position:relative;z-index:51;width:68px;height:68px;border:3px solid currentColor;border-radius:16px;
+  overflow:hidden;background:transparent;cursor:pointer;color:var(--ink);padding:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  transition:color .3s ease,background-color .3s ease,border .3s ease}
+/* Open (overlay showing) — fully white box with NO border (border-width
+   collapses to 0; box-sizing keeps the 68px outer size, so it stays equal to
+   the pill next to it) and black X lines. */
+.nv-burger.is-open{background:#FFFFFF;color:#111111;border-width:0}
+/* Over the dark theme backdrop (not open) — solid white box with NO border
+   (width collapses to 0; box-sizing keeps the 68px outer size, so it stays
+   equal to the pill next to it) and black lines. Until the backdrop blends
+   into the theme color the burger keeps its black border (default state); only
+   once it fully transitions to the white box does the border go away. */
+.nv-burger.is-dark:not(.is-open):not(.is-closing){background:#FFFFFF;color:#111111;border-width:0}
+.nv-fill{position:absolute;inset:0;background:var(--lime);transform:translateY(101%);
+  transition:transform .42s cubic-bezier(.65,0,.35,1);z-index:0}
+.nv-burger:hover .nv-fill{transform:translateY(0)}
+.nv-bl{position:relative;z-index:1;width:18px;height:3px;overflow:hidden;
+  transition:width .42s cubic-bezier(.65,0,.35,1),margin .42s cubic-bezier(.65,0,.35,1),transform .42s cubic-bezier(.65,0,.35,1)}
+/* Both bars centered (align-items on the burger) so the hamburger AND the X
+   always sit dead-center, independent of the box size. */
+.nv-bl1,.nv-bl2{margin-left:0}
+.nv-bln{position:absolute;left:0;top:0;height:3px;width:18px;--loop:18px;border-radius:3px;background:currentColor;
+  transition:width .42s cubic-bezier(.65,0,.35,1),transform .42s cubic-bezier(.65,0,.35,1)}
+.nv-burger:not(.is-open):not(.is-closing):hover .nv-bl1 .nv-bln{animation:nvbloop .5s cubic-bezier(.65,0,.35,1) 1}
+.nv-burger:not(.is-open):not(.is-closing):hover .nv-bl2 .nv-bln{animation:nvbloop .5s cubic-bezier(.65,0,.35,1) .06s 1}
+@keyframes nvbloop{0%{transform:translateX(0)}46%{transform:translateX(var(--loop))}
+  46.01%{transform:translateX(calc(-1*var(--loop)))}100%{transform:translateX(0)}}
+.nv-burger.is-open .nv-bl{overflow:visible}
+.nv-burger.is-open .nv-bl1{animation:nvclickX1 .62s cubic-bezier(.65,0,.35,1) forwards}
+.nv-burger.is-open .nv-bl2{animation:nvclickX2 .62s cubic-bezier(.65,0,.35,1) .05s forwards}
+@keyframes nvclickX1{0%{transform:translateX(0) translateY(0) rotate(0)}
+  45%{transform:translateX(50px) translateY(0) rotate(0)}
+  45.01%{transform:translateX(-50px) translateY(4.5px) rotate(45deg)}
+  100%{transform:translateX(0) translateY(4.5px) rotate(45deg)}}
+@keyframes nvclickX2{0%{transform:translateX(0) translateY(0) rotate(0)}
+  45%{transform:translateX(50px) translateY(0) rotate(0)}
+  45.01%{transform:translateX(-50px) translateY(-4.5px) rotate(-45deg)}
+  100%{transform:translateX(0) translateY(-4.5px) rotate(-45deg)}}
+.nv-burger.is-closing .nv-bl{overflow:visible}
+.nv-burger.is-closing .nv-bl1{animation:nvclickClose1 .62s cubic-bezier(.65,0,.35,1) forwards}
+.nv-burger.is-closing .nv-bl2{animation:nvclickClose2 .62s cubic-bezier(.65,0,.35,1) .05s forwards}
+@keyframes nvclickClose1{0%{transform:translateX(0) translateY(4.5px) rotate(45deg)}
+  45%{transform:translateX(50px) translateY(4.5px) rotate(45deg)}
+  45.01%{transform:translateX(-50px) translateY(0) rotate(0)}
+  100%{transform:translateX(0) translateY(0) rotate(0)}}
+@keyframes nvclickClose2{0%{transform:translateX(0) translateY(-4.5px) rotate(-45deg)}
+  45%{transform:translateX(50px) translateY(-4.5px) rotate(-45deg)}
+  45.01%{transform:translateX(-50px) translateY(0) rotate(0)}
+  100%{transform:translateX(0) translateY(0) rotate(0)}}
+
+/* ── full-page overlay ── */
+/* The reveal/conceal is a curved sweep driven by an SVG clip-path (see
+   Navbar.jsx) — the same mechanism as the Preloader. This rule only owns the
+   fill + pointer-events; the clip-path is applied inline. */
+.nv-overlay{position:fixed;inset:0;z-index:40;background:var(--dark-bg);color:var(--dark-ink);pointer-events:none}
+.nv-overlay.open{pointer-events:auto}
+.nv-topo{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.nv-ovinner{position:relative;z-index:1;height:100%;display:grid;grid-template-rows:1fr;gap:2vh;
+  padding:clamp(22px,3vw,40px) clamp(20px,3.4vw,52px) clamp(28px,4vh,52px);padding-top:max(10vh,84px)}
+.nv-el{opacity:0;transform:translateY(26px);transition:opacity .55s ease,transform .55s cubic-bezier(.65,0,.35,1)}
+/* Visible while open AND while closing — during the close sweep the content
+   should stay solid as the curved edge wipes up to reveal the page beneath. */
+.nv-overlay.open .nv-el,.nv-overlay.close .nv-el{opacity:1;transform:none}
+.nv-ovword{font-family:'Manrope',system-ui,sans-serif;font-weight:700;text-transform:uppercase;
+  line-height:.82;letter-spacing:.01em;font-size:clamp(40px,6vw,104px);transition-delay:.18s}
+.nv-ovword em{color:#B6C652;font-style:italic}
+.nv-ovmain{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:clamp(24px,5vw,90px);min-height:0}
+.nv-ovimgs{display:flex;gap:clamp(14px,1.6vw,26px);justify-content:center;align-items:flex-start}
+.nv-imgcol{display:flex;flex-direction:column;gap:clamp(14px,1.6vw,26px);flex:1;
+  max-width:clamp(160px,17vw,260px);will-change:transform}
+.nv-imgcol-lower{margin-top:clamp(30px,7vh,90px)}
+.nv-tile{position:relative;height:clamp(150px,26vh,300px);background:#22271B;
+  border:1px solid rgba(222,225,211,.10);overflow:hidden}
+.nv-tile span{position:absolute;left:10px;bottom:8px;color:rgba(222,225,211,.45);font-size:10px;
+  letter-spacing:.12em;text-transform:uppercase}
+.nv-imgcol .nv-el:nth-child(1){transition-delay:.26s}
+.nv-imgcol .nv-el:nth-child(2){transition-delay:.34s}
+.nv-ovside{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(22px,4vh,48px)}
+.nv-ovnav{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(2px,.6vh,10px)}
+.nv-nlink{position:relative;font-family:'Manrope',system-ui,sans-serif;font-weight:700;text-transform:uppercase;
+  letter-spacing:.01em;line-height:1.04;font-size:clamp(34px,4.8vw,86px);color:rgba(222,225,211,.45);
+  text-decoration:none;transition:color .25s ease}
+.nv-nlink:hover,.nv-nlink.active{color:var(--dark-ink)}
+.nv-nlink.active .nv-squig{opacity:1}
+.nv-squig{position:absolute;left:.04em;bottom:-.02em;width:1em;height:.16em;opacity:0;transition:opacity .25s ease}
+.nv-ovnav .nv-el:nth-child(1){transition-delay:.30s}
+.nv-ovnav .nv-el:nth-child(2){transition-delay:.36s}
+.nv-ovnav .nv-el:nth-child(3){transition-delay:.42s}
+.nv-ovnav .nv-el:nth-child(4){transition-delay:.48s}
+.nv-ovsocials{display:flex;flex-wrap:wrap;gap:clamp(16px,1.8vw,34px);color:var(--dark-ink);
+  font-family:ui-monospace,'JetBrains Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  transition-delay:.52s}
+.nv-ovsocials a{color:inherit;text-decoration:none;transition:color .2s ease}
+.nv-ovsocials a:hover{color:var(--accent)}

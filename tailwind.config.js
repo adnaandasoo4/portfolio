@@ -28,7 +28,7 @@ module.exports = {
         xs: "450px",
       },
       fontFamily: {
-        display: ["Moniqa", "Georgia", "serif"],
+        display: ["Manrope", "system-ui", "sans-serif"],
         sans: [
           "Manrope",
           "ui-sans-serif",

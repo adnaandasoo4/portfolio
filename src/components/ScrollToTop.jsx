@@ -41,7 +41,7 @@ export default function ScrollToTop() {
       aria-hidden={!visible}
       data-cursor="back to the top?"
       tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-6 right-6 z-50 hidden h-12 w-12 items-center justify-center rounded-full border border-edge bg-paper text-ink transition-[opacity,transform,background-color,color] duration-300 hover:bg-ink hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper md:flex sm:bottom-10 sm:right-10 sm:h-14 sm:w-14 ${
+      className={`fixed bottom-4 right-4 z-50 hidden h-14 w-14 items-center justify-center rounded-full border border-edge bg-paper text-ink transition-[opacity,transform,background-color,color,border-color] duration-300 hover:border-[var(--lime)] hover:bg-[var(--lime)] hover:text-[var(--dark-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper md:flex sm:bottom-8 sm:right-8 sm:h-16 sm:w-16 ${
         visible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-2 opacity-0"
@@ -56,7 +56,7 @@ export default function ScrollToTop() {
         strokeLinecap="square"
         strokeLinejoin="miter"
         aria-hidden="true"
-        className="h-4 w-4 sm:h-5 sm:w-5"
+        className="h-5 w-5 sm:h-6 sm:w-6"
       >
         <line x1="12" y1="19" x2="12" y2="5" />
         <polyline points="5,12 12,5 19,12" />

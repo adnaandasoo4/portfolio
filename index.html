@@ -67,6 +67,20 @@
         }
         document.documentElement.setAttribute("data-theme", theme);
       })();
+      // Pre-paint palette to avoid the default-lime accent flash before the
+      // PaletteProvider effect runs. Key "palette" + ids must match
+      // src/utils/palette.jsx.
+      (function () {
+        var ids = ["green", "oxblood", "blue", "graphite"];
+        var palette = "green";
+        try {
+          var stored = localStorage.getItem("palette");
+          if (ids.indexOf(stored) !== -1) palette = stored;
+        } catch (e) {
+          // localStorage unavailable — fall through to default.
+        }
+        document.documentElement.setAttribute("data-palette", palette);
+      })();
     </script>
     <title>Adnaan Dasoo</title>
   </head>

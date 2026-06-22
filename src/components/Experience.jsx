@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { HIDE_SECTION_LABELS, experience, experiences } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { revealVariant as reveal } from "../utils/motion";
+import { useSectionBackdrop } from "../utils/backdrop";
 import ExperienceRow from "./ExperienceRow";
 
 function Experience() {
@@ -19,8 +20,13 @@ function Experience() {
     setCanHover(window.matchMedia?.("(hover: hover)").matches ?? false);
   }, []);
 
+  // First 'dark' section after the light hero → video → about run; the
+  // white→theme-color background fade begins as Experience scrolls in.
+  const ref = useRef(null);
+  useSectionBackdrop(ref, "dark");
+
   return (
-    <div data-cursor="check me out" className="flex flex-col gap-10 py-6 sm:py-24">
+    <div ref={ref} data-cursor="check me out" className="flex flex-col gap-10 py-6 sm:py-24">
       {!HIDE_SECTION_LABELS && (
         <motion.span
           variants={reveal}
@@ -50,7 +56,9 @@ function Experience() {
         custom={0.1}
         className="flex flex-col"
       >
-        {experiences.map((entry, i) => (
+        {/* Newest first — reverse a copy so the source array (oldest→newest)
+            stays intact and the row indices still match display order. */}
+        {[...experiences].reverse().map((entry, i) => (
           <ExperienceRow
             key={`${entry.title}-${entry.company_name}-${entry.date}`}
             entry={entry}

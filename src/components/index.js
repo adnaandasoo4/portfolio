@@ -9,6 +9,7 @@ import Contact from './Contact';
 import ScrollToTop from './ScrollToTop';
 import BuzzwordMarquee from './BuzzwordMarquee';
 import CustomCursor from './CustomCursor';
+import CustomScrollbar from './CustomScrollbar';
 import Preloader from './Preloader';
 
 export {
@@ -23,5 +24,6 @@ export {
   ScrollToTop,
   BuzzwordMarquee,
   CustomCursor,
+  CustomScrollbar,
   Preloader,
 };

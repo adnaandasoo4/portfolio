@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
-import { BuzzwordMarquee, Contact, CustomCursor, Experience, Hero, Manifesto, Navbar, Preloader, Process, ScrollToTop, SelectedWork, Tech } from './components';
+// Process is intentionally not imported — temporarily removed from the page,
+// kept wired in ./components for when we add the design-process section back.
+import { BuzzwordMarquee, Contact, CustomCursor, CustomScrollbar, Experience, Hero, Manifesto, Navbar, Preloader, ScrollToTop, SelectedWork, Tech } from './components';
 import AllWorks from './components/AllWorks';
 import ProjectDetail from './components/ProjectDetail';
 import { ThemeProvider } from './utils/theme';
+import { PaletteProvider } from './utils/palette';
 import { LenisProvider, useLenis } from './utils/lenis';
 import { setupGsap } from './utils/gsap';
 import { BackdropProvider } from './utils/backdrop';
@@ -88,8 +91,13 @@ function Home({ ready }) {
   return (
     <>
       <Hero ready={ready} />
+      {/* Scroll-away room for the hero reel's expand→exit. The reel (fixed,
+          in Hero) expands over the first viewport, then translates off over
+          this spacer's viewport, revealing the About section beneath. */}
+      <div aria-hidden="true" className="h-screen w-full" />
       <Manifesto />
-      <Process />
+      {/* Design process — temporarily removed from the page, kept wired for
+          later. <Process /> */}
       <Experience />
       <BuzzwordMarquee />
       <Tech />
@@ -123,6 +131,7 @@ const App = () => {
 
   return (
     <ThemeProvider>
+      <PaletteProvider>
       <LenisProvider>
         <BackdropProvider>
           <GsapBootstrap />
@@ -140,10 +149,12 @@ const App = () => {
             </Routes>
           </div>
           <ScrollToTop />
+          <CustomScrollbar />
           <CustomCursor />
           <Preloader key={preloaderRunId} onReady={handlePreloaderReady} />
         </BackdropProvider>
       </LenisProvider>
+      </PaletteProvider>
     </ThemeProvider>
   )
 }

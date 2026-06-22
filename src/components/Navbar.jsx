@@ -1,16 +1,25 @@
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  animate,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 
 import { navLinks, socials } from "../constants";
-import ThemeToggle from "./ThemeToggle";
+import { useLenis } from "../utils/lenis";
+import ColorPicker from "./ColorPicker";
+import OverlayTopo from "./canvas/OverlayTopo";
 
-const ease = [0.65, 0, 0.35, 1];
+// Curve depth (in normalized objectBoundingBox units) of the overlay's curved
+// sweep edge — same quadratic-bow idea as the Preloader curtain.
+const SWEEP_SAG = 0.12;
 
-// Smooth-scroll an in-page anchor. Looks up by id and calls scrollIntoView;
-// the lookup is wrapped in a microtask to give React a chance to paint
-// before scrolling (matters when the target section was JUST mounted via
-// navigation from another route).
+// Smooth-scroll an in-page anchor. The lookup is wrapped in rAF to give React
+// a chance to paint before scrolling (matters when the target section was JUST
+// mounted via navigation from another route).
 function scrollToAnchor(id) {
   requestAnimationFrame(() => {
     const el = document.getElementById(id);
@@ -19,31 +28,69 @@ function scrollToAnchor(id) {
 }
 
 /**
- * Sticky top navigation. Holds the logo (text mark), anchor links to sections,
- * and the theme toggle. Background uses a translucent `bg-paper` with backdrop
- * blur so the nav stays readable when content scrolls beneath it.
+ * Sticky top navigation (V2). The bar holds the enlarged Azonix logo, a quirky
+ * "Say Hi" contact pill, and a boxed burger trigger. The burger opens a
+ * full-page overlay (all viewports) that reveals top→bottom: a big Moniqa
+ * wordmark, a 50/50 split of mouse-parallax image columns (left) and Moniqa nav
+ * links + socials (right).
  *
- * On mobile (<md), the hamburger trigger opens a full-page overlay that
- * animates down from the top: nav links stagger in as large display text,
- * followed by a pill-styled Resume CTA and a row of social links along the
- * bottom. The navbar bar (z-50) sits on top of the overlay (z-40) so the
- * close (×) button is always tappable. Body scroll is locked while open.
+ * The burger/contact/overlay visuals (box fill, wrap→X swap, swipe reveal,
+ * letter-roll) live as namespaced `.nv-*` CSS in index.css; this component owns
+ * the open/close state and wires the links to the real router/scroll handlers.
  */
 export default function Navbar({ onReplayPreloader }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // `closing` keeps the burger's X→dashes swap + overlay swipe-up running for a
+  // beat after menuOpen flips false (mirrors the prototype's is-closing class).
+  const [closing, setClosing] = useState(false);
+  // `scrolled` flips true once the page leaves the top — shrinks the logo/buttons
+  // 10%.
+  const [scrolled, setScrolled] = useState(false);
+  // `darkBg` flips true only once the scroll-driven backdrop blend has crossed
+  // into the dark theme palette (read from the live --bg var that
+  // TopographicField writes each frame). It — NOT mere scroll — is what swaps
+  // the burger to a white box with black border + lines, so the box keeps its
+  // black border over the light hero and only flips white over the theme color.
+  const [darkBg, setDarkBg] = useState(false);
+  const closeTimer = useRef(null);
+  const colARef = useRef(null);
+  const colBRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const lenis = useLenis();
   const isHome = location.pathname === "/";
 
-  // Smart back-to-top for the AD. logo.
-  //   On home → smooth-scroll to the top in place.
-  //   On any other route → replay the preloader (so it reads as a fresh
-  //   page load, not an SPA hop) and navigate to "/". The App-level
-  //   ScrollOnRouteChange helper resets scroll position to 0 on the
-  //   pathname change so we always land at the very top.
+  // Curved sweep for the overlay open/close — the same mechanism as the
+  // Preloader: one normalized motion value (0 = hidden, 1 = fully covering)
+  // drives an SVG clip-path whose bottom edge is a quadratic bow. The straight
+  // sides sit at `sweep` (0→1); the curve's midpoint dips below by `sag`, which
+  // peaks mid-sweep and eases to 0 at both ends — so the edge LEVELS OUT (flat)
+  // when fully open or fully closed, exactly like the Preloader curtain.
+  // ctrlY = baseY + 2·sag puts the quadratic midpoint a `sag` below the sides.
+  const sweep = useMotionValue(0);
+  const ctrlY = useTransform(sweep, (p) => p + 8 * SWEEP_SAG * p * (1 - p));
+  const sweepPath = useMotionTemplate`M0 0 H1 V${sweep} Q0.5 ${ctrlY} 0 ${sweep} Z`;
+
+  function openMenu() {
+    clearTimeout(closeTimer.current);
+    setClosing(false);
+    setMenuOpen(true);
+  }
+  function closeMenu() {
+    setMenuOpen(false);
+    setClosing(true);
+    closeTimer.current = setTimeout(() => setClosing(false), 700);
+  }
+  function toggleMenu() {
+    if (menuOpen) closeMenu();
+    else openMenu();
+  }
+
+  // Smart back-to-top for the AD. logo. On home → scroll to top; on any other
+  // route → replay the preloader (reads as a fresh load) and navigate to "/".
   function handleLogoClick(e) {
     e.preventDefault();
-    setMobileOpen(false);
+    closeMenu();
     if (isHome) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -52,61 +99,42 @@ export default function Navbar({ onReplayPreloader }) {
     navigate("/");
   }
 
-  // navAnchor links ("experience") always end up at home's #id section.
-  // On home: just scroll. On other routes: optionally replay the
-  // preloader (so the navigation feels like a fresh page load), then
-  // navigate to "/" with scrollTo state — Home reads that on mount and
-  // scrolls the section into view while the preloader covers the screen.
+  // navAnchor links always end up at home's #id section.
   function handleNavAnchorClick(e, link) {
     e.preventDefault();
-    setMobileOpen(false);
+    closeMenu();
     if (isHome) {
       scrollToAnchor(link.id);
       return;
     }
-    if (link.triggersPreloader && onReplayPreloader) {
-      onReplayPreloader();
-    }
+    if (link.triggersPreloader && onReplayPreloader) onReplayPreloader();
     navigate("/", { state: { scrollTo: link.id } });
   }
 
-  // hybrid links behave differently depending on where the user
-  // already is. On home: scroll to the section anchor. Off-home: route
-  // to a different page. Currently unused (works was hybrid; now a
-  // straight route) — kept here for future links that need it.
+  // hybrid: on home scroll to the anchor; off-home route to a page.
   function handleHybridClick(e, link) {
     e.preventDefault();
-    setMobileOpen(false);
-    if (isHome) {
-      scrollToAnchor(link.id);
-    } else {
-      navigate(link.to);
-    }
+    closeMenu();
+    if (isHome) scrollToAnchor(link.id);
+    else navigate(link.to);
   }
 
-  // route links ("works") always navigate to a router path, regardless
-  // of where the user already is. The router decides whether that's a
-  // remount (different route) or a no-op (same route).
+  // route links always navigate to a router path.
   function handleRouteClick(e, link) {
     e.preventDefault();
-    setMobileOpen(false);
+    closeMenu();
     navigate(link.to);
   }
 
-  // anchor links ("contact") always smooth-scroll to #id on the current
-  // page. The Contact component is rendered at the bottom of every
-  // route, so the anchor always exists — no navigation needed.
+  // anchor links smooth-scroll to #id on the current page (Contact renders on
+  // every route, so the anchor always exists).
   function handleAnchorClick(e, link) {
     e.preventDefault();
-    setMobileOpen(false);
+    closeMenu();
     scrollToAnchor(link.id);
   }
 
-  // Single click dispatcher used by both the desktop nav list and the
-  // mobile overlay list so behavior stays in lockstep across the two.
-  // The "home" kind reuses the AD. logo's smart back-to-top handler
-  // since the behavior is intentionally identical — the link is just
-  // a more obvious entry point for the same action.
+  // Single dispatcher used by the overlay nav list.
   function handleLinkClick(e, link) {
     if (link.kind === "home") return handleLogoClick(e);
     if (link.kind === "navAnchor") return handleNavAnchorClick(e, link);
@@ -115,9 +143,7 @@ export default function Navbar({ onReplayPreloader }) {
     return handleAnchorClick(e, link);
   }
 
-  // What the link's `href` should point to so middle-click / "open in new
-  // tab" land somewhere sensible (and the URL preview the browser shows
-  // on hover reads correctly).
+  // What the link's href points to for middle-click / open-in-new-tab.
   function linkHref(link) {
     if (link.kind === "home") return "/";
     if (link.kind === "hybrid") return isHome ? `#${link.id}` : link.to;
@@ -126,190 +152,287 @@ export default function Navbar({ onReplayPreloader }) {
     return `#${link.id}`;
   }
 
-  // Lock body scroll while the mobile overlay is open so the underlying
-  // page can't scroll behind it. Cleanup unlocks defensively if the
-  // component ever unmounts mid-open.
+  // The active nav link (gets the lime squiggle) tracks the current route.
+  function isActive(link) {
+    if (link.kind === "home") return isHome;
+    if (link.kind === "route") return location.pathname === link.to;
+    return false;
+  }
+
+  // The "Say Hi" pill scrolls to the contact section (present on every route).
+  function handleContactClick(e) {
+    e.preventDefault();
+    closeMenu();
+    scrollToAnchor("contact");
+  }
+
+  // Lock scroll while the overlay is open. The body overflow:hidden covers
+  // native scroll (e.g. prefers-reduced-motion, where Lenis never inits);
+  // lenis.stop() is what actually halts the smooth-scroll layer, which ignores
+  // overflow:hidden and would otherwise keep scrolling the page behind.
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (!menuOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    lenis?.stop();
     return () => {
       document.body.style.overflow = prev;
+      lenis?.start();
     };
-  }, [mobileOpen]);
+  }, [menuOpen, lenis]);
 
-  // Close on Escape — keyboard accessibility nicety even though the
-  // overlay is mobile-only (some users have BT keyboards on tablets).
+  // Close on Escape.
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (!menuOpen) return;
     const onKey = (e) => {
-      if (e.key === "Escape") setMobileOpen(false);
+      if (e.key === "Escape") closeMenu();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mobileOpen]);
+  }, [menuOpen]);
+
+  // Vertical mouse parallax for the two image columns while the menu is open.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const colA = colARef.current;
+    const colB = colBRef.current;
+    let pY = 0;
+    let aY = 0;
+    let bY = 0;
+    let raf = 0;
+    const onMove = (e) => {
+      pY = e.clientY / window.innerHeight - 0.5;
+    };
+    window.addEventListener("mousemove", onMove);
+    const loop = () => {
+      aY += (pY * -46 - aY) * 0.06;
+      bY += (pY * 46 - bY) * 0.06;
+      if (colA) colA.style.transform = `translateY(${aY}px)`;
+      if (colB) colB.style.transform = `translateY(${bY}px)`;
+      raf = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(raf);
+    };
+  }, [menuOpen]);
+
+  // Clear any pending close timer on unmount.
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+
+  // Drive the curved sweep: down to cover on open, up to reveal on close.
+  useEffect(() => {
+    const controls = animate(sweep, menuOpen ? 1 : 0, {
+      duration: menuOpen ? 0.6 : 0.5,
+      ease: [0.65, 0, 0.35, 1],
+    });
+    return () => controls.stop();
+  }, [menuOpen, sweep]);
+
+  // Track scroll-driven UI state. Lenis drives the real scroll position, so the
+  // native scroll event fires as expected. `scrolled` is a simple off-the-top
+  // flag (button/logo shrink); `darkBg` reads the live --bg blend luminance so
+  // the burger's white-box treatment only kicks in over the dark theme palette.
+  useEffect(() => {
+    const root = document.documentElement;
+    const luminance = (str) => {
+      const m = /(\d+(?:\.\d+)?)\D+(\d+(?:\.\d+)?)\D+(\d+(?:\.\d+)?)/.exec(str || "");
+      if (!m) return 1;
+      return (0.299 * +m[1] + 0.587 * +m[2] + 0.114 * +m[3]) / 255;
+    };
+    const onScroll = () => {
+      setScrolled((window.scrollY || window.pageYOffset || 0) > 8);
+      setDarkBg(luminance(getComputedStyle(root).getPropertyValue("--bg")) < 0.5);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const SAY_HI = ["S", "a", "y", " ", "H", "i"];
 
   return (
     <>
-      <nav
-        className="fixed left-0 right-0 top-0 z-50 backdrop-blur-md"
-        style={{ background: "rgb(from var(--bg) r g b / 0.8)" }}
-      >
-        {/* Inner rail matches every other section (max-w-[1800px] + same
-            px-6 sm:px-16) so the logo and theme toggle align with Hero,
-            Manifesto, Experience, Tech, and Contact on wide displays. */}
-        <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between px-6 py-5 text-ink sm:px-16">
+      <nav className="fixed left-0 right-0 top-0 z-50 bg-transparent">
+        <div className="flex w-full items-center justify-between p-4 text-ink sm:p-8">
           <a
             href="/"
-            aria-label="Home"
-            className="text-base tracking-wider transition-opacity hover:opacity-70"
-            style={{ fontFamily: "Azonix, Clash Display, system-ui, sans-serif" }}
+            aria-label="Home — Adnaan Dasoo"
+            className="transition-opacity hover:opacity-70"
+            style={{
+              fontFamily: "Manrope, system-ui, sans-serif",
+              fontWeight: 800,
+              // Scroll-blended ink normally; white while the menu overlay is open
+              // (the logo stays put in the top-left over the dark green overlay).
+              color: menuOpen ? "#FFFFFF" : undefined,
+              WebkitTextStroke: "0.9px currentColor",
+              fontSize: "34px",
+              lineHeight: 1.02,
+              letterSpacing: "0.02em",
+              textTransform: "uppercase",
+              transformOrigin: "left center",
+              transform: !menuOpen && scrolled ? "scale(0.9)" : "scale(1)",
+              transition: "transform .3s ease, color .3s ease",
+            }}
             onClick={handleLogoClick}
           >
-            AD.
+            Adnaan
+            <br />
+            Dasoo
           </a>
 
-          {/* Desktop nav */}
-          <ul className="hidden gap-8 font-mono text-sm uppercase tracking-widest md:flex">
-            {navLinks.map((link) => (
-              <li key={link.id ?? link.to ?? link.title}>
-                <a
-                  href={linkHref(link)}
-                  onClick={(e) => handleLinkClick(e, link)}
-                  data-cursor="jump here"
-                  className="transition-opacity hover:opacity-60"
-                >
-                  {link.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div
+            className="flex items-center gap-3"
+            style={{
+              transformOrigin: "right center",
+              transform: scrolled ? "scale(0.9)" : "scale(1)",
+              transition: "transform .3s ease",
+            }}
+          >
 
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
+            {/* Quirky contact pill — per-letter vertical swap + waving hand on hover. */}
+            <a
+              className="nv-contact"
+              href="#contact"
+              onClick={handleContactClick}
+              aria-label="Say Hi — contact"
+            >
+              <span className="nv-cttext" aria-hidden="true">
+                {SAY_HI.map((ch, i) =>
+                  ch === " " ? (
+                    <span key={i} className="nv-ltr nv-space">
+                      &nbsp;
+                    </span>
+                  ) : (
+                    <span key={i} className="nv-ltr" style={{ "--i": String(i) }}>
+                      <span className="nv-roll">
+                        <span>{ch}</span>
+                        <span>{ch}</span>
+                      </span>
+                    </span>
+                  ),
+                )}
+              </span>
+              <span className="nv-wave">👋</span>
+            </a>
 
-            {/* Mobile menu trigger */}
+            {/* Boxed burger — lime fill on hover, wrap→X swap on click. */}
             <button
               type="button"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-edge text-ink md:hidden"
+              onClick={toggleMenu}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              className={`nv-burger${menuOpen ? " is-open" : ""}${closing ? " is-closing" : ""}${darkBg ? " is-dark" : ""}`}
             >
               <span className="sr-only">Menu</span>
-              <span aria-hidden="true" className="text-xs">
-                {mobileOpen ? "×" : "≡"}
+              <span className="nv-fill" aria-hidden="true" />
+              <span className="nv-bl nv-bl1" aria-hidden="true">
+                <span className="nv-bln" />
+              </span>
+              <span className="nv-bl nv-bl2" aria-hidden="true">
+                <span className="nv-bln" />
               </span>
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Full-page mobile menu — animates down from the top, stays under
-          the navbar (z-40 vs z-50) so the close button is always accessible. */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            key="mobile-menu"
-            initial={{ y: "-100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-100%" }}
-            transition={{ duration: 0.5, ease }}
-            className="fixed inset-0 z-40 flex flex-col bg-paper md:hidden"
-          >
-            <div className="flex flex-1 flex-col justify-center px-6 pt-24">
-              {/* Big display-weight nav links, staggered in. Uses the
-                  same handleLinkClick dispatcher as the desktop nav so
-                  the three link kinds behave identically in both surfaces. */}
-              <ul className="flex flex-col gap-1">
-                {navLinks.map((link, i) => {
-                  const labelStyle = {
-                    fontWeight: 700,
-                    fontSize: "clamp(40px, 12vw, 80px)",
-                    lineHeight: 1.05,
-                    letterSpacing: "-0.01em",
-                  };
-                  return (
-                    <motion.li
-                      key={link.id ?? link.to ?? link.title}
-                      initial={{ opacity: 0, y: 24 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35 + i * 0.08, duration: 0.5, ease }}
-                    >
-                      <a
-                        href={linkHref(link)}
-                        onClick={(e) => handleLinkClick(e, link)}
-                        className="block font-display text-ink"
-                        style={labelStyle}
-                      >
-                        {link.title}
-                      </a>
-                    </motion.li>
-                  );
-                })}
-              </ul>
+      {/* Animated clip-path that gives the overlay its curved sweep (open/close).
+          objectBoundingBox units → the 0..1 path scales to the full-viewport
+          overlay and is responsive; the motion.path's `d` morphs each frame. */}
+      <svg aria-hidden="true" width="0" height="0" style={{ position: "absolute" }}>
+        <defs>
+          <clipPath id="nvSweepClip" clipPathUnits="objectBoundingBox">
+            <motion.path d={sweepPath} />
+          </clipPath>
+        </defs>
+      </svg>
 
-              {/* Resume — unique treatment: pill with orange flag accent
-                  + arrow, so it reads as a distinct CTA rather than another
-                  generic nav link. */}
-              <motion.a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileOpen(false)}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: 0.35 + navLinks.length * 0.08,
-                  duration: 0.5,
-                  ease,
-                }}
-                className="mt-10 inline-flex w-fit items-center gap-2 rounded-full border border-flag bg-flag/10 px-5 py-3 font-mono text-xs uppercase tracking-widest text-flag"
-              >
-                Read the Resume
-                <span aria-hidden="true">↗</span>
-              </motion.a>
+      {/* Full-page overlay (z-40, under the bar's z-50 so the burger stays clickable). */}
+      <div
+        className={`nv-overlay${menuOpen ? " open" : closing ? " close" : ""}`}
+        aria-hidden={!menuOpen}
+        style={{ clipPath: "url(#nvSweepClip)", WebkitClipPath: "url(#nvSweepClip)" }}
+      >
+        <OverlayTopo active={menuOpen || closing} />
+        <div className="nv-ovinner">
+          {/* The Moniqa wordmark that used to sit here is gone — the top-left now
+              shows the persistent Navbar logo (white while open) instead. */}
+          <div className="nv-ovmain">
+            {/* left — parallax image columns (placeholders until real work imagery) */}
+            <div className="nv-ovimgs">
+              <div className="nv-imgcol nv-imgcol-lower" ref={colARef}>
+                <div className="nv-tile nv-el">
+                  <span>Work 01</span>
+                </div>
+                <div className="nv-tile nv-el">
+                  <span>Work 03</span>
+                </div>
+              </div>
+              <div className="nv-imgcol" ref={colBRef}>
+                <div className="nv-tile nv-el">
+                  <span>Work 02</span>
+                </div>
+                <div className="nv-tile nv-el">
+                  <span>Work 04</span>
+                </div>
+              </div>
             </div>
 
-            {/* Socials row at the bottom — small mono links. */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{
-                delay: 0.35 + (navLinks.length + 1) * 0.08,
-                duration: 0.5,
-                ease,
-              }}
-              className="border-t border-edge px-6 pb-10 pt-6"
-            >
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-muted">
-                Elsewhere
-              </p>
-              <ul className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-sm uppercase tracking-widest text-ink">
-                {socials.map((social) => (
-                  <li key={social.name}>
+            {/* right — Moniqa nav links + socials */}
+            <div className="nv-ovside">
+              <nav className="nv-ovnav">
+                {navLinks.map((link) => {
+                  const active = isActive(link);
+                  return (
                     <a
-                      href={social.url}
-                      onClick={() => setMobileOpen(false)}
-                      target={
-                        social.url.startsWith("http") ? "_blank" : undefined
-                      }
-                      rel={
-                        social.url.startsWith("http")
-                          ? "noopener noreferrer"
-                          : undefined
-                      }
-                      className="inline-flex min-h-[44px] items-center"
+                      key={link.id ?? link.to ?? link.title}
+                      href={linkHref(link)}
+                      onClick={(e) => handleLinkClick(e, link)}
+                      className={`nv-nlink nv-el${active ? " active" : ""}`}
                     >
-                      {social.name}
+                      {link.title}
+                      {active && (
+                        <svg
+                          className="nv-squig"
+                          viewBox="0 0 60 12"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M2 7 Q12 1 22 7 T42 7 T58 6"
+                            stroke="var(--lime)"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      )}
                     </a>
-                  </li>
+                  );
+                })}
+              </nav>
+
+              <div className="nv-ovsocials nv-el">
+                {socials.map((s) => (
+                  <a
+                    key={s.name}
+                    href={s.url}
+                    onClick={closeMenu}
+                    target={s.url.startsWith("http") ? "_blank" : undefined}
+                    rel={s.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    {s.name}
+                  </a>
                 ))}
-              </ul>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Color-mode picker — bottom-left of the overlay. */}
+        <ColorPicker />
+      </div>
     </>
   );
 }

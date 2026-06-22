@@ -31,7 +31,10 @@ export default function ExperienceRow({
       custom={0.15 + index * 0.06}
       className="border-t border-edge last:border-b"
     >
-      <h3 className="text-ink text-xl sm:text-2xl leading-tight">
+      <h3
+        className="text-ink leading-tight"
+        style={{ fontSize: "clamp(26px, 3.8vw, 56px)", letterSpacing: "-0.01em" }}
+      >
         <button
           type="button"
           onClick={onToggle}
@@ -41,7 +44,7 @@ export default function ExperienceRow({
           onBlur={onHoverLeave ?? undefined}
           aria-expanded={isOpen}
           aria-controls={`exp-desc-${index}`}
-          className="w-full text-left py-6 outline-none transition-opacity focus-visible:opacity-90"
+          className="w-full text-left py-7 sm:py-9 outline-none transition-opacity focus-visible:opacity-90"
         >
           <span className="flex items-center justify-between gap-x-4">
             {/* Inner content block grows to fill the row (flex-1) and
@@ -56,7 +59,7 @@ export default function ExperienceRow({
                 <span className="font-medium">{entry.title}</span>
                 <span className="ml-2 text-muted font-normal">{entry.company_name}</span>
               </span>
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted whitespace-nowrap">
+              <span className="font-mono text-xs sm:text-sm uppercase tracking-widest text-muted whitespace-nowrap">
                 {entry.date}
               </span>
             </span>
@@ -102,7 +105,7 @@ export default function ExperienceRow({
               aria-hidden={!isOpen}
               className="block overflow-hidden"
             >
-              <span className="block max-w-2xl text-sm sm:text-base leading-relaxed text-ink font-normal">
+              <span className="block max-w-3xl text-base sm:text-lg leading-relaxed text-ink font-normal">
                 {entry.description}
               </span>
             </span>
