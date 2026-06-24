@@ -159,9 +159,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 .nv-burger:hover .nv-fill{transform:translateY(0)}
 .nv-bl{position:relative;z-index:1;width:18px;height:3px;overflow:hidden;
   transition:width .42s cubic-bezier(.65,0,.35,1),margin .42s cubic-bezier(.65,0,.35,1),transform .42s cubic-bezier(.65,0,.35,1)}
-/* Both bars centered (align-items on the burger) so the hamburger AND the X
-   always sit dead-center, independent of the box size. */
-.nv-bl1,.nv-bl2{margin-left:0}
+/* Rest state staggers the two bars horizontally (small deliberate detail).
+   The open/close keyframes use `forwards` and resolve to translateX(0), so they
+   fully override this offset — the X always rebuilds dead-center. */
+.nv-bl1{transform:translateX(4px)}
+.nv-bl2{transform:translateX(-4px)}
 .nv-bln{position:absolute;left:0;top:0;height:3px;width:18px;--loop:18px;border-radius:3px;background:currentColor;
   transition:width .42s cubic-bezier(.65,0,.35,1),transform .42s cubic-bezier(.65,0,.35,1)}
 .nv-burger:not(.is-open):not(.is-closing):hover .nv-bl1 .nv-bln{animation:nvbloop .5s cubic-bezier(.65,0,.35,1) 1}
