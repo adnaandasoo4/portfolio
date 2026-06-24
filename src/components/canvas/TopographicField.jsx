@@ -141,6 +141,11 @@ export default function TopographicField() {
             amt: U("uAmt"),
             breathe: U("uBreathe"),
             coverage: U("uCoverage"),
+            bg2: U("uBg2"),
+            line2: U("uLine2"),
+            center: U("uCenter"),
+            radius: U("uRadius"),
+            edge: U("uEdge"),
           };
           hasGL = true;
         } else {
@@ -197,6 +202,13 @@ export default function TopographicField() {
         gl.uniform1f(u.time, t);
         gl.uniform3fv(u.bg, p.bg);
         gl.uniform3fv(u.line, p.line);
+        // No splash on the main page field — neutralize the shared shader's
+        // radial-mix uniforms so it renders the single current palette.
+        gl.uniform3fv(u.bg2, p.bg);
+        gl.uniform3fv(u.line2, p.line);
+        gl.uniform2f(u.center, 0, 0);
+        gl.uniform1f(u.radius, 0);
+        gl.uniform1f(u.edge, 0);
         gl.uniform1f(u.density, TOPO_PARAMS.density);
         gl.uniform1f(u.scale, TOPO_PARAMS.scale);
         gl.uniform1f(u.weight, TOPO_PARAMS.weight);
