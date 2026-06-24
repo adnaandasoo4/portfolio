@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { VERT, FRAG, TOPO_PARAMS, BACKDROP_COLORS } from "./topoShader";
+import { readPaletteTransition, SPLASH_EDGE } from "../../utils/paletteTransition";
 
 /**
  * Dedicated topographic-field canvas that lives *inside* the full-page nav
@@ -75,6 +76,11 @@ export default function OverlayTopo({ active }) {
             amt: U("uAmt"),
             breathe: U("uBreathe"),
             coverage: U("uCoverage"),
+            bg2: U("uBg2"),
+            line2: U("uLine2"),
+            center: U("uCenter"),
+            radius: U("uRadius"),
+            edge: U("uEdge"),
           };
           hasGL = true;
         } else {
@@ -115,8 +121,45 @@ export default function OverlayTopo({ active }) {
           : ((performance.now() - start) / 1000) * (TOPO_PARAMS.speedPct / 40);
         gl.uniform2f(u.res, canvas.width, canvas.height);
         gl.uniform1f(u.time, t);
-        gl.uniform3fv(u.bg, pal.bg);
-        gl.uniform3fv(u.line, pal.line);
+        const tr = readPaletteTransition(performance.now());
+        if (tr) {
+          // aspect-corrected uv (matches the shader's auv); GL viewport uses
+          // device pixels but width/height share the viewport's aspect ratio.
+          const aspect = canvas.width / canvas.height;
+          const cx = tr.center[0] * aspect;
+          const cy = tr.center[1];
+          // Largest distance from the origin to any screen corner, so the
+          // splash radius at progress=1 fully covers the viewport.
+          let maxD = 0;
+          const corners = [
+            [0, 0],
+            [aspect, 0],
+            [0, 1],
+            [aspect, 1],
+          ];
+          for (let i = 0; i < corners.length; i++) {
+            const dx = corners[i][0] - cx;
+            const dy = corners[i][1] - cy;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d > maxD) maxD = d;
+          }
+          gl.uniform3fv(u.bg, tr.fromBg);
+          gl.uniform3fv(u.line, tr.fromLine);
+          gl.uniform3fv(u.bg2, tr.toBg);
+          gl.uniform3fv(u.line2, tr.toLine);
+          gl.uniform2f(u.center, cx, cy);
+          // +edge so the soft boundary still fully clears the far corner at end
+          gl.uniform1f(u.radius, tr.progress * maxD + SPLASH_EDGE);
+          gl.uniform1f(u.edge, SPLASH_EDGE);
+        } else {
+          gl.uniform3fv(u.bg, pal.bg);
+          gl.uniform3fv(u.line, pal.line);
+          gl.uniform3fv(u.bg2, pal.bg);
+          gl.uniform3fv(u.line2, pal.line);
+          gl.uniform2f(u.center, 0, 0);
+          gl.uniform1f(u.radius, 0);
+          gl.uniform1f(u.edge, 0);
+        }
         gl.uniform1f(u.density, TOPO_PARAMS.density);
         gl.uniform1f(u.scale, TOPO_PARAMS.scale);
         gl.uniform1f(u.weight, TOPO_PARAMS.weight);
