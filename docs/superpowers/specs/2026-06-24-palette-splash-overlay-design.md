@@ -63,12 +63,17 @@ New uniforms:
 Fragment tail becomes:
 
 ```glsl
-vec3 colOld = mix(uBg,  uLine,  clamp(ink,0.0,1.0));
-vec3 colNew = mix(uBg2, uLine2, clamp(ink,0.0,1.0));
-// aspect-corrected distance so the bloom is a circle, not an ellipse
-vec2 auv = vec2(uv.x * (uRes.x / uRes.y), uv.y);
-float d  = distance(auv, uCenter);
-float mask = smoothstep(uRadius + uEdge, uRadius - uEdge, d); // 1 inside radius
+float inkc = clamp(ink, 0.0, 1.0);
+vec3 colOld = mix(uBg,  uLine,  inkc);
+vec3 colNew = mix(uBg2, uLine2, inkc);
+float mask = 0.0;
+if (uRadius > 0.0) {
+  // aspect-corrected distance so the bloom is a circle, not an ellipse
+  vec2 auv = vec2(uv.x * (uRes.x / uRes.y), uv.y);
+  float d  = distance(auv, uCenter);
+  // 1 inside the radius, 0 outside (edge0 < edge1 — valid smoothstep)
+  mask = 1.0 - smoothstep(uRadius - uEdge, uRadius + uEdge, d);
+}
 gl_FragColor = vec4(mix(colOld, colNew, mask), 1.0);
 ```
 
@@ -76,9 +81,10 @@ gl_FragColor = vec4(mix(colOld, colNew, mask), 1.0);
 `uCenter.x` is supplied already multiplied by the aspect ratio so it matches
 `auv`.
 
-Steady state (no transition) is expressed by `uRadius = 0` → `mask = 0` → the
-existing `colOld` (= current palette) is used everywhere. So the visual is
-identical to today whenever no splash is running.
+Steady state (no transition) is expressed by `uRadius = 0` → the `if` is skipped,
+`mask = 0` → the existing `colOld` (= current palette) is used everywhere. So the
+visual is identical to today whenever no splash is running, and the shader is safe
+even if a consumer never sets the new uniforms (they default to 0).
 
 ### 2. Transition state — `src/utils/paletteTransition.js` (new module)
 
