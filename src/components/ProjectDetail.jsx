@@ -18,7 +18,7 @@ const viewport = { once: true, amount: 0.2 };
  * Per-project detail page mounted at /works/:slug.
  *
  * Sections, top → bottom:
- *   1. Hero — huge project name in Clash Display
+ *   1. Hero — huge project name in Clash Display (display token)
  *   2. Three-column metadata strip — Services / Year / Credits
  *   3. Description paragraph
  *   4. Two CTAMagneticFill buttons — Live Website + View Source (each
@@ -49,7 +49,7 @@ export default function ProjectDetail() {
     return (
       <main className="min-h-screen w-full bg-paper text-ink">
         <div className="mx-auto flex max-w-[1800px] flex-col gap-6 px-6 pt-40 sm:px-16">
-          <span className="font-mono text-xs uppercase tracking-widest text-muted">
+          <span className="font-sans text-xs uppercase tracking-widest text-muted">
             404 — Project not found
           </span>
           <h1
@@ -65,13 +65,13 @@ export default function ProjectDetail() {
           </h1>
           <p className="max-w-[55ch] text-sm text-muted">
             No project with the slug{" "}
-            <code className="font-mono text-ink">{slug}</code>. Head back to
+            <code className="font-sans text-ink">{slug}</code>. Head back to
             the work index and pick another.
           </p>
           <div className="pt-4">
             <Link
               to="/"
-              className="font-mono text-sm uppercase tracking-widest text-ink underline underline-offset-4"
+              className="font-sans text-sm uppercase tracking-widest text-ink underline underline-offset-4"
             >
               ← Back to home
             </Link>
@@ -101,7 +101,7 @@ export default function ProjectDetail() {
           <Link
             to="/works"
             data-cursor="back to works"
-            className="group inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-ink"
+            className="group inline-flex w-fit items-center gap-2 font-sans text-xs uppercase tracking-widest text-muted transition-colors hover:text-ink"
           >
             <span
               aria-hidden="true"
@@ -137,18 +137,18 @@ export default function ProjectDetail() {
           className="grid grid-cols-2 gap-6 border-t border-edge pt-10 sm:gap-10"
         >
           <div className="flex flex-col gap-4">
-            <span className="font-mono text-xs uppercase tracking-widest text-muted">
+            <span className="font-sans text-xs uppercase tracking-widest text-muted">
               Year
             </span>
-            <span className="font-mono text-sm uppercase tracking-widest text-ink">
+            <span className="font-sans text-sm uppercase tracking-widest text-ink">
               {project.year}
             </span>
           </div>
           <div className="flex flex-col gap-4 text-right">
-            <span className="font-mono text-xs uppercase tracking-widest text-muted">
+            <span className="font-sans text-xs uppercase tracking-widest text-muted">
               Services
             </span>
-            <div className="flex flex-col gap-1 font-mono text-sm uppercase tracking-widest text-ink">
+            <div className="flex flex-col gap-1 font-sans text-sm uppercase tracking-widest text-ink">
               {project.services.map((s) => (
                 <span key={s}>{s}</span>
               ))}
@@ -168,14 +168,14 @@ export default function ProjectDetail() {
           className="grid grid-cols-1 gap-10 sm:grid-cols-12 sm:items-end"
         >
           <div className="flex flex-col gap-5 sm:col-span-7">
-            <span className="font-mono text-xs uppercase tracking-widest text-muted">
+            <span className="font-sans text-xs uppercase tracking-widest text-muted">
               Tech stack
             </span>
             <ul className="flex flex-wrap gap-2">
               {project.techStack.map((tech) => (
                 <li
                   key={tech}
-                  className="border border-ink/30 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-ink"
+                  className="border border-ink/30 px-3 py-1.5 font-sans text-xs uppercase tracking-widest text-ink"
                 >
                   {tech}
                 </li>
@@ -221,7 +221,7 @@ export default function ProjectDetail() {
           />
         ) : (
           <div
-            className="flex w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted"
+            className="flex w-full items-center justify-center bg-edge font-sans text-xs uppercase tracking-widest text-muted"
             style={{ aspectRatio: "16 / 10" }}
           >
             Desktop screenshot · placeholder
@@ -245,7 +245,7 @@ export default function ProjectDetail() {
         <motion.h2
           variants={reveal}
           custom={0}
-          className="mb-10 font-mono text-xs uppercase tracking-widest text-muted"
+          className="mb-10 font-sans text-xs uppercase tracking-widest text-muted"
         >
           On mobile
         </motion.h2>
@@ -269,7 +269,7 @@ export default function ProjectDetail() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+                  <div className="flex h-full w-full items-center justify-center px-4 text-center font-sans text-[10px] uppercase tracking-widest text-muted">
                     Mobile screenshot {idx + 1} · placeholder
                   </div>
                 )}

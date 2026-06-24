@@ -99,7 +99,7 @@ function Tech() {
         <motion.span
           variants={reveal}
           custom={0}
-          className="font-mono text-xs uppercase tracking-widest text-muted"
+          className="font-sans text-xs uppercase tracking-widest text-muted"
         >
           {tech.label}
         </motion.span>

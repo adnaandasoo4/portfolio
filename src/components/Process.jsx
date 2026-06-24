@@ -84,7 +84,7 @@ function Process() {
         <motion.span
           variants={reveal}
           custom={0}
-          className="font-mono text-xs uppercase tracking-widest text-muted"
+          className="font-sans text-xs uppercase tracking-widest text-muted"
         >
           {designProcess.label}
         </motion.span>
@@ -144,10 +144,10 @@ function Process() {
                       </span>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="font-mono text-xs uppercase tracking-widest text-ink">
+                      <span className="font-sans text-xs uppercase tracking-widest text-ink">
                         {activeStage.name}
                       </span>
-                      <span className="text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+                      <span className="text-center font-sans text-[10px] uppercase tracking-widest text-muted">
                         {activeStage.tools.join(" · ")}
                       </span>
                     </div>

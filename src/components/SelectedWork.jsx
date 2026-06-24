@@ -124,7 +124,7 @@ function SelectedWork() {
           <motion.span
             {...inViewProps}
             transition={{ duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
-            className="font-mono text-xs uppercase tracking-widest text-muted"
+            className="font-sans text-xs uppercase tracking-widest text-muted"
           >
             {selectedWork.label}
           </motion.span>
@@ -239,7 +239,7 @@ function SelectedWork() {
                     }}
                   >
                     <span
-                      className="font-mono text-[10px] uppercase tracking-widest text-muted"
+                      className="font-sans text-[10px] uppercase tracking-widest text-muted"
                       aria-hidden="true"
                     >
                       {String(i + 1).padStart(2, "0")} /{" "}
@@ -248,8 +248,7 @@ function SelectedWork() {
                     <span
                       className="mt-3 text-center"
                       style={{
-                        fontFamily:
-                          "Clash Display, Geist, system-ui, sans-serif",
+                        fontFamily: "'Clash Display', system-ui, sans-serif",
                         fontWeight: 700,
                         fontSize: "clamp(18px, 1.8vw, 28px)",
                         letterSpacing: "0.02em",
@@ -284,7 +283,7 @@ function SelectedWork() {
                   >
                     <div className="flex h-full w-full flex-col justify-between p-5 text-ink">
                       <div className="flex flex-col gap-2">
-                        <span className="font-mono text-[10px] uppercase tracking-widest opacity-60">
+                        <span className="font-sans text-[10px] uppercase tracking-widest opacity-60">
                           {String(i + 1).padStart(2, "0")} /{" "}
                           {String(projects.length).padStart(2, "0")}
                         </span>
@@ -314,14 +313,14 @@ function SelectedWork() {
                           {project.techStack.slice(0, 4).map((tech) => (
                             <li
                               key={tech}
-                              className="border border-ink/30 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+                              className="border border-ink/30 px-2 py-0.5 font-sans text-[10px] uppercase tracking-widest"
                             >
                               {tech}
                             </li>
                           ))}
                         </ul>
                         <span
-                          className="whitespace-nowrap font-mono text-xs uppercase tracking-widest"
+                          className="whitespace-nowrap font-sans text-xs uppercase tracking-widest"
                           aria-hidden="true"
                         >
                           View ↗

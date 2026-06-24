@@ -82,7 +82,7 @@ function Manifesto() {
           while the words fill in; afterward it releases and scrolls up. */}
       <div ref={innerRef} className="flex h-screen flex-col justify-center gap-8">
         {!HIDE_SECTION_LABELS && (
-          <span className="font-mono text-xs uppercase tracking-widest text-muted">
+          <span className="font-sans text-xs uppercase tracking-widest text-muted">
             {manifesto.label}
           </span>
         )}

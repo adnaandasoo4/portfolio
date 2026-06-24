@@ -27,7 +27,7 @@ export default function ThemeToggle() {
         type="button"
         onClick={toggle}
         aria-label={`Switch to ${next} mode`}
-        className="ttg-button inline-flex items-center gap-2 rounded-full border border-edge px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-ink transition-colors duration-200 ease-out hover:border-ink hover:bg-ink hover:text-paper"
+        className="ttg-button inline-flex items-center gap-2 rounded-full border border-edge px-3 py-1.5 font-sans text-[10px] uppercase tracking-widest text-ink transition-colors duration-200 ease-out hover:border-ink hover:bg-ink hover:text-paper"
       >
         <span aria-hidden="true" className="ttg-emblem block h-2.5 w-2.5 rounded-full" />
         <span>{next}</span>

@@ -113,7 +113,7 @@ export default function CTAMagneticFill({
         }}
       />
       <span
-        className="relative z-10 font-mono text-sm uppercase tracking-widest transition-colors"
+        className="relative z-10 font-sans text-sm uppercase tracking-widest transition-colors"
         style={{
           color: isHovering ? "var(--bg)" : "var(--ink)",
           transitionDuration: `${FILL_DURATION_MS}ms`,

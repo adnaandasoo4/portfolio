@@ -7,9 +7,9 @@ import { HIDE_SECTION_LABELS, footer, socials } from "../constants";
  * gap, no giant wordmark — the empty space is left to breathe naturally
  * from the section's own pt-32 + mt-24 rhythm.
  *
- * Font family pulls from tailwind's `font-display` token (Clash Display
- * Bold), the same source Hero uses, so the two display moments share a
- * single typeface definition.
+ * Font family pulls from tailwind's `font-display` token (Clash Display,
+ * heavy + all-caps), the same source Hero uses, so the two display moments
+ * share a single typeface definition.
  */
 export default function Contact() {
   return (
@@ -19,7 +19,7 @@ export default function Contact() {
     >
       <div className="mx-auto flex w-full max-w-[1800px] flex-col">
         {!HIDE_SECTION_LABELS && (
-          <span className="font-mono text-xs uppercase tracking-widest text-muted">
+          <span className="font-sans text-xs uppercase tracking-widest text-muted">
             {footer.kicker}
           </span>
         )}
@@ -69,7 +69,7 @@ export default function Contact() {
           </span>
         </a>
 
-        <div className="mt-24 grid grid-cols-1 gap-6 pb-8 font-mono text-sm uppercase tracking-widest text-muted sm:grid-cols-3 sm:items-end">
+        <div className="mt-24 grid grid-cols-1 gap-6 pb-8 font-sans text-sm uppercase tracking-widest text-muted sm:grid-cols-3 sm:items-end">
           <div className="flex flex-col gap-1">
             <span>{footer.email}</span>
             <span>{footer.location}</span>

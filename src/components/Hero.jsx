@@ -246,7 +246,7 @@ export default function Hero({ ready = true }) {
         className="pointer-events-none grid grid-cols-3 items-end pb-8"
         style={{ opacity: 0 }}
       >
-        <div className="font-mono text-[14px] font-medium uppercase leading-[1.5] tracking-[0.16em] text-muted sm:text-[16px]">
+        <div className="font-sans text-[14px] font-medium uppercase leading-[1.5] tracking-[0.16em] text-muted sm:text-[16px]">
           <div ref={latRef}>40.7128° N</div>
           <div ref={lonRef}>74.0060° W</div>
         </div>
@@ -254,7 +254,7 @@ export default function Hero({ ready = true }) {
         <span
           className="justify-self-center self-end uppercase text-muted"
           style={{
-            fontFamily: "Manrope, system-ui, sans-serif",
+            fontFamily: "'Manrope', system-ui, sans-serif",
             fontWeight: 700,
             fontSize: "17px",
             letterSpacing: "0.24em",
@@ -264,7 +264,7 @@ export default function Hero({ ready = true }) {
           Scroll Down
         </span>
 
-        <div className="justify-self-end text-right font-mono text-[14px] font-medium uppercase leading-[1.5] tracking-[0.16em] text-muted sm:text-[16px]">
+        <div className="justify-self-end text-right font-sans text-[14px] font-medium uppercase leading-[1.5] tracking-[0.16em] text-muted sm:text-[16px]">
           <div>Elev</div>
           <div ref={elevRef}>0000 M</div>
         </div>

@@ -59,7 +59,7 @@ export default function ExperienceRow({
                 <span className="font-medium">{entry.title}</span>
                 <span className="ml-2 text-muted font-normal">{entry.company_name}</span>
               </span>
-              <span className="font-mono text-xs sm:text-sm uppercase tracking-widest text-muted whitespace-nowrap">
+              <span className="font-sans text-xs sm:text-sm uppercase tracking-widest text-muted whitespace-nowrap">
                 {entry.date}
               </span>
             </span>

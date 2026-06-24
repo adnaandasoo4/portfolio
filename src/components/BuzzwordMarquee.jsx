@@ -30,7 +30,7 @@ export default function BuzzwordMarquee() {
         {[...buzzwords, ...buzzwords].map((word, i) => (
           <span
             key={i}
-            className="flex shrink-0 items-center gap-12 font-mono text-[11px] uppercase tracking-widest text-muted sm:gap-16"
+            className="flex shrink-0 items-center gap-12 font-sans text-[11px] uppercase tracking-widest text-muted sm:gap-16"
           >
             {word}
             <span aria-hidden="true" className="opacity-50">

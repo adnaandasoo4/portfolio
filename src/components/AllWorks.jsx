@@ -81,7 +81,7 @@ export default function AllWorks() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                      <div className="flex h-full w-full items-center justify-center bg-edge font-sans text-xs uppercase tracking-widest text-muted">
                         {project.name}
                       </div>
                     )}
@@ -108,7 +108,7 @@ export default function AllWorks() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-edge font-mono text-xs uppercase tracking-widest text-muted">
+                      <div className="flex h-full w-full items-center justify-center bg-edge font-sans text-xs uppercase tracking-widest text-muted">
                         {project.name}
                       </div>
                     )}

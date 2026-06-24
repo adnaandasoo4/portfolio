@@ -31,7 +31,7 @@ function Experience() {
         <motion.span
           variants={reveal}
           custom={0}
-          className="font-mono text-xs uppercase tracking-widest text-muted"
+          className="font-sans text-xs uppercase tracking-widest text-muted"
         >
           {experience.label}
         </motion.span>

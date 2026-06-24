@@ -132,7 +132,7 @@ export default function CustomCursor() {
           side closest to the cursor. */}
       <motion.div
         animate={popControls}
-        className={`absolute left-[20px] top-[14px] inline-flex origin-center items-center gap-1.5 whitespace-nowrap rounded-full bg-flag px-2.5 py-1 font-mono text-[10px] capitalize tracking-wide text-white transition-opacity duration-200 ${
+        className={`absolute left-[20px] top-[14px] inline-flex origin-center items-center gap-1.5 whitespace-nowrap rounded-full bg-flag px-2.5 py-1 font-sans text-[10px] capitalize tracking-wide text-white transition-opacity duration-200 ${
           active ? "opacity-100" : "opacity-0"
         }`}
       >

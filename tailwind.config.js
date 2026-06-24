@@ -28,7 +28,9 @@ module.exports = {
         xs: "450px",
       },
       fontFamily: {
-        display: ["Manrope", "system-ui", "sans-serif"],
+        // Headers + big display pieces. Clash Display (heavy + all-caps via the
+        // .font-display rule in index.css). Body/small text use `sans` (Manrope).
+        display: ["Clash Display", "Manrope", "system-ui", "sans-serif"],
         sans: [
           "Manrope",
           "ui-sans-serif",
@@ -39,7 +41,6 @@ module.exports = {
           "Roboto",
           "sans-serif",
         ],
-        mono: ["JetBrains Mono", "ui-monospace", "monospace"],
       },
     },
   },

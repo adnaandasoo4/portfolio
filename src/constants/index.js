@@ -221,7 +221,7 @@ export const hero = {
   // Full-bleed Manrope wordmark across the bottom of the hero (rendered
   // uppercase via CSS).
   name: "Adnaan Dasoo",
-  // Two-line mono kicker rendered top-right at the same scale as the
+  // Two-line kicker rendered top-right at the same scale as the
   // SUERO reference's "DIGITAL DESIGN STUDIO / WEBFLOW PREMIUM PARTNER".
   kicker: ["Software Engineer", "Creative Developer"],
   // Vertical label under the animated scroll-stream indicator.
@@ -235,7 +235,7 @@ export const hero = {
   },
 };
 
-// Temporary experiment flag — when true, every section's small mono
+// Temporary experiment flag — when true, every section's small
 // "01 — Section" label is suppressed so the page can be evaluated without
 // section headers. Flip to false to restore the labels in one place.
 export const HIDE_SECTION_LABELS = true;
@@ -288,7 +288,7 @@ export const designProcess = {
 };
 
 export const footer = {
-  // Small mono label rendered above the display CTA.
+  // Small label rendered above the display CTA.
   kicker: "Get in touch",
   // CTA renders on two lines. `headlineLead` (line 1) is static; on link hover
   // `headlineHighlight` (line 2) turns the accent color and its trailing arrow
@@ -302,7 +302,7 @@ export const footer = {
 };
 
 export const manifesto = {
-  // Small uppercase mono label rendered above the intro. The em-dash is U+2014.
+  // Small uppercase label rendered above the intro. The em-dash is U+2014.
   label: "01 — About",
   // Intro is an array of segments rather than a single string so individual
   // keywords can carry their own color. Segments with `highlight: true` render
@@ -317,7 +317,7 @@ export const manifesto = {
 };
 
 export const experience = {
-  // Small uppercase mono label. Order matches the nav bar:
+  // Small uppercase label. Order matches the nav bar:
   // 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
   label: "02 — Experience",
   // Big display heading rendered in Clash Display above the experience accordion.
@@ -327,7 +327,7 @@ export const experience = {
 };
 
 export const tech = {
-  // Small uppercase mono label. Order matches the nav bar:
+  // Small uppercase label. Order matches the nav bar:
   // 01 Manifesto, 02 Experience, 03 Tech, 04 Selected Work.
   label: "03 — Stack",
   // Big display heading rendered in Clash Display above the bento grid. Independent
@@ -336,7 +336,7 @@ export const tech = {
 };
 
 export const selectedWork = {
-  // Small uppercase mono label rendered on the left of the section header.
+  // Small uppercase label rendered on the left of the section header.
   label: "04 — Featured Work",
   // Big display heading rendered in Clash Display above the horizontal carousel.
   // Independent of HIDE_SECTION_LABELS.
