@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
+import { LuShuffle } from "react-icons/lu";
 import { usePalette } from "../utils/palette";
 import { BACKDROP_COLORS, DARK_PALETTES } from "./canvas/topoShader";
 import { startPaletteTransition } from "../utils/paletteTransition";
 
-// Swatch colors per palette. `dark` is the backdrop; `accent` fills the active
-// square. Must stay in sync with topoShader DARK_PALETTES + the
+// Palette order is also the cycle order — clicking the dial advances to the
+// next entry and wraps. Must stay in sync with topoShader DARK_PALETTES + the
 // :root[data-palette=…] blocks in index.css.
 const PALETTES = [
   { id: "green", name: "Forest", dark: "#292E21", accent: "#DCFE4F" },
@@ -14,21 +15,33 @@ const PALETTES = [
 ];
 
 /**
- * Color-mode picker in the bottom-left of the full-page nav overlay. A 2×2 grid
- * of squares (active one filled). The native cursor stays; while hovering the
- * picker a long pill "cursor" expands and trails the pointer reading "See things
- * differently", tinted with the current theme's accent.
+ * Color-mode dial in the bottom-left of the full-page nav overlay. A single
+ * plain circle (sized to match the scroll-to-top button) holding a shuffle
+ * glyph; each click cycles to the NEXT palette and fires the radial splash
+ * from the dial's center. While hovering, the dial fills with the next
+ * palette's accent (a preview of where a click lands) and a lagging
+ * "See things differently" text label trails the pointer in that same color.
  */
 export default function ColorPicker() {
   const ctx = usePalette();
   const palette = ctx?.palette ?? "green";
   const setPalette = ctx?.setPalette ?? (() => {});
 
-  // Picking a swatch: kick off the radial splash from the clicked swatch (the
-  // overlay's OverlayTopo reads this each frame), THEN apply the palette. `from`
-  // is cloned before setPalette runs so the eventual setDarkPalette mutation of
-  // BACKDROP_COLORS.dark can't change it under us. Skipped under reduced motion.
-  const handlePick = (p, e) => {
+  const currentIndex = Math.max(
+    0,
+    PALETTES.findIndex((p) => p.id === palette)
+  );
+  const nextPalette = PALETTES[(currentIndex + 1) % PALETTES.length];
+
+  const [hovering, setHovering] = useState(false);
+  const cursorRef = useRef(null);
+
+  // Cycle forward: kick off the radial splash from the dial center (OverlayTopo
+  // reads this each frame), THEN apply the next palette. `from` is cloned before
+  // setPalette runs so the eventual setDarkPalette mutation of BACKDROP_COLORS
+  // can't change it under us. Splash skipped under reduced motion.
+  const handleClick = (e) => {
+    const next = PALETTES[(currentIndex + 1) % PALETTES.length];
     const reduce =
       typeof window.matchMedia === "function" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -37,7 +50,7 @@ export default function ColorPicker() {
       const cx = (r.left + r.width / 2) / window.innerWidth;
       const cy = 1 - (r.top + r.height / 2) / window.innerHeight;
       const from = BACKDROP_COLORS.dark;
-      const to = DARK_PALETTES[p.id] || DARK_PALETTES.green;
+      const to = DARK_PALETTES[next.id] || DARK_PALETTES.green;
       startPaletteTransition({
         fromBg: [...from.bg],
         fromLine: [...from.line],
@@ -47,18 +60,11 @@ export default function ColorPicker() {
         now: performance.now(),
       });
     }
-    setPalette(p.id);
+    setPalette(next.id);
   };
 
-  const [hovering, setHovering] = useState(false);
-  // Accent of the swatch currently under the pointer — tints the trailing pill
-  // so it previews the palette you're about to pick. null → fall back to the
-  // active theme's accent (--lime).
-  const [hoverAccent, setHoverAccent] = useState(null);
-  const cursorRef = useRef(null);
-
-  // Anchor the wrapper at the cursor tip; the inner box offsets right + centers
-  // vertically, so its left edge sits just to the right of the default cursor.
+  // Anchor the trailing label at the cursor tip; an inner offset floats it up
+  // and to the right. The wrapper's slow transition gives it the lagging trail.
   const onMove = (e) => {
     const el = cursorRef.current;
     if (el) {
@@ -70,63 +76,57 @@ export default function ColorPicker() {
     <div
       className="absolute bottom-6 left-6 z-[2]"
       onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => {
-        setHovering(false);
-        setHoverAccent(null);
-      }}
+      onMouseLeave={() => setHovering(false)}
       onMouseMove={onMove}
     >
-      <div className="grid grid-cols-2 gap-1.5">
-        {PALETTES.map((p) => {
-          const active = palette === p.id;
-          return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={(e) => handlePick(p, e)}
-              onMouseEnter={() => setHoverAccent(p.accent)}
-              onMouseLeave={() => setHoverAccent(null)}
-              aria-label={`Switch to ${p.name} theme`}
-              aria-pressed={active}
-              style={{
-                width: 15,
-                height: 15,
-                borderRadius: 4,
-                background: active ? p.accent : "transparent",
-                border: active
-                  ? `1px solid ${p.accent}`
-                  : "1px solid rgba(235,235,225,0.45)",
-                padding: 0,
-                cursor: "pointer",
-              }}
-            />
-          );
-        })}
-      </div>
+      <button
+        type="button"
+        onClick={handleClick}
+        aria-label={`Change color theme — next: ${nextPalette.name}`}
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 9999,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 0,
+          cursor: "pointer",
+          background: hovering ? nextPalette.accent : "transparent",
+          border: `1px solid ${
+            hovering ? nextPalette.accent : "rgba(241,239,232,0.35)"
+          }`,
+          color: hovering ? "var(--dark-bg)" : "var(--dark-ink)",
+          transform: hovering ? "scale(1.05)" : "scale(1)",
+          transition:
+            "background-color .25s ease, border-color .25s ease, color .25s ease, transform .2s ease",
+        }}
+      >
+        <LuShuffle size={24} strokeWidth={2} aria-hidden="true" />
+      </button>
 
-      {/* Custom trailing pill — follows the pointer and expands while hovering.
-          pointer-events:none so clicks fall through; offset right of the cursor. */}
+      {/* Lagging trail label — follows the pointer; offset up/right of the tip.
+          pointer-events:none so clicks fall through to whatever's beneath. */}
       <div
         ref={cursorRef}
         aria-hidden="true"
         className="pointer-events-none fixed left-0 top-0"
-        style={{ willChange: "transform", transition: "transform .12s ease-out" }}
+        style={{
+          willChange: "transform",
+          transition: "transform .72s cubic-bezier(.22,1,.36,1)",
+        }}
       >
         <div
           style={{
-            transform: `translate(16px, -50%) scale(${hovering ? 1 : 0.3})`,
-            transformOrigin: "left center",
+            transform: `translate(30px, -220%) translateX(${hovering ? 0 : -8}px)`,
             opacity: hovering ? 1 : 0,
             transition:
-              "transform .32s cubic-bezier(.34,1.56,.64,1), opacity .2s ease, background-color .2s ease",
-            background: hoverAccent ?? "var(--lime)",
-            color: "var(--dark-bg)",
-            borderRadius: 6,
-            padding: "10px 20px",
+              "transform .32s cubic-bezier(.34,1.56,.64,1), opacity .2s ease, color .2s ease",
+            color: nextPalette.accent,
             fontFamily: "'Manrope', system-ui, sans-serif",
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: "0.12em",
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             whiteSpace: "nowrap",
           }}
