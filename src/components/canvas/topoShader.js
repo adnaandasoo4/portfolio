@@ -49,6 +49,7 @@ export const FRAG = `
 precision highp float;
 uniform vec2 uRes;uniform float uTime;
 uniform vec3 uBg;uniform vec3 uLine;
+uniform vec3 uBg2;uniform vec3 uLine2;uniform vec2 uCenter;uniform float uRadius;uniform float uEdge;
 uniform float uDensity;uniform float uScale;uniform float uWeight;uniform float uAmt;
 uniform float uBreathe;uniform float uCoverage;
 vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}
@@ -85,7 +86,14 @@ void main(){
   float br=0.6*b1+0.4*b2;
   float bias=(uCoverage-50.0)*0.02;
   float breath=mix(1.0,smoothstep(-0.75,0.55,br+bias),uBreathe*0.01);
-  float ink=line*breath*uAmt;
-  vec3 col=mix(uBg,uLine,clamp(ink,0.0,1.0));
-  gl_FragColor=vec4(col,1.0);
+  float ink=clamp(line*breath*uAmt,0.0,1.0);
+  vec3 colOld=mix(uBg,uLine,ink);
+  vec3 colNew=mix(uBg2,uLine2,ink);
+  float mask=0.0;
+  if(uRadius>0.0){
+    vec2 auv=vec2(uv.x*(uRes.x/uRes.y),uv.y);
+    float d=distance(auv,uCenter);
+    mask=1.0-smoothstep(uRadius-uEdge,uRadius+uEdge,d);
+  }
+  gl_FragColor=vec4(mix(colOld,colNew,mask),1.0);
 }`;
