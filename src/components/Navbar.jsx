@@ -28,11 +28,10 @@ function scrollToAnchor(id) {
 }
 
 /**
- * Sticky top navigation (V2). The bar holds the enlarged Azonix logo, a quirky
- * "Say Hi" contact pill, and a boxed burger trigger. The burger opens a
- * full-page overlay (all viewports) that reveals top→bottom: a big Moniqa
- * wordmark, a 50/50 split of mouse-parallax image columns (left) and Moniqa nav
- * links + socials (right).
+ * Sticky top navigation (V2). The bar holds the enlarged "Adnaan Dasoo" logo, a
+ * quirky "Say Hi" contact pill, and a boxed burger trigger. The burger opens a
+ * full-page overlay (all viewports): a 50/50 split of mouse-parallax image
+ * columns (left) and the nav links + socials (right).
  *
  * The burger/contact/overlay visuals (box fill, wrap→X swap, swipe reveal,
  * letter-roll) live as namespaced `.nv-*` CSS in index.css; this component owns
@@ -230,10 +229,26 @@ export default function Navbar({ onReplayPreloader }) {
     return () => controls.stop();
   }, [menuOpen, sweep]);
 
-  // Track scroll-driven UI state. Lenis drives the real scroll position, so the
-  // native scroll event fires as expected. `scrolled` is a simple off-the-top
-  // flag (button/logo shrink); `darkBg` reads the live --bg blend luminance so
-  // the burger's white-box treatment only kicks in over the dark theme palette.
+  // `scrolled` is a simple off-the-top flag (button/logo shrink). It only
+  // changes with scroll position, so the native scroll event (driven by Lenis)
+  // is sufficient.
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled((window.scrollY || window.pageYOffset || 0) > 8);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // `darkBg` reads the live --bg blend luminance so the burger's white-box
+  // treatment only kicks in over the dark theme palette. --bg is rewritten by
+  // TopographicField every frame and ALSO flips independently of scroll: at
+  // startup the backdrop registry is briefly empty, during which the field
+  // writes the DARK palette, then flips to light once the sections register —
+  // with no scroll event to catch it. Reading on scroll alone left the burger
+  // stuck in its borderless mount-time state until the user scrolled. So poll
+  // --bg on rAF and update only when the threshold is crossed.
   useEffect(() => {
     const root = document.documentElement;
     const luminance = (str) => {
@@ -241,13 +256,18 @@ export default function Navbar({ onReplayPreloader }) {
       if (!m) return 1;
       return (0.299 * +m[1] + 0.587 * +m[2] + 0.114 * +m[3]) / 255;
     };
-    const onScroll = () => {
-      setScrolled((window.scrollY || window.pageYOffset || 0) > 8);
-      setDarkBg(luminance(getComputedStyle(root).getPropertyValue("--bg")) < 0.5);
+    let raf = 0;
+    let last = null;
+    const tick = () => {
+      const dark = luminance(getComputedStyle(root).getPropertyValue("--bg")) < 0.5;
+      if (dark !== last) {
+        last = dark;
+        setDarkBg(dark);
+      }
+      raf = requestAnimationFrame(tick);
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    tick();
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   const SAY_HI = ["S", "a", "y", " ", "H", "i"];
@@ -261,12 +281,11 @@ export default function Navbar({ onReplayPreloader }) {
             aria-label="Home — Adnaan Dasoo"
             className="transition-opacity hover:opacity-70"
             style={{
-              fontFamily: "Manrope, system-ui, sans-serif",
-              fontWeight: 800,
+              fontFamily: "'Clash Display', system-ui, sans-serif",
+              fontWeight: 700,
               // Scroll-blended ink normally; white while the menu overlay is open
               // (the logo stays put in the top-left over the dark green overlay).
               color: menuOpen ? "#FFFFFF" : undefined,
-              WebkitTextStroke: "0.9px currentColor",
               fontSize: "34px",
               lineHeight: 1.02,
               letterSpacing: "0.02em",
@@ -357,8 +376,8 @@ export default function Navbar({ onReplayPreloader }) {
       >
         <OverlayTopo active={menuOpen || closing} />
         <div className="nv-ovinner">
-          {/* The Moniqa wordmark that used to sit here is gone — the top-left now
-              shows the persistent Navbar logo (white while open) instead. */}
+          {/* No wordmark here — the top-left shows the persistent Navbar logo
+              (white while open) instead. */}
           <div className="nv-ovmain">
             {/* left — parallax image columns (placeholders until real work imagery) */}
             <div className="nv-ovimgs">
@@ -380,7 +399,7 @@ export default function Navbar({ onReplayPreloader }) {
               </div>
             </div>
 
-            {/* right — Moniqa nav links + socials */}
+            {/* right — nav links + socials */}
             <div className="nv-ovside">
               <nav className="nv-ovnav">
                 {navLinks.map((link) => {
