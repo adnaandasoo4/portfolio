@@ -31,7 +31,7 @@ export const DARK_PALETTES = {
 // up palette swaps without re-instantiating their GL contexts.
 export const BACKDROP_COLORS = {
   dark: { ...DARK_PALETTES.green },
-  light: { bg: rgb("#F1EFE8"), line: rgb("#292C21"), ink: rgb("#292C21") }, // paper bg, dark-green lines, dark ink
+  light: { bg: rgb("#F1EFE8"), line: rgb("#292C21"), ink: rgb("#000000") }, // paper bg, dark-green lines, pure-black ink
 };
 
 // Swap the active dark palette. Mutates the existing `dark` object's properties

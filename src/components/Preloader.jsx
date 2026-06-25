@@ -133,7 +133,7 @@ export default function Preloader({ onReady }) {
             key={index}
             dir="auto"
             style={{
-              color: "var(--dark-bg)",
+              color: "#000000",
               fontFamily: "Manrope, system-ui, sans-serif",
               fontWeight: 600,
               fontSize: "clamp(28px, 4vw, 60px)",

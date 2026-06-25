@@ -31,7 +31,7 @@
    becomes a no-op until it is removed in the navbar piece). */
 :root{
   --bg:#F1EFE8;
-  --ink:#292C21;
+  --ink:#000000;               /* primary text — pure black on paper */
   --accent:#B6C652;            /* muted green — headline accents / accent text */
   --lime:#DCFE4F;              /* bright lime — UI chrome only */
   --dark-bg:#292E21;           /* solid dark backdrop (overlay, chrome) */
@@ -125,7 +125,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 
 /* ── "Say Hi" contact pill ── */
 .nv-contact{height:68px;display:inline-flex;align-items:center;gap:11px;padding:0 30px;border-radius:16px;
-  border:3px solid var(--lime);background:var(--lime);color:var(--dark-bg);
+  border:3px solid var(--lime);background:var(--lime);color:#000000;
   font-family:'Manrope',system-ui,sans-serif;font-weight:800;font-size:20px;letter-spacing:.03em;
   text-transform:uppercase;text-decoration:none;white-space:nowrap}
 .nv-cttext{display:inline-flex}
@@ -160,8 +160,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 .nv-bl{position:relative;z-index:1;width:18px;height:3px;overflow:hidden;
   transition:width .42s cubic-bezier(.65,0,.35,1),margin .42s cubic-bezier(.65,0,.35,1),transform .42s cubic-bezier(.65,0,.35,1)}
 /* Rest state staggers the two bars horizontally (small deliberate detail).
-   The open/close keyframes use `forwards` and resolve to translateX(0), so they
-   fully override this offset — the X always rebuilds dead-center. */
+   The open/close keyframes start AND end on this same offset (only the X
+   itself is centered), so entering/leaving the animation never jumps — the
+   bars settle straight back into the stagger with no secondary slide. */
 .nv-bl1{transform:translateX(4px)}
 .nv-bl2{transform:translateX(-4px)}
 .nv-bln{position:absolute;left:0;top:0;height:3px;width:18px;--loop:18px;border-radius:3px;background:currentColor;
@@ -173,11 +174,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 .nv-burger.is-open .nv-bl{overflow:visible}
 .nv-burger.is-open .nv-bl1{animation:nvclickX1 .62s cubic-bezier(.65,0,.35,1) forwards}
 .nv-burger.is-open .nv-bl2{animation:nvclickX2 .62s cubic-bezier(.65,0,.35,1) .05s forwards}
-@keyframes nvclickX1{0%{transform:translateX(0) translateY(0) rotate(0)}
+@keyframes nvclickX1{0%{transform:translateX(4px) translateY(0) rotate(0)}
   45%{transform:translateX(50px) translateY(0) rotate(0)}
   45.01%{transform:translateX(-50px) translateY(4.5px) rotate(45deg)}
   100%{transform:translateX(0) translateY(4.5px) rotate(45deg)}}
-@keyframes nvclickX2{0%{transform:translateX(0) translateY(0) rotate(0)}
+@keyframes nvclickX2{0%{transform:translateX(-4px) translateY(0) rotate(0)}
   45%{transform:translateX(50px) translateY(0) rotate(0)}
   45.01%{transform:translateX(-50px) translateY(-4.5px) rotate(-45deg)}
   100%{transform:translateX(0) translateY(-4.5px) rotate(-45deg)}}
@@ -187,11 +188,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; display:
 @keyframes nvclickClose1{0%{transform:translateX(0) translateY(4.5px) rotate(45deg)}
   45%{transform:translateX(50px) translateY(4.5px) rotate(45deg)}
   45.01%{transform:translateX(-50px) translateY(0) rotate(0)}
-  100%{transform:translateX(0) translateY(0) rotate(0)}}
+  100%{transform:translateX(4px) translateY(0) rotate(0)}}
 @keyframes nvclickClose2{0%{transform:translateX(0) translateY(-4.5px) rotate(-45deg)}
   45%{transform:translateX(50px) translateY(-4.5px) rotate(-45deg)}
   45.01%{transform:translateX(-50px) translateY(0) rotate(0)}
-  100%{transform:translateX(0) translateY(0) rotate(0)}}
+  100%{transform:translateX(-4px) translateY(0) rotate(0)}}
 
 /* ── full-page overlay ── */
 /* The reveal/conceal is a curved sweep driven by an SVG clip-path (see

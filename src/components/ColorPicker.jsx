@@ -96,7 +96,7 @@ export default function ColorPicker() {
           border: `1px solid ${
             hovering ? nextPalette.accent : "rgba(241,239,232,0.35)"
           }`,
-          color: hovering ? "var(--dark-bg)" : "var(--dark-ink)",
+          color: hovering ? "#000000" : "var(--dark-ink)",
           transform: hovering ? "scale(1.05)" : "scale(1)",
           transition:
             "background-color .25s ease, border-color .25s ease, color .25s ease, transform .2s ease",
