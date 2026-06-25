@@ -6,7 +6,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { BuzzwordMarquee, Contact, CustomCursor, CustomScrollbar, Experience, Hero, Manifesto, Navbar, Preloader, ScrollToTop, SelectedWork, Tech } from './components';
 import AllWorks from './components/AllWorks';
 import ProjectDetail from './components/ProjectDetail';
-import { ThemeProvider } from './utils/theme';
 import { PaletteProvider } from './utils/palette';
 import { LenisProvider, useLenis } from './utils/lenis';
 import { setupGsap } from './utils/gsap';
@@ -130,8 +129,7 @@ const App = () => {
   }, []);
 
   return (
-    <ThemeProvider>
-      <PaletteProvider>
+    <PaletteProvider>
       <LenisProvider>
         <BackdropProvider>
           <GsapBootstrap />
@@ -154,8 +152,7 @@ const App = () => {
           <Preloader key={preloaderRunId} onReady={handlePreloaderReady} />
         </BackdropProvider>
       </LenisProvider>
-      </PaletteProvider>
-    </ThemeProvider>
+    </PaletteProvider>
   )
 }
 

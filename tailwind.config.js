@@ -2,11 +2,6 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx}"],
   mode: "jit",
-  // Theme is driven by `data-theme="dark"` on <html> (set by theme.jsx).
-  // This config enables the `dark:` variant whenever that attribute matches,
-  // so any `dark:text-...` / `dark:bg-...` class will pair with its base
-  // class automatically when the user toggles the navbar theme switch.
-  darkMode: ["class", '[data-theme="dark"]'],
   // Makes `hover:` and `group-hover:` variants only fire on devices that
   // actually support hover (mice / trackpads). Touch users never trigger
   // sticky-hover states from a tap.

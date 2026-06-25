@@ -50,23 +50,6 @@
       crossorigin
     />
     <script>
-      // Pre-paint theme to avoid flash. Read localStorage first, fall back to OS preference, default light.
-      // Key "theme" must match src/utils/theme.jsx.
-      (function () {
-        var theme = "light";
-        try {
-          var stored = localStorage.getItem("theme");
-          var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-          if (stored === "dark" || stored === "light") {
-            theme = stored;
-          } else if (prefersDark) {
-            theme = "dark";
-          }
-        } catch (e) {
-          // localStorage may be unavailable (private browsing, etc.). Fall through to default.
-        }
-        document.documentElement.setAttribute("data-theme", theme);
-      })();
       // Pre-paint palette to avoid the default-lime accent flash before the
       // PaletteProvider effect runs. Key "palette" + ids must match
       // src/utils/palette.jsx.
