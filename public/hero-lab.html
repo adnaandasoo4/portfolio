@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero Lab — Marquee</title>
+<style>
+  @font-face{
+    font-family:'Clash Display';
+    src:url('/fonts/clash-display/ClashDisplay-Variable.woff2') format('woff2');
+    font-weight:200 700;font-style:normal;font-display:swap;
+  }
+  @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+  :root{
+    --bg:#F1EFE8; --ink:#000000; --accent:#B6C652; --lime:#DCFE4F;
+    --display:'Clash Display','Manrope',system-ui,sans-serif;
+    --sans:'Manrope',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+  .hero{position:fixed;inset:0;overflow:hidden}
+
+  /* ── chrome ── */
+  .topbar{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;
+    align-items:flex-start;padding:26px 40px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .topbar .meta{display:flex;gap:34px}
+  .topbar .meta .pin{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ink);margin-right:9px;vertical-align:middle}
+  .topbar nav{display:flex;gap:28px}
+  .topbar nav a{color:inherit;text-decoration:none;position:relative}
+  .topbar nav a::after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:1.5px;background:var(--ink);
+    transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+  .topbar nav a:hover::after{transform:scaleX(1)}
+  .botbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-between;align-items:flex-end;
+    padding:26px 40px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .botbar .role b{color:var(--accent)}
+  .scroll{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;font-weight:700;
+    letter-spacing:.28em;text-transform:uppercase;opacity:.7}
+  .scroll .bar{width:1px;height:42px;background:var(--ink);position:relative;overflow:hidden;opacity:.4}
+  .scroll .bar::after{content:"";position:absolute;left:0;top:-100%;width:100%;height:100%;background:var(--ink);animation:drop 1.8s ease-in-out infinite}
+  @keyframes drop{0%{top:-100%}60%,100%{top:100%}}
+
+  /* ── marquee rows (shared) ── */
+  .mrow{overflow:hidden;display:flex}
+  .mtrack{display:inline-flex;white-space:nowrap;font-family:var(--display);text-transform:uppercase;
+    line-height:.92;letter-spacing:-.02em;word-spacing:.08em;color:var(--ink);
+    background:var(--bg)}  /* opaque backing → keeps crisp sub-pixel anti-aliasing while transformed */
+  .mtrack.accent{color:var(--accent)}
+  .mtrack span{padding:0 .12em}
+  .mtrack .sep{color:var(--accent);padding:0 .06em}
+  .mtrack.accent .sep{color:var(--ink)}
+
+  /* ── layout A: twin rows centered ── */
+  .marquee{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;z-index:1;
+    transition:transform 1.1s cubic-bezier(.16,1,.3,1) .15s}
+  @keyframes nameIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  .mrow.r1{animation:nameIn .9s cubic-bezier(.16,1,.3,1) both}
+  .mrow.r2{opacity:0;transform:translateY(52px);transition:opacity .8s ease,transform .9s cubic-bezier(.16,1,.3,1)}
+  .play .mrow.r2{opacity:1;transform:translateY(0)}
+
+  /* ── layout B: reel + bottom ticker ── */
+  .ticker{position:absolute;left:0;right:0;bottom:40px;z-index:2;transform:translateY(130%);
+    transition:transform 1s cubic-bezier(.16,1,.3,1)}
+  .ticker.up{transform:translateY(0)}
+  .reelB{position:absolute;top:45%;z-index:3;width:clamp(400px,42vw,820px);aspect-ratio:16/10;border-radius:12px;
+    overflow:hidden;background:#101109;isolation:isolate;will-change:transform,left;opacity:0;
+    box-shadow:0 50px 110px -25px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.09);transition:opacity .8s ease}
+  .play .reelB{opacity:1}
+  .reelB::before{content:"";position:absolute;inset:-45%;
+    background:conic-gradient(from 0deg,#3a3f2c,#7d8466,#1c1f14,#9aa37e,#2b2f1f,#3a3f2c);
+    filter:blur(30px);animation:reelspin 16s linear infinite}
+  .reelB .rmeta{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between;
+    padding:16px 18px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);z-index:2}
+  .reelB .play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:62px;height:62px;border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center;z-index:2;transition:.3s}
+  .reelB:hover .play-btn{transform:translate(-50%,-50%) scale(1.1);background:rgba(255,255,255,.12)}
+  .reelB .play-btn::after{content:"";border-left:15px solid rgba(255,255,255,.9);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:5px}
+  @keyframes reelspin{to{transform:rotate(360deg)}}
+
+  /* ── entrance (chrome) ── */
+  .enter{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s ease}
+  .play .enter{opacity:1;transform:none}
+  .play .enter.d1{transition-delay:.15s}.play .enter.d2{transition-delay:.7s}
+  .play .enter.d3{transition-delay:.8s}.play .enter.d4{transition-delay:.9s}
+
+  /* ── layout C: work-image trail ── */
+  .trailimg{position:fixed;z-index:40;border-radius:8px;pointer-events:none;transform:translate(-50%,-50%);
+    will-change:transform,opacity;box-shadow:0 24px 60px rgba(0,0,0,.28);
+    animation:trailpop .6s cubic-bezier(.33,1,.68,1) forwards}
+  @keyframes trailpop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.82)}
+    25%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    60%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-48%) scale(.97)}}
+  /* split role subtext (layout C) — Jasmine-inspired, our own placement */
+  .roleSplit{position:absolute;inset:0;z-index:2;pointer-events:none}
+  .roleSplit span{position:absolute;top:46%;transform:translateY(-50%);font-family:var(--display);
+    font-weight:600;text-transform:uppercase;font-size:clamp(22px,3.4vw,58px);letter-spacing:-.01em;line-height:1}
+  .roleSplit .rl{left:40px}
+  .roleSplit .rr{right:40px}
+  .roleSplit .rr em{font-style:normal;color:var(--accent)}
+  /* idle work-carousel (layout C) — fills the centre until the cursor moves */
+  .idle{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:3;pointer-events:none;
+    opacity:0;transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+  .idle.in{opacity:1}
+  .idle.hide{opacity:0;transform:translate(-50%,-50%) scale(.9)}
+  .idlecard{border-radius:10px;box-shadow:0 36px 80px rgba(0,0,0,.32);
+    transition:width .7s cubic-bezier(.16,1,.3,1),height .7s cubic-bezier(.16,1,.3,1),background-color .7s ease}
+
+  /* ── lab controls ── */
+  .fxbar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:5px;
+    background:rgba(20,20,15,.85);padding:5px;border-radius:999px;backdrop-filter:blur(8px)}
+  .fxbar button{font:inherit;font-size:11px;font-weight:600;color:#E8E6DD;cursor:pointer;background:transparent;
+    border:0;padding:7px 14px;border-radius:999px;white-space:nowrap;transition:.2s}
+  .fxbar button:hover{color:#fff}
+  .fxbar button.sel{background:var(--lime);color:#111}
+  .replay{position:fixed;bottom:14px;right:18px;z-index:60;font:inherit;font-size:11px;font-weight:600;
+    letter-spacing:.1em;text-transform:uppercase;color:#777;background:transparent;border:1px solid rgba(0,0,0,.2);
+    padding:7px 14px;border-radius:999px;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="hero" id="hero"></div>
+  <div class="fxbar" id="fxbar"></div>
+  <button class="replay" id="replay">↻ Replay</button>
+
+<script>
+  const NAME = "Adnaan Dasoo";
+  const hero = document.getElementById("hero");
+
+  let mx = innerWidth/2, my = innerHeight/2;
+  // image-trail state (layout C)
+  let trailActive = false, trailIdx = 0, trailLastX = null, trailLastY = null;
+  // idle work-carousel state (layout C)
+  let idleEl = null, idleTimer = null, idleIdx = 0;
+  function clearIdle(){ if (idleTimer){ clearInterval(idleTimer); idleTimer = null; } idleEl = null; }
+  addEventListener("mousemove", e=>{
+    mx = e.clientX; my = e.clientY;
+    if (trailActive){
+      if (trailLastX === null){ trailLastX = e.clientX; trailLastY = e.clientY; }
+      if (Math.hypot(e.clientX - trailLastX, e.clientY - trailLastY) > 70){
+        spawnTrail(e.clientX, e.clientY);
+        trailLastX = e.clientX; trailLastY = e.clientY;
+      }
+    }
+  });
+
+  // live clock (GMT-4)
+  function clockStr(){
+    const now = new Date(Date.now() - 4*3600*1000);
+    return `${String(now.getUTCHours()).padStart(2,"0")}:${String(now.getUTCMinutes()).padStart(2,"0")} GMT-4`;
+  }
+
+  const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+  const mod = (v,m)=>((v % m) + m) % m;
+  function div(html){ const d=document.createElement("div"); d.innerHTML=html.trim(); return d.firstChild; }
+  function fsFor(){ return Math.max(60, Math.min(0.165 * innerWidth, 380)); }
+
+  function makeRow(container, { accent, fs, weight, dir, cls }){
+    const reps = Math.ceil(innerWidth / (fs * 4.0)) + 3;
+    const unit = `<span>${NAME}</span><span class="sep">✦</span>`;
+    const half = unit.repeat(reps);
+    const row = div(`<div class="mrow ${cls||""}">
+      <div class="mtrack${accent ? " accent" : ""}" style="font-size:${fs}px;font-weight:${weight}">${half + half}</div></div>`);
+    container.appendChild(row);
+    const track = row.querySelector(".mtrack");
+    const nameW = track.children[0].getBoundingClientRect().width;
+    return { track, dirSign: dir, pos: (nameW - innerWidth) / 2, halfW: track.scrollWidth / 2, speed: 0 };
+  }
+
+  // ── shared state + loop ──
+  let rows = [], started = false, layout = "A";
+  let reelEl = null, reelX = 0, reelIn = false, reelScale = 0.9;
+
+  (function loop(){
+    rows.forEach(r => {
+      if (!r.halfW) return;
+      if (started) r.pos += r.dirSign * r.speed;
+      r.track.style.transform = `translateX(${Math.round(-mod(r.pos, r.halfW))}px)`; // whole px → no sub-pixel blur
+    });
+    if (reelEl){
+      const pad = innerWidth >= 640 ? 32 : 16, w = reelEl.offsetWidth;
+      reelX += (clamp(mx - w/2, pad, innerWidth - pad - w) - reelX) * 0.08;  // follow cursor X (dev-server feel)
+      if (reelIn) reelScale += (1 - reelScale) * 0.06;
+      const dy = my/innerHeight - 0.5;
+      reelEl.style.left = reelX + "px";
+      reelEl.style.transform = `translateY(calc(-50% + ${dy*34}px)) scale(${reelScale})`;
+    }
+    requestAnimationFrame(loop);
+  })();
+
+  const TOPBAR = `<div class="topbar">
+      <div class="meta enter d1">
+        <span><span class="pin"></span>New York, US</span><span class="clock">—</span><span>40.7128° N, 74.0060° W</span>
+      </div>
+      <nav class="enter d1"><a href="#">Work</a><a href="#">About</a><a href="#">Break</a><a href="#">Contact</a></nav>
+    </div>`;
+
+  const BOTBAR = `<div class="botbar">
+      <div class="role enter d2">Creative <b>Developer</b> — Software Engineer</div>
+      <div class="scroll enter d3"><span>Scroll</span><span class="bar"></span></div>
+      <div class="role enter d4" style="text-align:right">Portfolio<br>© 2026</div>
+    </div>`;
+
+  // two centered rows + the lone-name → marquee entrance (used by A and C)
+  function buildTwinRows(instant){
+    const marquee = hero.querySelector("#marquee");
+    const fs = fsFor(), rowH = fs * 0.92;
+    const r1 = makeRow(marquee, { accent:false, fs, weight:600, dir:1, cls:"r1" }); r1.speed = 1.3; rows.push(r1);
+    const r2 = makeRow(marquee, { accent:true,  fs, weight:600, dir:-1, cls:"r2" }); r2.speed = 1.3; rows.push(r2);
+    marquee.style.transition = "none";
+    marquee.style.transform = `translateY(${rowH/2}px)`;
+    void marquee.offsetWidth; marquee.style.transition = "";
+    const go = ()=>{ hero.classList.add("play"); marquee.style.transform = "translateY(0)"; started = true; };
+    if (instant) go(); else setTimeout(go, 1500);   // hold lone centered name → blend in
+  }
+
+  // ── layout A: twin rows centered, free scroll, no mouse FX ──
+  function renderA(instant){
+    layout = "A"; started = false; reelEl = null; rows = []; trailActive = false;
+    hero.className = "hero";
+    hero.innerHTML = TOPBAR + `<div class="marquee" id="marquee"></div>` + BOTBAR;
+    buildTwinRows(instant); setClock();
+  }
+
+  // ── layout B: cursor-following reel above a single bottom ticker ──
+  function renderB(instant){
+    layout = "B"; started = false; rows = []; reelEl = null; trailActive = false;
+    reelIn = false; reelScale = instant ? 1 : 0.9;
+    hero.className = "hero";
+    hero.innerHTML = TOPBAR +
+      `<div class="reelB" id="reelB"><div class="rmeta"><span>Showreel</span><span>2026</span></div><div class="play-btn"></div></div>` +
+      `<div class="ticker" id="ticker"></div>`;
+    const ticker = hero.querySelector("#ticker");
+    const fs = fsFor() * 0.85;   // ~15% smaller than the twin-row size
+    const r = makeRow(ticker, { accent:false, fs, weight:600, dir:1, cls:"tick" }); r.speed = 0.7; rows.push(r);
+    reelEl = hero.querySelector("#reelB");
+    reelX = clamp(mx - reelEl.offsetWidth/2, 32, innerWidth - 32 - reelEl.offsetWidth);
+    setClock();
+    if (instant){ ticker.classList.add("up"); hero.classList.add("play"); started = true; reelIn = true; reelScale = 1; return; }
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      ticker.classList.add("up");                              // marquee rises from the ground
+      setTimeout(()=>{ hero.classList.add("play"); started = true; reelIn = true; }, 850); // then the rest animate in
+    }));
+  }
+
+  // ── layout C: twin rows + work-image trail following the cursor ──
+  const WORKS = [
+    { w:340, h:220, bg:"#B6C652" }, { w:240, h:310, bg:"#16180F" }, { w:320, h:210, bg:"#DCFE4F" },
+    { w:270, h:270, bg:"#7d8466" }, { w:380, h:230, bg:"#292E21" }, { w:240, h:300, bg:"#C3995A" },
+    { w:330, h:220, bg:"#8FC2F2" },
+  ];
+  function spawnTrail(x, y){
+    // first movement dismisses the idle carousel and hands off to the trail
+    if (idleEl){ idleEl.classList.add("hide"); clearIdle(); }
+    const wk = WORKS[trailIdx % WORKS.length]; trailIdx++;
+    const im = div(`<div class="trailimg" style="left:${x}px;top:${y}px;width:${wk.w}px;height:${wk.h}px;background:${wk.bg}"></div>`);
+    document.body.appendChild(im);
+    im.addEventListener("animationend", ()=>im.remove());
+  }
+  function renderC(instant){
+    layout = "C"; started = false; reelEl = null; rows = [];
+    trailActive = true; trailLastX = null; trailLastY = null;
+    hero.className = "hero";
+    hero.innerHTML = TOPBAR +
+      `<div class="roleSplit"><span class="rl enter d2">Creative</span><span class="rr enter d3"><em>Developer</em></span></div>` +
+      `<div class="idle" id="idle"><div class="idlecard"></div></div>` +
+      `<div class="ticker" id="ticker"></div>`;
+    const ticker = hero.querySelector("#ticker");
+    const fs = fsFor() * 0.85;
+    const r = makeRow(ticker, { accent:false, fs, weight:600, dir:1, cls:"tick" }); r.speed = 0.7; rows.push(r);
+    // idle carousel — morph a centred card through the work thumbnails until the cursor moves
+    idleEl = hero.querySelector("#idle"); idleIdx = 0;
+    const card = idleEl.querySelector(".idlecard");
+    const cycle = ()=>{ const wk = WORKS[idleIdx % WORKS.length]; idleIdx++;
+      card.style.width = wk.w + "px"; card.style.height = wk.h + "px"; card.style.background = wk.bg; };
+    cycle();
+    idleTimer = setInterval(cycle, 1400);
+    setClock();
+    if (instant){ ticker.classList.add("up"); hero.classList.add("play"); idleEl.classList.add("in"); started = true; return; }
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      ticker.classList.add("up");                                  // ticker rises from the ground
+      setTimeout(()=>{ hero.classList.add("play"); if (idleEl) idleEl.classList.add("in"); started = true; }, 850);
+    }));
+  }
+
+  function render(key, instant){
+    clearIdle();
+    key === "B" ? renderB(instant) : key === "C" ? renderC(instant) : renderA(instant);
+  }
+
+  function setClock(){
+    const el = hero.querySelector(".clock");
+    if (el) el.textContent = clockStr();
+  }
+  setInterval(setClock, 1000);
+
+  // switcher
+  const LAYOUTS = [["A","Twin Rows"],["B","Reel + Ticker"],["C","Image Trail"]];
+  const fxbar = document.getElementById("fxbar");
+  LAYOUTS.forEach(([k,label])=>{
+    const b = document.createElement("button");
+    b.textContent = label; b.dataset.k = k;
+    if (k === layout) b.classList.add("sel");
+    b.addEventListener("click", ()=>{
+      [...fxbar.children].forEach(c=>c.classList.toggle("sel", c.dataset.k === k));
+      render(k, false);
+    });
+    fxbar.appendChild(b);
+  });
+
+  let rt;
+  addEventListener("resize", ()=>{ clearTimeout(rt); rt = setTimeout(()=>render(layout, true), 200); });
+  document.getElementById("replay").addEventListener("click", ()=>render(layout, false));
+
+  render("A", false);
+</script>
+</body>
+</html>
