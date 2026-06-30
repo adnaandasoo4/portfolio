@@ -1,121 +1,114 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HIDE_SECTION_LABELS, manifesto } from "../constants";
 import { SectionWrapper } from "../hoc";
 import { useSectionBackdrop } from "../utils/backdrop";
-import { useLenis } from "../utils/lenis";
-import { gsap, ScrollTrigger } from "../utils/gsap";
 
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const lerp = (a, b, t) => a + (b - a) * t;
 
-// Unlit word opacity (grayed) → 1 (full color).
-const DIM = 0.2;
-// Words mid-transition at the leading edge (soft fill instead of a hard step).
-const RAMP = 5;
-// Fraction of the pin over which the fill completes (the rest holds full color
-// before the section releases and scrolls up).
-const FILL_END = 0.85;
+// Resting (un-lit) text tint and the radius of the cursor "shine". The shine
+// reveals full --ink at the cursor, fading back to DIM outward — a glimmer that
+// follows the pointer across the words.
+const DIM = "color-mix(in srgb, var(--ink) 30%, transparent)";
+// Peak brightness at the cursor. Below full --ink so the lit/unlit contrast is
+// gentle rather than a hard pop.
+const SHINE = "color-mix(in srgb, var(--ink) 72%, transparent)";
+const SHINE_RADIUS = 350;
 
 function Manifesto() {
   const ref = useRef(null);
-  const innerRef = useRef(null);
-  const wordEls = useRef([]);
-  const lenis = useLenis();
-  // Light/paper through hero → video → about; the white→dark fade begins at the
+  const pRef = useRef(null);
+  // Light/paper through hero → about; the white→dark fade begins at the
   // About → Experience handoff (Experience is the first 'dark' section).
   useSectionBackdrop(ref, "light");
 
-  // Tokenize the intro into words (+ whitespace). Each word gets a sequential
-  // index so it can light left→right as the section scrolls.
-  const tokens = useMemo(() => {
-    const out = [];
-    let wi = 0;
-    manifesto.intro.forEach((seg) => {
-      seg.text.split(/(\s+)/).forEach((part) => {
-        if (part === "") return;
-        if (/^\s+$/.test(part)) out.push({ space: true, text: part });
-        else out.push({ space: false, text: part, highlight: !!seg.highlight, wi: wi++ });
-      });
-    });
-    return out;
-  }, []);
-  const wordCount = useMemo(() => tokens.filter((t) => !t.space).length, [tokens]);
+  // Whole intro as one string — the shine is a continuous gradient over the
+  // paragraph, so the old per-word tokenization is no longer needed.
+  const text = manifesto.intro.map((s) => s.text).join("");
 
-  // Pin the centered text and fill it with color as the user scrolls through.
-  // Mirrors SelectedWork's ScrollTrigger setup (waits for Lenis's scrollerProxy).
+  const [reduce] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  // Cursor-tracked shine: update CSS vars (--mx/--my) on the paragraph, smoothed
+  // toward the pointer so the highlight glides rather than snaps. The gradient
+  // (background-clip:text) brightens the glyphs nearest the cursor.
   useEffect(() => {
-    if (!lenis || !innerRef.current) return;
+    const host = ref.current;
+    const p = pRef.current;
+    if (reduce || !host || !p) return; // reduced motion: static, fully-lit text
 
-    const setFill = (progress) => {
-      const front = clamp(progress / FILL_END, 0, 1) * (wordCount + RAMP);
-      wordEls.current.forEach((el, wi) => {
-        if (!el) return;
-        el.style.opacity = String(lerp(DIM, 1, clamp((front - wi) / RAMP, 0, 1)));
-      });
+    // Park the highlight off-screen so the text rests fully DIM until hovered.
+    let tx = -SHINE_RADIUS, ty = -SHINE_RADIUS, cx = tx, cy = ty;
+    const onMove = (e) => {
+      const r = p.getBoundingClientRect();
+      tx = e.clientX - r.left;
+      ty = e.clientY - r.top;
     };
+    const onLeave = () => {
+      tx = -SHINE_RADIUS;
+      ty = -SHINE_RADIUS;
+    };
+    host.addEventListener("pointermove", onMove);
+    host.addEventListener("pointerleave", onLeave);
 
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const st = ScrollTrigger.create({
-        trigger: innerRef.current,
-        pin: innerRef.current,
-        start: "top top",
-        end: "+=120%",
-        scrub: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => setFill(self.progress),
-      });
-      return () => st.kill();
-    });
-    // Reduced motion: no pin — just present the text fully colored.
-    mm.add("(prefers-reduced-motion: reduce)", () => {
-      setFill(1);
-      return () => {};
-    });
-    return () => mm.revert();
-  }, [lenis, wordCount]);
+    let raf = 0;
+    const frame = () => {
+      cx = lerp(cx, tx, 0.06);
+      cy = lerp(cy, ty, 0.06);
+      p.style.setProperty("--mx", `${cx}px`);
+      p.style.setProperty("--my", `${cy}px`);
+      raf = requestAnimationFrame(frame);
+    };
+    frame();
+    return () => {
+      host.removeEventListener("pointermove", onMove);
+      host.removeEventListener("pointerleave", onLeave);
+      cancelAnimationFrame(raf);
+    };
+  }, [reduce]);
+
+  const shineStyle = reduce
+    ? { color: "var(--ink)" }
+    : {
+        color: "transparent",
+        WebkitTextFillColor: "transparent",
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        backgroundImage: `radial-gradient(circle ${SHINE_RADIUS}px at var(--mx, ${-SHINE_RADIUS}px) var(--my, ${-SHINE_RADIUS}px), ${SHINE} 0%, ${DIM} 45%)`,
+      };
 
   return (
-    <div ref={ref}>
-      {/* Pinned, viewport-centered text. ScrollTrigger pins this h-screen block
-          while the words fill in; afterward it releases and scrolls up. */}
-      <div ref={innerRef} className="flex h-screen flex-col justify-center gap-8">
-        {!HIDE_SECTION_LABELS && (
-          <span className="font-sans text-xs uppercase tracking-widest text-muted">
-            {manifesto.label}
-          </span>
-        )}
-        <p
-          className="text-ink"
-          style={{
-            fontWeight: 700,
-            fontSize: "clamp(34px, 5vw, 72px)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.015em",
-            maxWidth: "60ch",
-          }}
-        >
-          {tokens.map((t, i) =>
-            t.space ? (
-              <span key={i}>{t.text}</span>
-            ) : (
-              <span
-                key={i}
-                ref={(el) => {
-                  wordEls.current[t.wi] = el;
-                }}
-                style={{ opacity: DIM, color: t.highlight ? "var(--lime)" : undefined }}
-              >
-                {t.text}
-              </span>
-            ),
-          )}
-        </p>
-      </div>
+    <div ref={ref} className="flex flex-col gap-8 p-4 px-6 py-10 pb-24 sm:p-8 sm:px-12 sm:py-16 sm:pb-40">
+      {!HIDE_SECTION_LABELS && (
+        <span className="font-sans text-xs uppercase tracking-widest text-muted">
+          {manifesto.label}
+        </span>
+      )}
+      <p
+        ref={pRef}
+        style={{
+          fontWeight: 700,
+          fontSize: "clamp(33px, 5.2vw, 79px)",
+          lineHeight: 1.18,
+          letterSpacing: "-0.015em",
+          maxWidth: "none",
+          // First line indented far right (Huy-style) — the rest wrap left,
+          // giving an organic ragged block instead of a flush paragraph.
+          textIndent: "40%",
+          ...shineStyle,
+        }}
+      >
+        {text}
+      </p>
     </div>
   );
 }
 
-const ManifestoSection = SectionWrapper(Manifesto, "about", { scrollTriggered: true });
+const ManifestoSection = SectionWrapper(Manifesto, "about", {
+  scrollTriggered: true,
+  fullBleed: true,
+});
 export default ManifestoSection;

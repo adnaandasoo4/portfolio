@@ -90,10 +90,6 @@ function Home({ ready }) {
   return (
     <>
       <Hero ready={ready} />
-      {/* Scroll-away room for the hero reel's expand→exit. The reel (fixed,
-          in Hero) expands over the first viewport, then translates off over
-          this spacer's viewport, revealing the About section beneath. */}
-      <div aria-hidden="true" className="h-screen w-full" />
       <Manifesto />
       {/* Design process — temporarily removed from the page, kept wired for
           later. <Process /> */}

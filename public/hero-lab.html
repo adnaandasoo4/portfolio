@@ -44,7 +44,7 @@
   /* ── marquee rows (shared) ── */
   .mrow{overflow:hidden;display:flex}
   .mtrack{display:inline-flex;white-space:nowrap;font-family:var(--display);text-transform:uppercase;
-    line-height:.92;letter-spacing:-.02em;word-spacing:.08em;color:var(--ink);
+    line-height:.92;letter-spacing:-.02em;word-spacing:.32em;color:var(--ink);
     background:var(--bg)}  /* opaque backing → keeps crisp sub-pixel anti-aliasing while transformed */
   .mtrack.accent{color:var(--accent)}
   .mtrack span{padding:0 .12em}
@@ -52,12 +52,18 @@
   .mtrack.accent .sep{color:var(--ink)}
 
   /* ── layout A: twin rows centered ── */
-  .marquee{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;z-index:1;
-    transition:transform 1.1s cubic-bezier(.16,1,.3,1) .15s}
-  @keyframes nameIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-  .mrow.r1{animation:nameIn .9s cubic-bezier(.16,1,.3,1) both}
-  .mrow.r2{opacity:0;transform:translateY(52px);transition:opacity .8s ease,transform .9s cubic-bezier(.16,1,.3,1)}
-  .play .mrow.r2{opacity:1;transform:translateY(0)}
+  .marquee{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;z-index:1}
+  .mrow.r2{opacity:0;transition:opacity .8s ease}   /* 2nd row simply fades in — no slide → nothing to skip */
+  .play .mrow.r2{opacity:1}
+
+  /* ── intro: lone name positioned exactly over r1's first name, scaled down → grows to scale 1 ── */
+  .intro{position:absolute;inset:0;z-index:4;pointer-events:none}
+  .intro span{position:absolute;font-family:var(--display);text-transform:uppercase;font-weight:600;line-height:.92;
+    letter-spacing:-.02em;word-spacing:.32em;white-space:nowrap;color:var(--ink);transform-origin:center center;
+    opacity:0;transform:translate(-50%,calc(-50% + 24px)) scale(var(--shrink,.4));
+    transition:opacity .6s ease, transform 1s cubic-bezier(.16,1,.3,1)}
+  .intro.in span{opacity:1;transform:translate(-50%,-50%) scale(var(--shrink,.4))}
+  .intro.grow span{transform:translate(-50%,-50%) scale(1);transition:transform 1.05s cubic-bezier(.16,1,.3,1)}
 
   /* ── layout B: reel + bottom ticker ── */
   .ticker{position:absolute;left:0;right:0;bottom:40px;z-index:2;transform:translateY(130%);
@@ -115,6 +121,13 @@
     border:0;padding:7px 14px;border-radius:999px;white-space:nowrap;transition:.2s}
   .fxbar button:hover{color:#fff}
   .fxbar button.sel{background:var(--lime);color:#111}
+  .sepbar{position:fixed;bottom:14px;left:18px;z-index:60;display:flex;align-items:center;gap:4px;
+    background:rgba(20,20,15,.85);padding:5px;border-radius:999px;backdrop-filter:blur(8px)}
+  .sepbar .lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#888;padding:0 6px 0 8px}
+  .sepbar button{font-family:var(--display);font-size:17px;line-height:1;color:#E8E6DD;cursor:pointer;background:transparent;
+    border:0;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .sepbar button:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .sepbar button.sel{background:var(--lime);color:#111}
   .replay{position:fixed;bottom:14px;right:18px;z-index:60;font:inherit;font-size:11px;font-weight:600;
     letter-spacing:.1em;text-transform:uppercase;color:#777;background:transparent;border:1px solid rgba(0,0,0,.2);
     padding:7px 14px;border-radius:999px;cursor:pointer}
@@ -123,10 +136,12 @@
 <body>
   <div class="hero" id="hero"></div>
   <div class="fxbar" id="fxbar"></div>
+  <div class="sepbar" id="sepbar"></div>
   <button class="replay" id="replay">↻ Replay</button>
 
 <script>
   const NAME = "Adnaan Dasoo";
+  let SEP = "✦";   // live-swappable separator (see sepbar toggle)
   const hero = document.getElementById("hero");
 
   let mx = innerWidth/2, my = innerHeight/2;
@@ -159,7 +174,7 @@
 
   function makeRow(container, { accent, fs, weight, dir, cls }){
     const reps = Math.ceil(innerWidth / (fs * 4.0)) + 3;
-    const unit = `<span>${NAME}</span><span class="sep">✦</span>`;
+    const unit = `<span>${NAME}</span><span class="sep">${SEP}</span>`;
     const half = unit.repeat(reps);
     const row = div(`<div class="mrow ${cls||""}">
       <div class="mtrack${accent ? " accent" : ""}" style="font-size:${fs}px;font-weight:${weight}">${half + half}</div></div>`);
@@ -206,21 +221,59 @@
   // two centered rows + the lone-name → marquee entrance (used by A and C)
   function buildTwinRows(instant){
     const marquee = hero.querySelector("#marquee");
-    const fs = fsFor(), rowH = fs * 0.92;
-    const r1 = makeRow(marquee, { accent:false, fs, weight:600, dir:1, cls:"r1" }); r1.speed = 1.3; rows.push(r1);
-    const r2 = makeRow(marquee, { accent:true,  fs, weight:600, dir:-1, cls:"r2" }); r2.speed = 1.3; rows.push(r2);
-    marquee.style.transition = "none";
-    marquee.style.transform = `translateY(${rowH/2}px)`;
-    void marquee.offsetWidth; marquee.style.transition = "";
-    const go = ()=>{ hero.classList.add("play"); marquee.style.transform = "translateY(0)"; started = true; };
-    if (instant) go(); else setTimeout(go, 1500);   // hold lone centered name → blend in
+    const intro = hero.querySelector("#intro");
+    const introName = intro.querySelector("span");
+    const fs = fsFor();
+    const r1 = makeRow(marquee, { accent:false, fs, weight:600, dir:1, cls:"r1" }); r1.speed = 0.5; rows.push(r1);
+    const r2 = makeRow(marquee, { accent:true,  fs, weight:600, dir:-1, cls:"r2" }); r2.speed = 0.5; rows.push(r2);
+
+    // the marquee is built in its FINAL resting position (rows centred as a block); keep it hidden for now
+    marquee.style.opacity = "0";
+
+    // apply the resting scroll offset now so we can measure exactly where r1's first name will sit on screen
+    rows.forEach(r=>{ if (r.halfW) r.track.style.transform = `translateX(${Math.round(-mod(r.pos, r.halfW))}px)`; });
+    const nameRect = r1.track.children[0].getBoundingClientRect();
+    const cx = nameRect.left + nameRect.width  / 2;
+    const cy = nameRect.top  + nameRect.height / 2;
+
+    // place the lone name dead over r1's first name, rendered at full size but scaled DOWN so it reads;
+    // growing back to scale 1 lands on the marquee's own glyphs pixel-for-pixel → the handoff is invisible
+    introName.style.fontSize = "100px";
+    const w100 = introName.getBoundingClientRect().width;
+    const introFs = clamp(100 * (innerWidth * 0.52) / w100, 44, 140);
+    introName.style.fontSize = fs + "px";
+    introName.style.left = cx + "px";
+    introName.style.top  = cy + "px";
+    intro.style.setProperty("--shrink", introFs / fs);
+
+    // hand off: the grown word already sits exactly where r1's first name is — reveal the marquee with NO fade
+    // under the (identical) intro, drop the intro the same frame, start scrolling, fade the 2nd row + chrome in
+    const go = ()=>{
+      marquee.style.opacity = "1";   // r1 is already exactly under the intro → nothing changes on screen
+      if (intro) intro.remove();     // remove the cover → r1's first name shows in the exact same spot & size
+      started = true;                // r1 scrolls on from the word's resting spot — no jump
+      hero.classList.add("play");    // r2 + topbar/botbar fade in (pure opacity, no row-slide → no skip)
+    };
+
+    if (instant){ if (intro) intro.remove(); marquee.style.opacity = "1"; started = true; hero.classList.add("play"); return; }
+
+    requestAnimationFrame(()=>requestAnimationFrame(()=> intro.classList.add("in"))); // 1) read the name in, small
+    setTimeout(()=>{                                                                  // 2) hold so it reads, then scale up to full size
+      introName.addEventListener("transitionend", function onGrow(e){                 // 3) hand off the exact frame the grow lands
+        if (e.propertyName !== "transform") return;
+        introName.removeEventListener("transitionend", onGrow);
+        go();                                                                         //    → BECOMES the marquee, frame-exact, no flicker
+      });
+      intro.classList.add("grow");
+    }, 2300);
   }
 
   // ── layout A: twin rows centered, free scroll, no mouse FX ──
   function renderA(instant){
     layout = "A"; started = false; reelEl = null; rows = []; trailActive = false;
     hero.className = "hero";
-    hero.innerHTML = TOPBAR + `<div class="marquee" id="marquee"></div>` + BOTBAR;
+    hero.innerHTML = TOPBAR + `<div class="marquee" id="marquee"></div>` +
+      `<div class="intro" id="intro"><span>${NAME}</span></div>` + BOTBAR;
     buildTwinRows(instant); setClock();
   }
 
@@ -234,7 +287,7 @@
       `<div class="ticker" id="ticker"></div>`;
     const ticker = hero.querySelector("#ticker");
     const fs = fsFor() * 0.85;   // ~15% smaller than the twin-row size
-    const r = makeRow(ticker, { accent:false, fs, weight:600, dir:1, cls:"tick" }); r.speed = 0.7; rows.push(r);
+    const r = makeRow(ticker, { accent:false, fs, weight:600, dir:1, cls:"tick" }); r.speed = 0.4; rows.push(r);
     reelEl = hero.querySelector("#reelB");
     reelX = clamp(mx - reelEl.offsetWidth/2, 32, innerWidth - 32 - reelEl.offsetWidth);
     setClock();
@@ -269,7 +322,7 @@
       `<div class="ticker" id="ticker"></div>`;
     const ticker = hero.querySelector("#ticker");
     const fs = fsFor() * 0.85;
-    const r = makeRow(ticker, { accent:false, fs, weight:600, dir:1, cls:"tick" }); r.speed = 0.7; rows.push(r);
+    const r = makeRow(ticker, { accent:false, fs, weight:600, dir:1, cls:"tick" }); r.speed = 0.4; rows.push(r);
     // idle carousel — morph a centred card through the work thumbnails until the cursor moves
     idleEl = hero.querySelector("#idle"); idleIdx = 0;
     const card = idleEl.querySelector(".idlecard");
@@ -308,6 +361,29 @@
       render(k, false);
     });
     fxbar.appendChild(b);
+  });
+
+  // separator toggle — curated, editorial marks; swaps live & instantly
+  const SEPS = [
+    ["✦","Star"],     // original — soft, sparkly
+    ["—","Dash"],     // em-dash — calm, editorial
+    ["/","Slash"],    // fashion/agency marquee
+    ["·","Dot"],      // middle dot — quiet, refined
+    ["◆","Diamond"],  // geometric, confident
+    ["✳","Asterisk"], // structured six-spoke
+  ];
+  const sepbar = document.getElementById("sepbar");
+  sepbar.insertAdjacentHTML("beforeend", `<span class="lbl">Sep</span>`);
+  SEPS.forEach(([glyph,label])=>{
+    const b = document.createElement("button");
+    b.textContent = glyph; b.title = label; b.dataset.s = glyph;
+    if (glyph === SEP) b.classList.add("sel");
+    b.addEventListener("click", ()=>{
+      SEP = glyph;
+      [...sepbar.querySelectorAll("button")].forEach(c=>c.classList.toggle("sel", c.dataset.s === glyph));
+      render(layout, true);   // instant rebuild — no entrance replay
+    });
+    sepbar.appendChild(b);
   });
 
   let rt;

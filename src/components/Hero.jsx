@@ -5,245 +5,151 @@ import { useSectionBackdrop } from "../utils/backdrop";
 const ease = [0.65, 0, 0.35, 1];
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const lerp = (a, b, t) => a + (b - a) * t;
-// Smooth ease-in-out for the expand progress.
-const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+const mod = (v, m) => ((v % m) + m) % m;
+
+const NAME = "Adnaan Dasoo";
+// Pairs of name + separator per row. The track renders this many; `halfW`
+// (scrollWidth / 2) is the wrap period, so any even split is seamless. 24 keeps
+// `halfW` wider than the viewport at every clamp size, so there's never a gap.
+const REPS = 24;
 
 /**
- * Hero section (V2).
+ * Hero section (V2) — twin marquee.
  *
- * Scroll choreography (driven by a single rAF reading scroll position):
- * - The headline + bottom HUD scroll away with the section and fade out.
- * - The reel does NOT scroll with them: it stays put and SCALES UP to a
- *   near-fullscreen video (inset by the page padding) over the first viewport
- *   of scroll (p1). A same-size invisible slot reserves its place in the layout
- *   so the headline/HUD sit around it; the visible reel is a fixed overlay.
- * - Over the next viewport (p2, provided by the 100vh spacer after the hero in
- *   App), the now-fullscreen reel translates up and off, revealing the About
- *   section beneath it.
+ * Two rows of "ADNAAN DASOO ✦" drift in opposite directions, the first name of
+ * each row centered. A single scroll-independent rAF translates the two tracks
+ * and wraps them at their half-width. The bottom HUD (coordinates / scroll /
+ * elevation) is kept from the previous hero and still animates with scroll.
  *
  * @param {object} props
- * @param {boolean} [props.ready=true] - Hold entrance animations until the
+ * @param {boolean} [props.ready=true] - Hold the entrance fade until the
  *   preloader peels away.
  */
 export default function Hero({ ready = true }) {
   const sectionRef = useRef(null);
-  const stmtRef = useRef(null);
-  const reelRef = useRef(null);
-  const slotRef = useRef(null);
+  const r1Ref = useRef(null);
+  const r2Ref = useRef(null);
   const hudRef = useRef(null);
   const latRef = useRef(null);
   const lonRef = useRef(null);
   const elevRef = useRef(null);
-  const initRectRef = useRef(null);
   const readyRef = useRef(ready);
   readyRef.current = ready;
   useSectionBackdrop(sectionRef, "light");
 
-  // Measure the reel slot's document-relative box (scroll-independent via
-  // rect.top + scrollY). Re-measured on resize. This is the reel's start state.
+  // Marquee loop: each row drifts at a constant speed, wrapping seamlessly at
+  // its half-width. `pos` is initialized so the first name sits dead-center.
   useEffect(() => {
+    const rows = [
+      { el: r1Ref.current, dir: 1, speed: 0.5, pos: 0, halfW: 0 },
+      { el: r2Ref.current, dir: -1, speed: 0.5, pos: 0, halfW: 0 },
+    ];
     const measure = () => {
-      const slot = slotRef.current;
-      if (!slot) return;
-      const r = slot.getBoundingClientRect();
-      initRectRef.current = {
-        top: r.top + (window.scrollY || 0),
-        left: r.left,
-        width: r.width,
-        height: r.height,
-      };
+      rows.forEach((r) => {
+        if (!r.el) return;
+        const nameW = r.el.children[0].getBoundingClientRect().width;
+        r.halfW = r.el.scrollWidth / 2;
+        r.pos = (nameW - window.innerWidth) / 2; // center the first name
+      });
     };
-    // Two rAFs so fonts/layout settle before the first measure.
+    // Two rAFs so the (variable) font settles before we measure widths.
     requestAnimationFrame(() => requestAnimationFrame(measure));
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
-  // Single scroll-driven rAF: HUD coordinates + fade, and the reel expand/exit.
-  // While the reel sits at rest it slides along a horizontal track that follows
-  // the cursor's X position (vertical stays put); as the reel expands to
-  // fullscreen the track resolves into the centered fullscreen inset, so the
-  // cursor-follow naturally fades out as you scroll.
-  useEffect(() => {
-    const reduce =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // targetX = the cursor's X (px); cx eases toward it each frame. Default to
-    // viewport center so the reel rests over its centered slot before first move
-    // (and stays centered under reduced motion, where no listener is attached).
-    let targetX = (typeof window !== "undefined" ? window.innerWidth : 0) / 2;
-    let cx = targetX;
-    const onMove = (e) => {
-      targetX = e.clientX;
-    };
-    if (!reduce) window.addEventListener("mousemove", onMove);
 
     let raf = 0;
     const frame = () => {
-      const vh = window.innerHeight;
-      const vw = window.innerWidth;
-      const scroll = window.scrollY || 0;
-      const p1 = clamp(scroll / vh, 0, 1); // expand
-      const p2 = clamp((scroll - vh) / vh, 0, 1); // exit
-      const e1 = easeInOut(p1);
-      // Ease the smoothed cursor X toward the live target every frame.
-      cx += (targetX - cx) * 0.08;
+      rows.forEach((r) => {
+        if (!r.el || !r.halfW) return;
+        r.pos += r.dir * r.speed;
+        // Whole-pixel transform → no sub-pixel blur on the huge glyphs.
+        r.el.style.transform = `translateX(${Math.round(-mod(r.pos, r.halfW))}px)`;
+      });
+      raf = requestAnimationFrame(frame);
+    };
+    frame();
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
 
-      // HUD coordinate/elevation readouts.
+  // Bottom HUD: scroll-driven coordinate/elevation readouts + fade-out as the
+  // section scrolls up. Independent of the marquee.
+  useEffect(() => {
+    let raf = 0;
+    const frame = () => {
+      const vh = window.innerHeight;
+      const scroll = window.scrollY || 0;
       const pc = clamp(scroll / (vh * 0.9), 0, 1);
       if (latRef.current) latRef.current.textContent = `${(40.7128 + pc * 0.2872).toFixed(4)}° N`;
       if (lonRef.current) lonRef.current.textContent = `${(74.006 - pc * 0.6).toFixed(4)}° W`;
       if (elevRef.current) elevRef.current.textContent = `${String(Math.round(pc * 2480)).padStart(4, "0")} M`;
-      // HUD fades out over the first ~half viewport as it scrolls up.
       if (hudRef.current) {
         hudRef.current.style.opacity = readyRef.current
           ? String(1 - clamp(scroll / (vh * 0.5), 0, 1))
           : "0";
       }
-
-      // Reel: lerp from its slot box to a padding-inset fullscreen box, then
-      // translate up and off during the exit phase.
-      const init = initRectRef.current;
-      const reel = reelRef.current;
-      if (reel && init) {
-        // Match the nav's padding (p-4 / sm:p-8 = 16 / 32px) so the expanded
-        // reel's edges align with the logo (left) and the buttons (right).
-        const pad = vw >= 640 ? 32 : 16;
-        const fTop = pad, fLeft = pad, fW = vw - 2 * pad, fH = vh - 2 * pad;
-        // Rest-state left: center the reel under the cursor, clamped so it can
-        // travel the full width between the page padding without leaving frame.
-        const restLeft = clamp(cx - init.width / 2, pad, vw - pad - init.width);
-        reel.style.left = `${lerp(restLeft, fLeft, e1)}px`;
-        reel.style.top = `${lerp(init.top, fTop, e1)}px`;
-        reel.style.width = `${lerp(init.width, fW, e1)}px`;
-        reel.style.height = `${lerp(init.height, fH, e1)}px`;
-        // Keep the rounded corners through the expand (don't square off at
-        // fullscreen) — overflow:hidden clips the video to this radius.
-        reel.style.borderRadius = "10px";
-        reel.style.transform = `translateY(${-p2 * (fH + fTop + 40)}px)`;
-        reel.style.opacity = readyRef.current && scroll < vh * 2.1 ? "1" : "0";
-      }
       raf = requestAnimationFrame(frame);
     };
     frame();
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMove);
-    };
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Cursor-kinetic drift + skew on the headline (the reel gets its own drift in
-  // the scroll rAF above, scaled to fade as it expands).
-  useEffect(() => {
-    const reduce =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+  // One row's content: REPS pairs of <name><✦>. The separator is tinted with
+  // the opposite color of the row's text so the two rows mirror each other.
+  const buildUnits = (sepColor) => {
+    const out = [];
+    for (let i = 0; i < REPS; i++) {
+      out.push(
+        <span key={`n${i}`} style={{ padding: "0 0.12em" }}>{NAME}</span>,
+        <span key={`s${i}`} style={{ padding: "0 0.06em", color: sepColor }}>✦</span>,
+      );
+    }
+    return out;
+  };
 
-    let sTx = 0, sTy = 0, sSk = 0, scx = 0, scy = 0, scs = 0;
-    const onMove = (e) => {
-      const dx = e.clientX / window.innerWidth - 0.5;
-      const dy = e.clientY / window.innerHeight - 0.5;
-      sTx = dx * -22;
-      sTy = dy * -14;
-      sSk = dx * -2.2;
-    };
-    window.addEventListener("mousemove", onMove);
-
-    let raf = 0;
-    const frame = () => {
-      const stmt = stmtRef.current;
-      if (stmt) {
-        scx += (sTx - scx) * 0.07;
-        scy += (sTy - scy) * 0.07;
-        scs += (sSk - scs) * 0.07;
-        stmt.style.transform = `translate(${scx}px, ${scy}px) skewX(${scs}deg)`;
-      }
-      raf = requestAnimationFrame(frame);
-    };
-    frame();
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
+  const trackStyle = {
+    fontWeight: 600,
+    fontSize: "clamp(60px, 16.5vw, 380px)",
+    lineHeight: 0.92,
+    letterSpacing: "-0.02em",
+    wordSpacing: "0.32em",
+    willChange: "transform",
+  };
 
   return (
     <section
       ref={sectionRef}
-      className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden px-6 pt-32 sm:px-16 sm:pt-40"
+      className="relative flex min-h-screen min-h-[100dvh] w-full flex-col overflow-hidden"
     >
-      {/* Expanding reel — a fixed overlay (escapes the section's overflow since
-          no transformed ancestor). Geometry + opacity are driven by the scroll
-          rAF above. Black placeholder for now; drop a <video> in later. */}
-      <div
-        ref={reelRef}
-        aria-hidden="true"
-        className="pointer-events-none fixed z-20 overflow-hidden bg-black"
-        style={{
-          left: 0,
-          top: 0,
-          width: 0,
-          height: 0,
-          opacity: 0,
-          willChange: "transform",
-          transition: "opacity .5s ease",
-        }}
-      />
+      {/* Accessible heading — the marquee itself is decorative repetition. */}
+      <h1 className="sr-only">Adnaan Dasoo — Creative Developer</h1>
 
-      {/* Statement — centered in the flex-1 band between the nav and the reel. */}
-      <div className="flex flex-1 flex-col justify-center">
+      {/* Twin marquee — full-bleed, vertically centered. Fades in on `ready`. */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={ready ? { opacity: 1, y: 0 } : false}
-        transition={{ duration: 0.7, delay: 0.35, ease }}
-        className="-mx-6 sm:-mx-16"
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={ready ? { opacity: 1 } : false}
+        transition={{ duration: 0.8, delay: 0.3, ease }}
+        className="pointer-events-none absolute inset-0 flex select-none flex-col justify-center font-display uppercase"
       >
-        <h1
-          ref={stmtRef}
-          className="text-center text-ink"
-          style={{
-            fontFamily: "'Clash Display', system-ui, sans-serif",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            fontSize: "clamp(32px, 9.8vw, 200px)",
-            lineHeight: 0.92,
-            letterSpacing: "-0.02em",
-            whiteSpace: "nowrap",
-            willChange: "transform",
-            paddingInline: "clamp(8px, 1.4vw, 24px)",
-          }}
-        >
-          Hi, my name is{" "}
-          <em style={{ fontStyle: "normal", color: "var(--accent)" }}>Adnaan</em>
-        </h1>
+        <div className="flex overflow-hidden">
+          <div ref={r1Ref} className="inline-flex whitespace-nowrap text-ink" style={trackStyle}>
+            {buildUnits("var(--accent)")}
+          </div>
+        </div>
+        <div className="flex overflow-hidden">
+          <div ref={r2Ref} className="inline-flex whitespace-nowrap text-accent" style={trackStyle}>
+            {buildUnits("var(--ink)")}
+          </div>
+        </div>
       </motion.div>
-      </div>
-
-      {/* Reel slot — invisible box reserving the reel's place in the layout so
-          the headline/HUD frame it. The visible reel overlays it at scroll 0. */}
-      <div className="flex items-center justify-center">
-        <div
-          ref={slotRef}
-          aria-hidden="true"
-          style={{
-            width: "clamp(400px, 42vw, 820px)",
-            aspectRatio: "16 / 10",
-            visibility: "hidden",
-          }}
-        />
-      </div>
-
-      {/* Balances the headline band above so the reel slot stays centered. */}
-      <div className="flex-1" />
 
       {/* Bottom HUD — coordinates (left) + SCROLL DOWN (center) + elevation
-          (right). Scrolls away with the section; opacity owned by the rAF
-          (gated on `ready`) so it fades out as it scrolls up. */}
+          (right). Opacity owned by the rAF (gated on `ready`). */}
       <div
         ref={hudRef}
-        className="pointer-events-none grid grid-cols-3 items-end pb-8"
+        className="pointer-events-none mt-auto grid grid-cols-3 items-end px-4 pb-8 sm:px-8"
         style={{ opacity: 0 }}
       >
         <div className="font-sans text-[14px] font-medium uppercase leading-[1.5] tracking-[0.16em] text-muted sm:text-[16px]">

@@ -282,7 +282,7 @@ export default function Navbar({ onReplayPreloader }) {
             className="transition-opacity hover:opacity-70"
             style={{
               fontFamily: "'Clash Display', system-ui, sans-serif",
-              fontWeight: 700,
+              fontWeight: 600,
               // Scroll-blended ink normally; white while the menu overlay is open
               // (the logo stays put in the top-left over the dark green overlay).
               color: menuOpen ? "#FFFFFF" : undefined,
