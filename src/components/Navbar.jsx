@@ -12,6 +12,7 @@ import { navLinks, socials } from "../constants";
 import { useLenis } from "../utils/lenis";
 import ColorPicker from "./ColorPicker";
 import OverlayTopo from "./canvas/OverlayTopo";
+import SwapText from "./SwapText";
 
 // Curve depth (in normalized objectBoundingBox units) of the overlay's curved
 // sweep edge — same quadratic-bow idea as the Preloader curtain.
@@ -51,9 +52,12 @@ export default function Navbar({ onReplayPreloader }) {
   // the burger to a white box with black border + lines, so the box keeps its
   // black border over the light hero and only flips white over the theme color.
   const [darkBg, setDarkBg] = useState(false);
+  // `activeKey` marks which nav link is the current section — set on click so
+  // the chosen link stays crossed-through the next time the overlay opens.
+  // Defaults to "home" (the home link's key) on first load.
+  const [activeKey, setActiveKey] = useState("home");
   const closeTimer = useRef(null);
-  const colARef = useRef(null);
-  const colBRef = useRef(null);
+  const photoRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
@@ -89,6 +93,7 @@ export default function Navbar({ onReplayPreloader }) {
   // route → replay the preloader (reads as a fresh load) and navigate to "/".
   function handleLogoClick(e) {
     e.preventDefault();
+    setActiveKey("home");
     closeMenu();
     if (isHome) {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -135,6 +140,8 @@ export default function Navbar({ onReplayPreloader }) {
 
   // Single dispatcher used by the overlay nav list.
   function handleLinkClick(e, link) {
+    // Mark this link as the current section so it shows crossed-through.
+    setActiveKey(linkKey(link));
     if (link.kind === "home") return handleLogoClick(e);
     if (link.kind === "navAnchor") return handleNavAnchorClick(e, link);
     if (link.kind === "hybrid") return handleHybridClick(e, link);
@@ -151,11 +158,31 @@ export default function Navbar({ onReplayPreloader }) {
     return `#${link.id}`;
   }
 
-  // The active nav link (gets the lime squiggle) tracks the current route.
+  // A stable key per link (id → route → title), used to track/compare which
+  // link is the active section.
+  function linkKey(link) {
+    return link.id ?? link.to ?? link.title;
+  }
+
+  // The active nav link (stays white + gets a slash through it) is whichever
+  // link was last clicked (tracked in activeKey).
   function isActive(link) {
-    if (link.kind === "home") return isHome;
-    if (link.kind === "route") return location.pathname === link.to;
-    return false;
+    return activeKey === linkKey(link);
+  }
+
+  // Slight magnetic pull on the overlay photo — the frame drifts a fraction
+  // toward the cursor while hovered and eases back on leave (CSS transition on
+  // .nv-ovphoto-frame handles the smoothing).
+  function handlePhotoMove(e) {
+    const el = photoRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+    el.style.transform = `translate(${dx * 0.06}px, ${dy * 0.06}px)`;
+  }
+  function handlePhotoLeave() {
+    if (photoRef.current) photoRef.current.style.transform = "";
   }
 
   // The "Say Hi" pill scrolls to the contact section (present on every route).
@@ -188,33 +215,6 @@ export default function Navbar({ onReplayPreloader }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
-
-  // Vertical mouse parallax for the two image columns while the menu is open.
-  useEffect(() => {
-    if (!menuOpen) return;
-    const colA = colARef.current;
-    const colB = colBRef.current;
-    let pY = 0;
-    let aY = 0;
-    let bY = 0;
-    let raf = 0;
-    const onMove = (e) => {
-      pY = e.clientY / window.innerHeight - 0.5;
-    };
-    window.addEventListener("mousemove", onMove);
-    const loop = () => {
-      aY += (pY * -46 - aY) * 0.06;
-      bY += (pY * 46 - bY) * 0.06;
-      if (colA) colA.style.transform = `translateY(${aY}px)`;
-      if (colB) colB.style.transform = `translateY(${bY}px)`;
-      raf = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(raf);
-    };
   }, [menuOpen]);
 
   // Clear any pending close timer on unmount.
@@ -379,27 +379,20 @@ export default function Navbar({ onReplayPreloader }) {
           {/* No wordmark here — the top-left shows the persistent Navbar logo
               (white while open) instead. */}
           <div className="nv-ovmain">
-            {/* left — parallax image columns (placeholders until real work imagery) */}
-            <div className="nv-ovimgs">
-              <div className="nv-imgcol nv-imgcol-lower" ref={colARef}>
-                <div className="nv-tile nv-el">
-                  <span>Work 01</span>
-                </div>
-                <div className="nv-tile nv-el">
-                  <span>Work 03</span>
-                </div>
-              </div>
-              <div className="nv-imgcol" ref={colBRef}>
-                <div className="nv-tile nv-el">
-                  <span>Work 02</span>
-                </div>
-                <div className="nv-tile nv-el">
-                  <span>Work 04</span>
-                </div>
-              </div>
+            {/* Left — mood photo (dark dev-desk still that matches the warm,
+                low-key overlay palette). Decorative, so alt is empty. */}
+            <div className="nv-ovphoto nv-el">
+              <figure
+                className="nv-ovphoto-frame"
+                ref={photoRef}
+                onMouseMove={handlePhotoMove}
+                onMouseLeave={handlePhotoLeave}
+              >
+                <img src="/nav-desk.png" alt="" aria-hidden="true" />
+              </figure>
             </div>
 
-            {/* right — nav links + socials */}
+            {/* Right — nav links (centered) + socials (pinned bottom). */}
             <div className="nv-ovside">
               <nav className="nv-ovnav">
                 {navLinks.map((link) => {
@@ -409,24 +402,26 @@ export default function Navbar({ onReplayPreloader }) {
                       key={link.id ?? link.to ?? link.title}
                       href={linkHref(link)}
                       onClick={(e) => handleLinkClick(e, link)}
-                      className={`nv-nlink nv-el${active ? " active" : ""}`}
+                      aria-label={link.title}
+                      aria-current={active ? "page" : undefined}
+                      className={`nv-nlink nv-el group${active ? " active" : ""}`}
                     >
-                      {link.title}
-                      {active && (
-                        <svg
-                          className="nv-squig"
-                          viewBox="0 0 60 12"
-                          fill="none"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M2 7 Q12 1 22 7 T42 7 T58 6"
-                            stroke="var(--lime)"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                          />
-                        </svg>
+                      {/* Active tab renders static (no letter swap); others get
+                          the per-letter vertical swap on hover. */}
+                      {active ? (
+                        <span className="block whitespace-nowrap leading-[1.25]">
+                          {link.title}
+                        </span>
+                      ) : (
+                        <SwapText text={link.title} />
                       )}
+                      {/* Hover: a horizontal slash sweeps through the word
+                          left→right (non-active links only). */}
+                      {!active && (
+                        <span aria-hidden="true" className="nv-nstrike" />
+                      )}
+                      {/* Active tab — a permanent horizontal slash. */}
+                      {active && <span aria-hidden="true" className="nv-nslash" />}
                     </a>
                   );
                 })}
@@ -438,10 +433,12 @@ export default function Navbar({ onReplayPreloader }) {
                     key={s.name}
                     href={s.url}
                     onClick={closeMenu}
+                    aria-label={s.name}
+                    className="nv-osocial group"
                     target={s.url.startsWith("http") ? "_blank" : undefined}
                     rel={s.url.startsWith("http") ? "noopener noreferrer" : undefined}
                   >
-                    {s.name}
+                    <SwapText text={s.name} />
                   </a>
                 ))}
               </div>

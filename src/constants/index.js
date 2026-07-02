@@ -36,7 +36,8 @@ import { NextjsWordmark, GsapWordmark } from "../components/icons/TechLogos";
 //                  obvious for visitors who don't recognize the wordmark.
 export const navLinks = [
   { kind: "home", title: "home" },
-  { kind: "route", to: "/works", title: "works" },
+  { kind: "navAnchor", id: "experience", title: "experience" },
+  { kind: "navAnchor", id: "projects", title: "work" },
   { kind: "anchor", id: "contact", title: "contact" },
 ];
 

@@ -21,9 +21,11 @@ const rgb = (h) => [
 // contour-line color), mirrored in CSS as --lime.
 export const DARK_PALETTES = {
   green: { bg: rgb("#292E21"), line: rgb("#DCFE4F"), ink: rgb("#DEE1D3") }, // green bg, lime lines
+  sage: { bg: rgb("#1A2517"), line: rgb("#ACC8A2"), ink: rgb("#DEE6D8") }, // deep forest bg, soft sage lines
   oxblood: { bg: rgb("#200B10"), line: rgb("#8A8E94"), ink: rgb("#E6E3DD") }, // dark muted oxblood, darker silver-gray lines
   blue: { bg: rgb("#0F1B30"), line: rgb("#8FC2F2"), ink: rgb("#D7E1EE") }, // midnight navy, light-blue lines
-  graphite: { bg: rgb("#24262B"), line: rgb("#E0A94A"), ink: rgb("#DEE1E6") }, // graphite charcoal, amber lines
+  graphite: { bg: rgb("#24262B"), line: rgb("#B7A6F0"), ink: rgb("#DEE1E6") }, // graphite charcoal, soft violet lines
+  onyx: { bg: rgb("#0C0D10"), line: rgb("#E9B44C"), ink: rgb("#E8E6E0") }, // near-black bg, warm gold lines
 };
 
 // Per-backdrop background + contour-line colors. `dark` is mutated in place by

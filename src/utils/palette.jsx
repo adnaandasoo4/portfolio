@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { setDarkPalette } from "../components/canvas/topoShader";
 
-const PALETTE_IDS = ["green", "oxblood", "blue", "graphite"];
+const PALETTE_IDS = ["green", "sage", "oxblood", "blue", "graphite", "onyx"];
 
 const PaletteContext = createContext(null);
 

@@ -9,9 +9,11 @@ import { startPaletteTransition } from "../utils/paletteTransition";
 // :root[data-palette=…] blocks in index.css.
 const PALETTES = [
   { id: "green", name: "Forest", dark: "#292E21", accent: "#DCFE4F" },
+  { id: "sage", name: "Sage", dark: "#1A2517", accent: "#ACC8A2" },
   { id: "oxblood", name: "Oxblood", dark: "#200B10", accent: "#8A8E94" },
   { id: "blue", name: "Midnight", dark: "#0F1B30", accent: "#8FC2F2" },
-  { id: "graphite", name: "Graphite", dark: "#24262B", accent: "#E0A94A" },
+  { id: "graphite", name: "Graphite", dark: "#24262B", accent: "#B7A6F0" },
+  { id: "onyx", name: "Onyx", dark: "#0C0D10", accent: "#E9B44C" },
 ];
 
 /**
@@ -113,7 +115,7 @@ export default function ColorPicker() {
         className="pointer-events-none fixed left-0 top-0"
         style={{
           willChange: "transform",
-          transition: "transform .72s cubic-bezier(.22,1,.36,1)",
+          transition: "transform 1.15s cubic-bezier(.22,1,.36,1)",
         }}
       >
         <div

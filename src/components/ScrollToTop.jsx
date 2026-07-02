@@ -41,7 +41,7 @@ export default function ScrollToTop() {
       aria-hidden={!visible}
       data-cursor="back to the top?"
       tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-4 right-4 z-50 hidden h-14 w-14 items-center justify-center rounded-full border border-edge bg-paper text-ink transition-[opacity,transform,background-color,color,border-color] duration-300 hover:border-[var(--lime)] hover:bg-[var(--lime)] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper md:flex sm:bottom-8 sm:right-8 sm:h-16 sm:w-16 ${
+      className={`fixed bottom-10 right-4 z-50 hidden h-14 w-14 items-center justify-center rounded-full border border-edge bg-paper text-ink transition-[opacity,transform,background-color,color,border-color] duration-300 hover:border-[var(--lime)] hover:bg-[var(--lime)] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2 focus-visible:ring-offset-paper md:flex sm:bottom-16 sm:right-8 sm:h-16 sm:w-16 ${
         visible
           ? "pointer-events-auto translate-y-0 opacity-100"
           : "pointer-events-none translate-y-2 opacity-0"

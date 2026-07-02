@@ -57,20 +57,15 @@ export default function CustomCursor() {
       // This lets a section wrapper declare a blanket label that wins
       // over a descendant <button> matching the default-interactive
       // selector.
+      // Pill shows ONLY over elements that explicitly opt in with a
+      // `data-cursor` attribute — no generic interactive fallback. This keeps
+      // the pill glued to actual glyphs (the text spans carry the attribute)
+      // instead of firing across a link's whole bounding box / empty space.
       const labeled = e.target.closest?.("[data-cursor]");
       if (labeled) {
         setActive(true);
         const custom = labeled.getAttribute("data-cursor");
         setLabel(custom && custom !== "active" ? custom : "click");
-        return;
-      }
-      // Fallback: any default-interactive element gets the generic label.
-      const interactive = e.target.closest?.(
-        'a, button, [role="button"], input, label'
-      );
-      if (interactive) {
-        setActive(true);
-        setLabel("click");
       } else {
         setActive(false);
       }
@@ -81,8 +76,8 @@ export default function CustomCursor() {
 
     let rafId = 0;
     const tick = () => {
-      current.current.x += (target.current.x - current.current.x) * 0.14;
-      current.current.y += (target.current.y - current.current.y) * 0.14;
+      current.current.x += (target.current.x - current.current.x) * 0.07;
+      current.current.y += (target.current.y - current.current.y) * 0.07;
       if (wrapperRef.current) {
         wrapperRef.current.style.transform = `translate3d(${current.current.x}px, ${current.current.y}px, 0)`;
       }
@@ -109,9 +104,9 @@ export default function CustomCursor() {
       // are inversely correlated for a stage of the cycle, which sells
       // the "ball getting squeezed from the sides and rebounding" feel.
       popControls.start({
-        scaleX: [1, 0.92, 1.04, 1],
-        scaleY: [1, 1.08, 0.97, 1],
-        transition: { duration: 0.35, ease: "easeOut" },
+        scaleX: [1, 0.82, 1.11, 0.97, 1],
+        scaleY: [1, 1.18, 0.92, 1.03, 1],
+        transition: { duration: 0.45, ease: "easeOut" },
       });
     }
     prevActive.current = active;
@@ -132,11 +127,11 @@ export default function CustomCursor() {
           side closest to the cursor. */}
       <motion.div
         animate={popControls}
-        className={`absolute left-[20px] top-[14px] inline-flex origin-center items-center gap-1.5 whitespace-nowrap rounded-full bg-flag px-2.5 py-1 font-sans text-[10px] capitalize tracking-wide text-white transition-opacity duration-200 ${
+        className={`absolute left-[22px] top-[-46px] inline-flex origin-center items-center gap-2.5 whitespace-nowrap rounded-full bg-flag px-4 py-1.5 font-sans text-[16px] capitalize tracking-wide text-white transition-opacity duration-200 ${
           active ? "opacity-100" : "opacity-0"
         }`}
       >
-        <span className="block h-1.5 w-1.5 rounded-full bg-white" />
+        <span className="block h-2.5 w-2.5 rounded-full bg-white" />
         {label}
       </motion.div>
     </div>
